@@ -1,0 +1,54 @@
+2014-02-06T12:54:47 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.4776 26.0592 30.0195 74.1262.
+2014-02-06T12:54:47 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.57012.
+2014-02-06T12:54:58 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.8205 23.2138 28.9534 78.7266.
+2014-02-06T12:54:58 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.838718.
+2014-02-06T12:55:08 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.9916 26.1337 45.1646 101.235.
+2014-02-06T12:55:08 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.577134.
+2014-02-06T12:55:19 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.4293 24.7455 27.6711 72.7165.
+2014-02-06T12:55:19 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.871303.
+2014-02-06T12:55:30 - Warning: CursorFeedbackTask::Process: features[1-4]: 30.054 25.6879 30.5791 74.5934.
+2014-02-06T12:55:30 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.806051.
+2014-02-06T12:55:41 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.487 24.2274 29.7399 74.3569.
+2014-02-06T12:55:41 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.617227.
+2014-02-06T12:55:52 - Warning: CursorFeedbackTask::Process: features[1-4]: 30.4724 25.5089 34.2729 78.1724.
+2014-02-06T12:55:52 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.57953.
+2014-02-06T12:56:02 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.9721 27.3543 32.9901 72.4813.
+2014-02-06T12:56:02 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.523897.
+2014-02-06T12:56:08 - Warning: CursorFeedbackTask::Process: features[1-4]: 26.6278 28.8213 32.5439 70.1451.
+2014-02-06T12:56:08 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.581195.
+2014-02-06T12:56:19 - Warning: CursorFeedbackTask::Process: features[1-4]: 26.5029 25.4206 33.1288 70.6702.
+2014-02-06T12:56:19 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.534767.
+2014-02-06T12:56:30 - Warning: CursorFeedbackTask::Process: features[1-4]: 26.5081 24.7957 29.9612 76.119.
+2014-02-06T12:56:30 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.521393.
+2014-02-06T12:56:41 - Warning: CursorFeedbackTask::Process: features[1-4]: 26.6854 21.6535 29.1684 73.7288.
+2014-02-06T12:56:41 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.708525.
+2014-02-06T12:56:51 - Warning: CursorFeedbackTask::Process: features[1-4]: 29.2677 24.7851 33.308 77.6959.
+2014-02-06T12:56:51 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.627994.
+2014-02-06T12:57:01 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.4482 25.4205 32.208 77.2537.
+2014-02-06T12:57:01 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.596343.
+2014-02-06T12:57:11 - Warning: CursorFeedbackTask::Process: features[1-4]: 29.2333 24.9762 36.8867 88.8914.
+2014-02-06T12:57:11 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.59661.
+2014-02-06T12:57:22 - Warning: CursorFeedbackTask::Process: features[1-4]: 28.1453 24.2539 28.9118 76.7712.
+2014-02-06T12:57:22 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.556865.
+2014-02-06T12:57:33 - Warning: CursorFeedbackTask::Process: features[1-4]: 29.4466 25.3833 29.7125 71.6107.
+2014-02-06T12:57:33 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.627156.
+2014-02-06T12:57:39 - Warning: CursorFeedbackTask::Process: features[1-4]: 24.8858 25.2463 32.4735 75.4116.
+2014-02-06T12:57:39 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.854103.
+2014-02-06T12:57:50 - Warning: CursorFeedbackTask::Process: features[1-4]: 27.4085 24.0724 31.6879 72.0258.
+2014-02-06T12:57:50 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.5954.
+2014-02-06T12:58:00 - Warning: CursorFeedbackTask::Process: features[1-4]: 29.2045 27.3554 34.4803 79.4625.
+2014-02-06T12:58:00 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.876493.
+2014-02-06T12:58:11 - Warning: CursorFeedbackTask::Process: features[1-4]: 30.3159 24.0381 32.6638 80.4647.
+2014-02-06T12:58:11 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.904585.
+2014-02-06T12:58:17 - Warning: CursorFeedbackTask::Process: features[1-4]: 28.9982 25.6433 27.2998 74.3196.
+2014-02-06T12:58:17 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.544463.
+2014-02-06T12:58:28 - Warning: CursorFeedbackTask::Process: features[1-4]: 26.6255 24.2276 31.4888 78.692.
+2014-02-06T12:58:28 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.875461.
+2014-02-06T12:58:39 - Warning: CursorFeedbackTask::Process: features[1-4]: 29.9487 25.7809 32.6315 72.122.
+2014-02-06T12:58:39 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.536881.
+2014-02-06T12:58:49 - Warning: CursorFeedbackTask::Process: features[1-4]: 26.9779 25.477 29.8252 76.656.
+2014-02-06T12:58:49 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.662875.
+2014-02-06T12:59:00 - Warning: CursorFeedbackTask::Process: features[1-4]: 28.8509 27.7525 33.3889 71.5776.
+2014-02-06T12:59:00 - Warning: CursorFeedbackTask::Process: classified the target as 1 with a posterior of 0.75641.
+2014-02-06T12:59:11 - Warning: CursorFeedbackTask::Process: features[1-4]: 26.6365 22.3191 29.1483 82.0508.
+2014-02-06T12:59:11 - Warning: CursorFeedbackTask::Process: classified the target as 0 with a posterior of 0.585668.

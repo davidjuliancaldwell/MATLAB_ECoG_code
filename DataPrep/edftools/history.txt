@@ -1,0 +1,95 @@
+A. Schloegl, "EDF/SDF toolbox for the use with Matlab", University of Technology Graz, Ver 0.85, 24 Jun 2002
+
+Please send your bug reports to
+%	Version 0.85
+%	24 Jun 2002
+%	Copyright (c) 1997-2002 by Alois Schloegl
+%	a.schloegl@ieee.org	
+
+
+HISTORY:
+
+24 Jun 2002       SDFREAD bug fix of incorrect input argument check
+15 Jun 2002 V0.85 SDFOPEN, SDFTELL, SDFSEEK
+05 Mar 2002 	  SDFOPEN and SDFERROR Header check of ASCII(0) changed to check for non-printable ASCII characters
+			However, some EDF-files do use ASCII(181) or ASCII(230) for µ (micro) in Physical dimension field 
+			Therefore, test implemented on <ASCII(32) only. 
+13 Feb 2002 V0.84 SDFREAD  bug fixed 
+21 Sep 2001 V0.83 SDFERROR bug fixed
+ 		
+ 8 Jun 2001 V0.82 SDFOPEN made more compatible to OCTAVE (LOAD FILE_IN_LOADPATH)
+13 Oct 2000 	  SDFOPEN reserved1 header included, indicate header modification
+ 1 Oct 2000 V0.81 SDFOPEN High_Pass_Filter imp|emented 1.0Hz_Hamming 
+26 Sep 2000	  ALARM: filter and resampling, Do they work together? Yes, they do!!! Everything is OK. 
+18 Sep 2000       SDFWRITE bug fixed
+ 7 Sep 2000 V0.80 SDFREAD bug fixed
+ 4 Sep 2000       SDFOPEN, SDFERROR ErrNo 16 modified.
+			SDFOPEN079 -> SDFOPEN 
+17 Aug 2000	  SDFOPEN->SDFOPEN079, SDFOPEN071->SDFOPEN setback
+07 Aug 2000 V0.79 SDFREAD  bug fixed , SDFOPEN revised
+02 Aug 2000 V0.79 SDFERROR included, SDFOPEN error handling changed,
+                  SDFOPEN block duration check revised  
+21 Jul 2000 V0.78 SDFOPEN revised, help text modified.
+ 3 Jul 2000 V0.78 CONTENTS.M included
+   Jun 2000 V0.77 SDFWRITE extended, temporary SDFOPEN-W included, 
+07 Jun 2000 V0.77 SDFREAD, SDFOPEN, SDFSEEK modified. 
+			Buffer included in order to read data continously, even data is post-processed.
+06 Jun 2000 V0.76 SDFREAD changed to units in seconds [before V0.76 the units were records]
+15 May 2000 V0.75 SDFSEEK bug fixed
+09 May 2000 V0.75 SDFOPEN Mode='w+', writes the header information aftewards, SDFCLOSE modified
+			now you can do E=sdfopen('.','r+'), oder 
+			E=sdfopen('.','w'), opens tentative EDF-file 
+			E=sdfclose(E); writes final Headerinformation using sdfopen('.','w+');
+08 May 2000 V0.74 SDFOPEN check of startdate and time improved
+   Apr 2000 V0.73 SDFOPEN, Error messages improved (for proper handling of SIESTA scoring files)
+11 Mar 2000 V0.72 SDFOPEN, SDFREAD: bug fixes for TECG
+22 Feb 2000 V0.71 SDFOPEN, SDFREAD: TECG implemented (Test status)
+17 Feb 2000 V0.70 SDFOPEN: in case of incorrect HEaderInfo is corrected EDF.NRec
+30 Jan 2000	  SDFOPEN: error message modified
+11 Jan 2000       SDFREAD-mode-OVERFLOW: OVERFLOW = NaN; SDFOPEN: EDF.Calib is sparse
+11 Jan 2000 V0.69 SDFREAD: Intermediate variable S(:,EDF.NS) reduced to S(:,length(InChanSelect))
+10 Jan 2000 V0.68 SDFOPEN, SDFREAD for QRSdetect0 corrected
+17 Dec 1999 V0.67 SDFOPEN, SDFREAD, modified
+ 3 Dec 1999 V0.66 SDFOPEN, modified
+29 Nov 1999 V0.65 SDFOPEN, bug (when reading EOF) fixed, 
+                  50Hz-Notch improved. 
+10 Nov 1999 V0.64 SDFOPEN, SDFREAD Octave compatible
+29 Oct 1999 V0.63 SDF-tb, SIESTA-DATA-FORMAT toolbox
+20 Oct 1999 V0.63 gdfread, bug fixed 
+20 Aug 1999 V0.62 gdfread, bug fixed 
+18 Aug 1999 V0.61 Regression coefficients included.
+		Overflowcheck in GDFREAD applied.
+16 Aug 1999 	EDF-toolbox for SIESTA 
+	    V0.60 filenames changed to SDF*, GNU/GPL license removed, 
+13 Aug 1999     GDFOPEN-WRITE: Check of EDF-Struct improved
+		GDFOPEN-READ: Mode 'r+' enabled
+		GDFSEEK, GDFTELL: Filepositioning is more consistent now
+		Correcting the EDF.NRec field in and EDF-file FN with: 
+		EDF=gdfopen(FN,'r+'); EDF.FILE.OPEN=2; EDF.NRec=-1; EDF=GDFCLOSE(EDF);
+12 Aug 1999 V0.58 NOTCH implemented
+ 6 Aug 1999 V0.57 option 'UCAL' implemented
+ 5 Aug 1999 V0.56 EDF.FILE.POS defined
+ 4 Aug 1999       GDFAFIR extracted
+30 Jul 1999 V0.55 
+		GDFEOF.M, GDFREAD.M bug fixed, 
+		stabilized for routine processing. 
+		Major test procedures passed.
+28 Jul 1999 GDFEOF.M included, 
+		GDFSEEK.M, GDFTELL, stabilized (origin==eof)
+27 Jul 1999 V0.54 
+		gdfread, gdfopen, stabilized
+19 Jul 1999 V0.53 Adaptive FIR
+		Output arguments of gdfread have changed. 
+		Instead of [S,count,OFCHK]=gdfread(...) is provided [S,EDF,OFCHK]=gdfread(...)
+		The value of count can be retrieved from EDF.AS.numrec
+15 Jul 1999 V0.52 Overflowcheck
+ 6 Jul 1999 gdfopen: Y2K solution changed to cut-off year 85
+ 6 Jul 1999 gdfopen: Channel selection, Resampling, Re-Referenzing is included
+
+
+see HISTORY of stable version too. 
+
+ACKNOWLEDGEMENT:
+This work was supported by the Biomed-2 Project-SIESTA BMH4-CT97-2040.
+funded by the European Commission, DG XII      
+

@@ -1,0 +1,13 @@
+1) Electrode selection
+  - Controlling electrode (M1)
+  - Prefrontal electrode(s): significant change from rest, in BA 9, 10, 46
+
+2) TFA
+  - Activity patterns overall / before-after learning in CE and PFE
+
+3) Multi-site interactions
+  - Interaction changes between rest and feedback
+  - Interaction changes across learning
+
+4) Single-site PAC
+  - save for a later date

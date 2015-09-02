@@ -1,0 +1,2 @@
+LIBRARY "gausswc.mexw64"
+EXPORTS mexFunction

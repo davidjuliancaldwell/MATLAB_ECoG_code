@@ -1,0 +1,15 @@
+bad electrodes are hand identified
+data are common average re-referenced
+then downsampled from either 2400 or 1200 to 600 and 1000 to 500 for computational tractability.
+the data are notch filtered at 120 and 180 Hz using a 2nd order IIR notch filter
+then time-variant power estimates are found by bandpass filtering, performing the hilbert transform, squaring the coefficients and taking the log of this result
+this is performed for three signal ranges: HG 70-200, beta 12 18 Hz and LF, 0 - 10 Hz
+data are then separated in to trial epochs, which are manually screened for inter-ictal spiking activity and other non-physiological artifacts.
+
+
+
+data
+5 subjects, looks like all from hmc, all doing the RJB
+selection criteria? at least 300 clean BCI epochs using the RJB
+How about the DFT? or THE UD?
+

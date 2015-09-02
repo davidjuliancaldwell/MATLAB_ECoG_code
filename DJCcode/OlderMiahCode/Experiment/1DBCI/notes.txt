@@ -1,0 +1,47 @@
+On 11/2, I realized that many of these scripts had been overwritten by their previous SVN versions.  
+In an effort to be able to recreate figures and analyses that had been previously run, I went
+back to the code to try to discover the differences, or rather the new changes that I had made.
+
+Specifically with respect to how I am deriving the trial average HG activation, I noticed inconsistencies
+This is reflected in the differences between AllPowerV2 and V3.  In V2, I am using my method for 
+deriving a z-scored average activation per trial (normalizing by mean / std from all REST averages).
+
+However, in V2, this appears to be calculated using the hilbert(BP(signal)), which I don't believe
+is normally distributed, which is a bit of a problem for z-scores, technically.
+
+To test, I generated another version that is identical to V2 in methodology, but uses the 
+log(square(hilbert(BP(signal)))) instead. Running this on 26cb98 and 38e116 I see that it does not make a
+substantial difference in the average power as a function of trial as well as the pre-post transition 
+estimate, which I guess makes sense.  V4 is the current, usable version.
+
+It is also worth noting that these scripts, pre V4 used only the frequency band that was used for control
+to do post-hoc analyses.  In V4, we expanded the field of view to involve not only the control band,
+but the entire 70-200 Hz range.
+
+~~~~~~~~~~~~~
+
+Also, it is valuable for me to write some notes as to how these scripts are / can be used to generate
+the figures from the paper.  Especially since I'm bound to forget less than a week from now.
+
+(pre) the basics of these scripts is that they all use the same initial configuration file, called fig_setup.
+This file contains information on the colormap that we are using for consistency in plotting, as well as the list
+of subject ids, etc.  In future scripts, it might be good to store data sets in here, etc.
+
+(1) First, many of the figures, and subsequent analyses are based on having an estimate of HG activation in a 
+given electrode for a given trial.  This ends up being a matrix that is NxM where N represents the number
+of channels in the recording montage and M represents the total number of trials performed.  We 
+can generate a similar matrix for rest periods, as opposed to trials, if we want to look at other
+interesting measures.  In this case the matrix is NxR, where N is the same as previously, but R represents
+the total number of rest epochs that we recorded (and included for analyses).
+
+These matrices, as well as a few other pertinent goodies, are generated using the AllPower_batch script 
+and the AllPowerVN script, where N is the current version of that script.  I have been toying with a few 
+different analysis methods, but the current version is 4.
+
+(2) Using the AllPower cache files generated in step (1) we can now look at fig_finddivs.m  This script
+determines the division point in which the estimate of up target activation minus down target activation
+can be divided such that the distance between the two distributions (measured as r^2) is maximized.
+
+
+
+

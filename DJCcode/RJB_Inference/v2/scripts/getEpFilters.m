@@ -1,0 +1,63 @@
+function [coeffs, constants] = getEpFilters(data, labels)
+    
+    ulabels = unique(labels);
+    
+    % first step is to determine the mean time course for the two labels
+    filters = zeros(length(ulabels), size(data, 2), size(data, 3));
+    
+    for ulabeli = 1:length(ulabels)
+        labeli = labels==ulabels(ulabeli);
+        
+        filters(ulabeli, :, :) = mean(data(labeli, :, :), 1);
+    end
+
+    % get the projections of every timeseries on to the mean filters
+    projections = coeffProject(data, filters);
+    
+    % we could simply use the projection line between the two means, but
+    % instead, let's use LDA to determine the best separator.    
+         
+    coeffs = zeros(size(data, 2), size(data, 3));
+    constants = zeros(size(data, 2), 1);
+    
+    for c = 1:size(data, 2)
+        chans = (c-1)*2 + [1 2];
+        [~,~,~,~,model] = classify(projections(:, chans), projections(:, chans), labels);
+%         [a(:,c),~,~,~,model] = classify(projections(:, chans), projections(:, chans), labels);
+%         val(:,c) = model(1,2).const + projections(:, chans) * model(1,2).linear;
+        coeffs(c, :) = squeeze(filters(:,c,:))' * model(1,2).linear;
+        constants(c, :) = model(1,2).const;        
+    end
+        
+    tproj = getEpProjections(data, coeffs, constants);
+end
+
+function projections = coeffProject(data, filters)
+    OBS = size(data, 1);
+    CHANS = size(data, 2);
+    T = size(data, 3);
+    
+    NFILT = size(filters, 1);
+    
+    ridx = repmat(1:CHANS, NFILT, 1);
+    rdata = data(:,ridx(:),:);
+    
+    rfilters = reshape(filters, [1 size(filters,1)*size(filters,2) size(filters, 3)]);
+    rfilters = repmat(rfilters, [OBS 1 1]);
+    
+    projections = dot(rdata, rfilters, 3);
+end
+
+%% this is the mean based approach, doesn't maximize between class variance
+% function filters = getEpFilters(data, labels)
+%     
+%     ulabels = unique(labels);
+%     
+%     filters = zeros(length(ulabels), size(data, 2), size(data, 3));
+%     
+%     for ulabeli = 1:length(ulabels)
+%         labeli = labels==ulabels(ulabeli);
+%         
+%         filters(ulabeli, :, :) = mean(data(labeli, :, :), 1);
+%     end
+% end

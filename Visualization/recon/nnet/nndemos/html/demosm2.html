@@ -1,0 +1,119 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Two-Dimensional Self-organizing Map</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="demosm2.m"><link rel="stylesheet" type="text/css" href="../../../matlab/helptools/private/style.css"></head><body><div class="header"><div class="left"><a href="matlab:edit demosm2">Open demosm2.m in the Editor</a></div><div class="right"><a href="matlab:echodemo demosm2">Run in the Command Window</a></div></div><div class="content"><h1>Two-Dimensional Self-organizing Map</h1><!--introduction--><p>As in DEMOSM1, this self-organizing map will learn to represent different regions of the input space where input vectors occur.  In this example, however, the neurons will arrange themselves in a two-dimensional grid, rather than a line.</p><!--/introduction--><p>We would like to classify 1000 two-element vectors occurring in a rectangular shaped vector space.</p><pre class="codeinput">X = rands(2,1000);
+plot(X(1,:),X(2,:),<span class="string">'+r'</span>)
+</pre><img vspace="5" hspace="5" src="demosm2_01.png" alt=""> <p>We will use a 5 by 6 layer of neurons to classify the vectors above. We would like each neuron to respond to a different region of the rectangle, and neighboring neurons to respond to adjacent regions.</p><p>The network is configured to match the dimensions of the inputs. This step is required here because we will plot the initial weights. Normally configuration is performed automatically by TRAIN.</p><pre class="codeinput">net = selforgmap([5 6]);
+net = configure(net,X);
+</pre><p>We can visualize the network we have just created with PLOTSOMPOS.</p><p>Each neuron is represented by a red dot at the location of its two weights. Initially all the neurons have the same weights in the middle of the vectors, so only one dot appears.</p><pre class="codeinput">plotsompos(net)
+</pre><img vspace="5" hspace="5" src="demosm2_02.png" alt=""> <p>Now we train the map on the 1000 vectors for 1 epoch and replot the network weights.</p><p>After training, note that the layer of neurons has begun to self-organize so that each neuron now classifies a different region of the input space, and adjacent (connected) neurons respond to adjacent regions.</p><pre class="codeinput">net.trainParam.epochs = 1;
+net = train(net,X);
+plotsompos(net)
+</pre><img vspace="5" hspace="5" src="demosm2_03.png" alt=""> <p>We can now use SIM to classify vectors by giving them to the network and seeing which neuron responds.</p><p>The neuron indicated by "a" responded with a "1", so x belongs to that class.</p><pre class="codeinput">x = [0.5;0.3];
+y = net(x)
+</pre><pre class="codeoutput">
+y =
+
+     1
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+     0
+
+</pre><p class="footer">Copyright 1992-2012 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br><br>
+		  MATLAB and Simulink are registered trademarks of The MathWorks, Inc.  Please see <a href="http://www.mathworks.com/trademarks">www.mathworks.com/trademarks</a> for a list of other trademarks owned by The MathWorks, Inc.  Other product or brand names are trademarks or registered trademarks of their respective owners.
+      </p></div><!--
+##### SOURCE BEGIN #####
+%% Two-Dimensional Self-organizing Map
+% As in DEMOSM1, this self-organizing map will learn to represent different
+% regions of the input space where input vectors occur.  In this example, however,
+% the neurons will arrange themselves in a two-dimensional grid, rather than a
+% line.
+%
+% Copyright 1992-2012 The MathWorks, Inc.
+% $Revision: 1.18.2.6 $  $Date: 2012/03/27 18:07:59 $
+
+%%
+% We would like to classify 1000 two-element vectors occurring in a rectangular
+% shaped vector space.
+
+X = rands(2,1000);
+plot(X(1,:),X(2,:),'+r')
+
+%%
+% We will use a 5 by 6 layer of neurons to classify the vectors above. We would
+% like each neuron to respond to a different region of the rectangle, and
+% neighboring neurons to respond to adjacent regions.
+%
+% The network is configured to match the dimensions of the inputs. This
+% step is required here because we will plot the initial weights. Normally
+% configuration is performed automatically by TRAIN.
+
+net = selforgmap([5 6]);
+net = configure(net,X);
+
+%%
+% We can visualize the network we have just created with PLOTSOMPOS.
+% 
+% Each neuron is represented by a red dot at the location of its two weights.
+% Initially all the neurons have the same weights in the middle of the vectors,
+% so only one dot appears.
+
+plotsompos(net)
+
+%%
+% Now we train the map on the 1000 vectors for 1 epoch and replot the network
+% weights.
+% 
+% After training, note that the layer of neurons has begun to self-organize so
+% that each neuron now classifies a different region of the input space, and
+% adjacent (connected) neurons respond to adjacent regions.
+
+net.trainParam.epochs = 1;
+net = train(net,X);
+plotsompos(net)
+
+%%
+% We can now use SIM to classify vectors by giving them to the network and
+% seeing which neuron responds.
+% 
+% The neuron indicated by "a" responded with a "1", so x belongs to that class.
+
+x = [0.5;0.3];
+y = net(x)
+
+
+displayEndOfDemoMessage(mfilename)
+
+##### SOURCE END #####
+--></body></html>

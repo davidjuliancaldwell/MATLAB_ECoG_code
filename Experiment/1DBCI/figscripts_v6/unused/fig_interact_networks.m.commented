@@ -1,0 +1,79 @@
+% plots increasingly and decreasingly coherent networks on talairach brain
+
+subjids = {'fc9643', '26cb98', '38e116', '4568f4', '30052b', 'mg', '04b3d5'};
+
+for c = 1:length(subjids)
+    subjid = subjids{c};
+    fprintf('aggregating data from %s\n', subjid);
+    
+    interact_cache = fullfile(myGetenv('output_dir'), '1DBCI', 'cache', sprintf('fig_interact.%s.mat', subjid));
+    load(interact_cache, 'Montage', 'interest');
+    coh_cache = fullfile(myGetenv('output_dir'), '1DBCI', 'cache', sprintf('phase_coh.%s.mat', subjid));
+    load(coh_cache, 'allinchs', 'alldechs');
+    
+    if(strcmp(subjid, 'fc9643'))
+        interest = interest(interest <= 64); % a quick hack to ignore medial electrodes
+    end
+    
+    locs = trodeLocsFromMontage(subjid, Montage, true);
+    locs = locs(interest,:);
+    
+%     declocs = locs(sum(alldechs,1)>0,:);
+%     inclocs = locs(sum(allinchs,1)>0,:);
+    
+    locs(:,1) = 1.01*abs(locs(:,1));
+    
+    alllocs{c} = locs;
+    alldecconns{c} = alldechs;
+    allincconns{c} = allinchs;
+end
+
+% plot decreasing coherences
+for c = 1:2
+    fdir = fullfile(myGetenv('output_dir'), '1DBCI', 'figs');
+    switch(c)
+        case 1
+            conns = alldecconns;
+            title_str = 'networks showing decreasing phase coherence';
+            fname = 'dec.interact.network';
+        case 2
+            conns = allincconns;
+            title_str = 'networks showing increasing phase coherence';
+            fname = 'inc.interact.network';            
+    end
+    
+    figure;
+    PlotCortex('tail', 'r'); hold on;
+    alpha .8;
+    
+    title(title_str);
+    
+    colors = 'brgycmk';
+    
+    for d = 1:length(alllocs)
+        slocs = alllocs{d};
+        sconns = conns{d};
+       
+        convals = sum(sconns,1);
+        
+        % add the network with a subject specific color
+        for e = 1:size(slocs,1)
+            if (convals(e) > 0)
+                plot3(slocs(e,1),slocs(e,2),slocs(e,3),'o',...
+                    'MarkerFaceColor',colors(d),'MarkerSize',5+convals(e),'MarkerEdgeColor','k');
+            end
+        end
+        
+        clear ls;
+        [ls(:,1),ls(:,2)]=find(sconns==1);
+        
+        for e = 1:size(ls,1)
+            l1 = slocs(ls(e,1),:);
+            l2 = slocs(ls(e,2),:);
+            
+            line([l1(1) l2(1)], [l1(2) l2(2)], [l1(3) l2(3)], 'Color', colors(d));
+        end
+    end
+    maximize;
+    SaveFig(fdir, fname, 'png');
+end

@@ -1,0 +1,4 @@
+for num = 1:7
+    fig_interact_all;
+    clean;
+end

@@ -1,0 +1,55 @@
+load (fullfile(pwd,'cache','tal-brod'));
+load (fullfile(pwd,'cache','tal-hmat'));
+
+areas = areas';
+areas(~ismember(areas, [8 9 10 46])) = 0;
+
+M1 = 1; % 1 - M1
+S1 = 2; % 2 - S1
+PMd = 3; % 3 - PMd
+PMv = 4; % 4 - PMv
+PFC = 5; % 5 - PFC
+
+final = zeros(size(areas));
+
+final(areas > 0) = PFC;
+final(cdata == 1) = M1;
+final(cdata == 3) = S1;
+final(cdata == 9) = PMd;
+final(cdata == 11) = PMv;
+
+
+ctx.tri = cortex.faces;
+ctx.vert = cortex.vertices;
+
+tripatch(ctx, [], final);
+shading interp;
+light;
+
+%% find electrode positions
+
+% fc9643 - S1
+Montage.MontageTokenized = {'Grid(24)','Grid(56)','Grid(20)','Grid(23)','Grid(7)'};
+locs = trodeLocsFromMontage('fc9643', Montage, true);
+
+% 4568f4 - S4
+Montage.MontageTokenized = {'Grid(42)'};
+locs = cat(1, locs, trodeLocsFromMontage('30052b', Montage, true));
+
+% 38e116 - S3
+Montage.MontageTokenized = {'Grid(26)','Grid(41)'};
+locs = cat(1, locs, trodeLocsFromMontage('38e116', Montage, true));
+
+cats = [M1 PMd PFC PMv PMv PFC S1 M1];
+
+figure;
+PlotDotsDirect('tail', locs, cats, 'r', [min(cats) max(cats)], 10, 'recon_colormap');%, [], false);
+load('recon_colormap');
+colormap(cm);
+cb = colorbar('YTickLabel', {'M1','S1','PMd','PMv','PFC'}, 'YTick', 1:5);
+set(cb, 'YTickMode', 'manual');
+set(cb, 'TickLength', [0 0]);
+set(gcf, 'Color', [1 1 1]);
+
+SaveFig(fullfile(pwd, 'figs'), 'overall-examples', 'png');
+

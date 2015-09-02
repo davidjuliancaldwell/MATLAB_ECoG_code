@@ -1,0 +1,128 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Linear Prediction Design</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="applin1.m"><link rel="stylesheet" type="text/css" href="../../../matlab/helptools/private/style.css"></head><body><div class="header"><div class="left"><a href="matlab:edit applin1">Open applin1.m in the Editor</a></div><div class="right"><a href="matlab:echodemo applin1">Run in the Command Window</a></div></div><div class="content"><h1>Linear Prediction Design</h1><!--introduction--><p>This example illustrates how to design a linear neuron to predict the next value in a time series given the last five values.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Defining a Wave Form</a></li><li><a href="#3">Setting up the Problem for a Neural Network</a></li><li><a href="#6">Designing the Linear Layer</a></li><li><a href="#7">Testing the Linear Layer</a></li></ul></div><h2>Defining a Wave Form<a name="1"></a></h2><p>Here time is defined from 0 to 5 seconds in steps of 1/40 of a second.</p><pre class="codeinput">time = 0:0.025:5;
+</pre><p>We can define a signal with respect to time.</p><pre class="codeinput">signal = sin(time*4*pi);
+plot(time,signal)
+xlabel(<span class="string">'Time'</span>);
+ylabel(<span class="string">'Signal'</span>);
+title(<span class="string">'Signal to be Predicted'</span>);
+</pre><img vspace="5" hspace="5" src="applin1_01.png" alt=""> <h2>Setting up the Problem for a Neural Network<a name="3"></a></h2><p>The signal convert is then converted to a cell array.  Neural Networks represent timesteps as columns of a cell array, do distinguish them from different samples at a given time, which are represented with columns of matrices.</p><pre class="codeinput">signal = con2seq(signal);
+</pre><p>To set up the problem we will use the first four values of the signal as initial input delay states, and the rest except for the last step as inputs.</p><pre class="codeinput">Xi = signal(1:4);
+X = signal(5:(end-1));
+timex = time(5:(end-1));
+</pre><p>The targets are now defined to match the inputs, but shifted earlier by one timestep.</p><pre class="codeinput">T = signal(6:end);
+</pre><h2>Designing the Linear Layer<a name="6"></a></h2><p>The function <b>newlind</b> will now design a linear layer with a single neuron which predicts the next timestep of the signal given the current and four past values.</p><pre class="codeinput">net = newlind(X,T,Xi);
+view(net)
+</pre><pre class="codeoutput">Warning: Rank deficient, rank = 3, tol =  4.352074e-14. 
+</pre><img vspace="5" hspace="5" src="applin1_02.png" alt=""> <h2>Testing the Linear Layer<a name="7"></a></h2><p>The network can now be called like a function on the inputs and delayed states to get its time response.</p><pre class="codeinput">Y = net(X,Xi);
+</pre><p>The output signal is plotted with the targets.</p><pre class="codeinput">figure
+plot(timex,cell2mat(Y),timex,cell2mat(T),<span class="string">'+'</span>)
+xlabel(<span class="string">'Time'</span>);
+ylabel(<span class="string">'Output -  Target +'</span>);
+title(<span class="string">'Output and Target Signals'</span>);
+</pre><img vspace="5" hspace="5" src="applin1_03.png" alt=""> <p>The error can also be plotted.</p><pre class="codeinput">figure
+E = cell2mat(T)-cell2mat(Y);
+plot(timex,E,<span class="string">'r'</span>)
+hold <span class="string">off</span>
+xlabel(<span class="string">'Time'</span>);
+ylabel(<span class="string">'Error'</span>);
+title(<span class="string">'Error Signal'</span>);
+</pre><img vspace="5" hspace="5" src="applin1_04.png" alt=""> <p>Notice how small the error is!</p><p>This example illustrated how to design a dynamic linear network which can predict a signal's next value from current and past values.</p><p class="footer">Copyright 1992-2012 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br><br>
+		  MATLAB and Simulink are registered trademarks of The MathWorks, Inc.  Please see <a href="http://www.mathworks.com/trademarks">www.mathworks.com/trademarks</a> for a list of other trademarks owned by The MathWorks, Inc.  Other product or brand names are trademarks or registered trademarks of their respective owners.
+      </p></div><!--
+##### SOURCE BEGIN #####
+%% Linear Prediction Design
+% This example illustrates how to design a linear neuron to predict
+% the next value in a time series given the last five values.
+
+% Copyright 1992-2012 The MathWorks, Inc.
+
+%% Defining a Wave Form
+% Here time is defined from 0 to 5 seconds in steps of 1/40 of
+% a second.
+
+time = 0:0.025:5;
+
+%%
+% We can define a signal with respect to time.
+
+signal = sin(time*4*pi);
+plot(time,signal)
+xlabel('Time');
+ylabel('Signal');
+title('Signal to be Predicted');
+
+%% Setting up the Problem for a Neural Network
+% The signal convert is then converted to a cell array.  Neural Networks
+% represent timesteps as columns of a cell array, do distinguish them from
+% different samples at a given time, which are represented with columns
+% of matrices.
+
+signal = con2seq(signal);
+
+%%
+% To set up the problem we will use the first four values of the
+% signal as initial input delay states, and the rest except for the
+% last step as inputs.
+
+Xi = signal(1:4);
+X = signal(5:(end-1));
+timex = time(5:(end-1));
+
+%%
+% The targets are now defined to match the inputs, but shifted earlier
+% by one timestep.
+
+T = signal(6:end);
+
+%% Designing the Linear Layer
+% The function *newlind* will now design a linear layer with a single
+% neuron which predicts the next timestep of the signal given the current
+% and four past values.
+
+net = newlind(X,T,Xi);
+view(net)
+
+%% Testing the Linear Layer
+% The network can now be called like a function on the inputs and delayed
+% states to get its time response.
+
+Y = net(X,Xi);
+
+%%
+% The output signal is plotted with the targets.
+
+figure
+plot(timex,cell2mat(Y),timex,cell2mat(T),'+')
+xlabel('Time');
+ylabel('Output -  Target +');
+title('Output and Target Signals');
+
+%%
+% The error can also be plotted.
+
+figure
+E = cell2mat(T)-cell2mat(Y);
+plot(timex,E,'r')
+hold off
+xlabel('Time');
+ylabel('Error');
+title('Error Signal');
+
+%%
+% Notice how small the error is!
+%
+% This example illustrated how to design a dynamic linear network which
+% can predict a signal's next value from current and past values.
+
+displayEndOfDemoMessage(mfilename)
+
+
+##### SOURCE END #####
+--></body></html>

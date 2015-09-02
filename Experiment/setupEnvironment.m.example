@@ -1,0 +1,6 @@
+% here is an example m file of what setupEnvironment.m should look like on
+% your machine.  Make sure to change the values of the environment
+% variables below to reflect your workspace settings.
+
+setenv('matlab_devel_dir', 'c:\users\jeremiah\research\scripts');
+setenv('subject_dir', 'c:\users\jeremiah\research\subjects');

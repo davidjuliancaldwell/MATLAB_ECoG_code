@@ -1,0 +1,439 @@
+%% this script generates all of the interaction (coh?) figures
+
+subjids = {'fc9643', '26cb98', '38e116', '4568f4', '30052b', 'mg', '04b3d5'};
+ids = {'S1','S2','S3','S4','S5','S6','S7'};
+
+num = 7;
+
+subjid = subjids{num};
+id = ids{num};
+clear num;
+
+cachefile = fullfile(pwd, 'cache', ['fig_interact.' subjid '.mat']);
+
+if (exist(cachefile, 'file'))
+    fprintf('using previously generated cache file for %s\n', subjid);
+    load(cachefile);
+else
+    fprintf('running analysis for %s\n', subjid);
+
+    % build the list of electrodes that we're interested in
+    overallcachefile = fullfile(pwd, 'cache', ['fig_overall.' subjid '.mat']);
+    load(overallcachefile, 'Montage');
+
+    [fas, key] = hmatValue(trodeLocsFromMontage(subjid, Montage, true));
+    bas = brodmannAreaForElectrodes(trodeLocsFromMontage(subjid, Montage, true), true)';
+
+    overallcachefile = ['d:\research\code\gridlab\Experiment\1DBCI\AllPower.m.cache\' subjid '.mat'];
+    load(overallcachefile, 'controlChannel');    
+    
+    interest = find(ismember(bas, [8 9 46]) | ismember(fas, [1:4 9:12])); % save all M1/S1/PM/PFC trodes as interesting
+
+    interest = interest(interest < 64); % get rid of non grid electrodes.
+    
+    if (isempty(find(interest==controlChannel)))
+        fprintf('forcing in control channel\n');
+        interest = sort([interest; controlChannel]);
+    end
+    
+    % get the list of files
+    [files, side, ~] = getBCIFilesForSubjid(subjid);
+
+    % build our data structures
+    allresults = [];
+    alltargets = [];
+    allwindows = [];
+    bads = [];
+
+    for c = 1:length(files)
+        fprintf('  processing file %d\n', c);
+
+        file = files{c};
+        [signals, states, parameters] = load_bcidat(file);
+        load(strrep(file, '.dat', '_montage.mat'));
+        subjid = extractSubjid(file);
+
+        bads = union(bads, Montage.BadChannels);
+        control = parameters.TransmitChList.NumericValue;
+        fs = parameters.SamplingRate.NumericValue;
+        
+        if (fs == 2400)
+            % cheat and downsample everything
+            fprintf('    downsampling from 2.4 KHz\n');
+            
+            signals = downsample(signals,2);
+            states.Feedback = downsample(states.Feedback, 2);
+            states.TargetCode = downsample(states.TargetCode, 2);
+            states.ResultCode = downsample(states.ResultCode, 2);
+            states.Running = downsample(states.Running,2 );
+            
+            fs = 1200;
+        end
+        
+        % 
+
+        signals = double(signals(:, 1:max(cumsum(Montage.Montage))));
+        signals = ReferenceCAR(Montage.Montage, Montage.BadChannels, signals);
+
+        signals = signals(:,interest);
+
+        signals = NotchFilter(signals, [60 120 180], fs);
+        
+        trialTime = parameters.PreFeedbackDuration.NumericValue + ...
+                    parameters.FeedbackDuration.NumericValue + ... 
+                    parameters.PostFeedbackDuration.NumericValue;
+
+        if (~exist('prevTrialTime','var'))
+            prevTrialTime = trialTime;
+        elseif (trialTime ~= prevTrialTime)
+            warning('trial time not consistent across runs');
+        end
+
+        isi = parameters.ITIDuration.NumericValue;
+        tgt = parameters.PreFeedbackDuration.NumericValue;
+        fb  = parameters.FeedbackDuration.NumericValue;
+        rew = parameters.PostFeedbackDuration.NumericValue;        
+
+        if (~exist('prevfs', 'var'))
+            prevfs = fs;
+        elseif (prevfs ~= fs)
+            error('sampling frequency not consistet across runs');
+        end
+
+        state = double(states.TargetCode * 8 + states.ResultCode * 2 + states.Feedback);
+        state(1) = -1;
+
+        epochs = ones(length(find(diff(state)~= 0)),1);
+        epochs(:,1) = cumsum(epochs(:,1));
+        newEpochAt = find(diff(state) ~= 0);
+        epochs(:,2:3) = [newEpochAt+1 [newEpochAt(2:end);length(states.Running)]];
+        epochs(:,4) = states.Feedback(epochs(:,3));
+        epochs(:,5) = states.TargetCode(epochs(:,3));
+        epochs(:,6) = states.ResultCode(epochs(:,3));
+
+        %% backtrack so that last complete epoch is of result
+        lastIdx = find(epochs(:,5) == 0, 1, 'last');
+
+        if (size(epochs, 1) ~= lastIdx)
+            fprintf('    trimming epochs (%d) \n', size(epochs, 1)-lastIdx);
+            epochs = epochs(1:lastIdx, :);
+        end
+
+%         allepochs = cat(1, allepochs, epochs);
+        
+%         restsamples = sigHg(states.Feedback == 0, :);
+% 
+%         sigScored = (sigHg - repmat(mean(restsamples,1),size(sigHg,1),1)) ./ repmat(std(restsamples,0,1), size(sigHg,1), 1);
+%     %     sigScored = lowpass(sigScored, 1, fs, 4);
+% %         sigScored = GaussianSmooth(sigScored, .5*fs);
+%     %     sigScored = exp(sigScored);
+
+        fbepochs = find(epochs(:,4)==1);
+
+        windows = getEpochSignal(signals, epochs(fbepochs,2)-(isi+tgt)*fs, epochs(fbepochs,2)+(fb+rew)*fs);
+        results = epochs(fbepochs+1,5) == epochs(fbepochs+1,6);
+        targets = epochs(fbepochs,5);
+
+        allwindows = cat(3, allwindows, windows);
+        allresults = cat(1, allresults, results);
+        alltargets = cat(1, alltargets, targets);
+    end
+    
+    save(cachefile, 'allresults', 'alltargets', 'allwindows', 'bads', 'Montage', 'subjid', ...
+        'side', 'isi', 'tgt', 'fb', 'rew', 'fs', 'interest', 'bas', 'fas', 'key');
+    
+    clearvars -except allresults alltargets allwindows bads Montage subjid side isi tgt fb rew fs interest bas key fas
+end
+
+%% figure out classifications
+for c = 1:length(interest)
+    switch (fas(interest(c)))
+        case 1
+            class{c} = 'M1';
+        case 2
+            class{c} = 'M1';
+        case 3
+            class{c} = 'S1';
+        case 4
+            class{c} = 'S1';
+        case 9
+            class{c} = 'PMd';
+        case 10
+            class{c} = 'PMd';
+        case 11
+            class{c} = 'PMv';
+        case 12
+            class{c} = 'PMv';
+        otherwise
+            if (ismember(bas(interest(c)), [8 9 46]))
+                class{c} = 'PFC';
+            end
+    end
+end
+
+%% do coherence analyses
+t = (isi+tgt)*fs : (isi+tgt+fb)*fs;
+
+% get the size of my intermittent matrices and output matrix
+[~, fw] = pwelch(allwindows(t,1,1), [], [], [], fs);
+
+psds = zeros(length(fw), length(interest), size(allwindows, 3));
+
+for chan_idx = 1:length(interest)
+    fprintf('precomputing spectra for chan %d\n', interest(chan_idx));
+    
+    for tidx = 1:size(allwindows,3)
+        data = squeeze(allwindows(t, chan_idx, tidx));
+        psds(:,chan_idx,tidx) = pwelch(data, [], [], [], fs);
+    end
+end
+
+for ctl_idx = 1:length(interest)
+    fprintf('reference chan: %d\n', interest(ctl_idx));
+    vals = zeros(sum(fw <= 200), length(interest), size(allwindows, 3));    
+    
+    for chan_idx = 1:length(interest)   
+        fprintf('  comparison chan: %d\n', interest(chan_idx));
+        for tidx = 1:size(allwindows,3)
+            ctl_data = squeeze(allwindows(t, ctl_idx, tidx));
+            chan_data = squeeze(allwindows(t, chan_idx, tidx));
+
+            pxy = cpsd(ctl_data, chan_data, [], [], [], fs);
+            pxx = squeeze(psds(:, ctl_idx, tidx));
+            pyy = squeeze(psds(:, chan_idx, tidx));
+            msc = (abs(pxy).^2) ./ (pxx .* pyy);
+
+            vals(:, chan_idx, tidx) = msc(fw <= 200);
+        end        
+    end
+    
+    % TEMP DELETE ME
+%     svals = shuffle(vals, 3);
+    
+    % plot this guy
+    freqs = fw(fw <= 200);        
+
+    figure;
+
+    dim = ceil(sqrt(length(interest)));
+    mval = 0;
+
+    fwidth = [floor(length(freqs)/10) floor(size(vals,3)/10)];
+    sigmas = floor(fwidth/3);
+
+    for c = 1:size(vals,2)
+            subplot(dim,dim,c); 
+    %         temp = squeeze(vals(:,c,:));
+            temp = GaussianSmooth2(squeeze(vals(:,c,alltargets==2)), fwidth, sigmas);
+            imagesc(freqs, 1:size(vals,3), temp'); 
+            title([trodeNameFromMontage(interest(c), Montage) ' - ' class{c}]);
+            xlabel('frequency (Hz)');
+            ylabel('trial');
+
+            if (interest(c) ~= interest(ctl_idx))
+                mval = max(mval, max(max(temp)));
+            end
+    end
+
+    for c = 1:size(vals,2)
+        subplot(dim,dim,c);
+        set(gca,'clim', [0 mval]);
+    end
+
+    mtit (sprintf('reference channel: %d, max mscoherence: %f', interest(ctl_idx), mval),'xoff',0,'yoff',.05); 
+    maximize;
+    SaveFig(fullfile(pwd, 'figs'), sprintf('fig_interact.%s.%d.down', subjid, interest(ctl_idx)), 'png');
+    
+end
+
+
+
+%% all targets
+
+% %% up targets
+% figure;
+% 
+% uvals = vals(:,:,alltargets==1);
+% 
+% fwidth = [floor(length(freqs)/10) floor(size(uvals,3)/10)];
+% sigmas = floor(fwidth/3);
+% for c = 1:size(uvals,2)
+% %     figure(ceil(c/8));
+%     subplot(8,8,c); 
+% %     temp = squeeze(vals(:,c,:));
+%     temp = GaussianSmooth2(squeeze(uvals(:,c,:)), fwidth, sigmas);
+%     imagesc(freqs, 1:size(uvals,3), temp);
+%     title(trodeNameFromMontage(interest(c), Montage));
+%     xlabel('frequency (Hz)');
+%     ylabel('trial');
+% end
+
+
+
+% % % 
+% % % 
+% % % 
+% % % % clearvars -except allresults alltargets allwindows allepochs bads Montage subjid side pre post fs div id theme_colors red blue green;
+% % % 
+% % % %% assumes that fig_overall has been run
+% % % 
+% % % overallcachefile = fullfile(pwd, 'cache', ['fig_overall.' subjid '.mat']);
+% % % load(overallcachefile, 'usigs', 'dsigs');
+% % % 
+% % % interestingTrodes = union(find(usigs), find(dsigs));
+% % % 
+% % % % determine up/down trial number corresponding to div
+% % % % posttargs = alltargets;
+% % % % posttargs(1:(div-1)) = 0;
+% % % 
+% % % % uppostidx = find(posttargs==1, 1, 'first');
+% % % % downpostidx = find(posttargs==2, 1, 'first');
+% % % 
+% % % upcount = cumsum(alltargets==1);
+% % % % updiv = upcount(uppostidx);
+% % % 
+% % % downcount = cumsum(alltargets==2);
+% % % % downdiv = downcount(downpostidx);
+% % % 
+% % % t = (-pre*fs:(post*fs-1))/fs;
+% % % 
+% % % tallocs = trodeLocsFromMontage(subjid, Montage, true);
+% % % 
+% % % for trode = interestingTrodes'
+% % %     fprintf('plotting %s - %s\n', subjid, trodeNameFromMontage(trode, Montage));
+% % %     
+% % %     figure;
+% % %     
+% % %     subplot(221); % up mean vs down mean
+% % %     muSmooth = GaussianSmooth(mean(squeeze(allwindows(:,trode,alltargets==1)),2), .5*fs);
+% % %     sigmaSmooth = GaussianSmooth(std(squeeze(allwindows(:,trode,alltargets==1)),0,2)/sqrt(sum(alltargets==1)), .5*fs);
+% % %     plot(t, muSmooth, 'Color', theme_colors(red,:), 'LineWidth', 2);
+% % %     hold on;
+% % %     plot(t, muSmooth+sigmaSmooth, 'Color', theme_colors(red,:), 'LineStyle', ':');
+% % %     plot(t, muSmooth-sigmaSmooth, 'Color', theme_colors(red,:), 'LineStyle', ':');
+% % %     
+% % %     muSmooth = GaussianSmooth(mean(squeeze(allwindows(:,trode,alltargets==2)),2), .5*fs);
+% % %     sigmaSmooth = GaussianSmooth(std(squeeze(allwindows(:,trode,alltargets==2)),0,2)/sqrt(sum(alltargets==2)), .5*fs);
+% % %     plot(t, muSmooth, 'Color', theme_colors(blue,:), 'LineWidth', 2);
+% % %     hold on;
+% % %     plot(t, muSmooth+sigmaSmooth, 'Color', theme_colors(blue,:), 'LineStyle', ':');
+% % %     plot(t, muSmooth-sigmaSmooth, 'Color', theme_colors(blue,:), 'LineStyle', ':');
+% % %     axis tight;
+% % % %     legend('up', 'up+SE', 'up-SE', 'down', 'down+SE', 'down-SE');
+% % %     plot([0 0], ylim, 'Color', theme_colors(green,:), 'LineWidth', 4);    
+% % %     plot([post-1 post-1], ylim, 'Color', theme_colors(green,:), 'LineWidth', 4);
+% % %     plot([t(15) t(15)], ylim, 'Color', [0 0 0], 'LineWidth', 4);
+% % %     plot([-pre+1 -pre+1], ylim, 'Color', [0 0 0], 'LineWidth', 4);
+% % % 
+% % %     
+% % %     set(gca, 'FontSize', 24, 'FontName', 'Arial');
+% % %     xlabel('time (s), fb at t=0', 'FontSize', 28, 'FontName', 'Arial');
+% % %     ylabel('z(HG power)', 'FontSize', 28, 'FontName', 'Arial');
+% % %     title('average response', 'FontSize', 28, 'FontName', 'Arial');
+% % % 
+% % %     % prepare to plot the trial by trial HG, smoothed
+% % %     gfilt = customgauss([.5*fs+1 7], .125*fs, 3, 0, 0, 1, [0 0]);
+% % %     gfilt = gfilt / sum(sum(gfilt));
+% % %     [r,c] = size(gfilt);
+% % %     rs = ceil(r/2);
+% % %     re = floor(r/2);
+% % %     cs = ceil(c/2);
+% % %     ce = floor(c/2);
+% % % 
+% % %     ups = squeeze(allwindows(:,trode,alltargets==1));    
+% % %     upsSmooth = conv2(ups,gfilt);    
+% % %     upsSmooth = upsSmooth(rs:(end-re),cs:(end-ce));
+% % %     downs = squeeze(allwindows(:,trode,alltargets==2));
+% % %     downsSmooth = conv2(downs,gfilt);
+% % %     downsSmooth = downsSmooth(rs:(end-re),cs:(end-ce));
+% % % 
+% % %     clims = [min(min(min(downsSmooth)), min(min(upsSmooth))) max(max(max(downsSmooth)),max(max(upsSmooth)))];
+% % % 
+% % %     subplot(223); % evolution of ups
+% % %     
+% % %     imagesc(t,1:size(ups,2),upsSmooth',clims);
+% % %     hold on;
+% % %     plot([0 0], ylim, 'Color', theme_colors(green,:), 'LineWidth', 4);    
+% % %     plot([post-1 post-1], ylim, 'Color', theme_colors(green,:), 'LineWidth', 4);
+% % %     plot([t(15) t(15)], ylim, 'Color', [0 0 0], 'LineWidth', 4);
+% % %     plot([-pre+1 -pre+1], ylim, 'Color', [0 0 0], 'LineWidth', 4);
+% % % %     plot(t, updiv*ones(size(t)), 'k', 'LineWidth', 2);
+% % %     
+% % %     set(gca, 'FontSize', 24, 'FontName', 'Arial');
+% % %     xlabel('time (s), fb at t=0', 'FontSize', 28, 'FontName', 'Arial');
+% % %     ylabel('trials', 'FontSize', 28, 'FontName', 'Arial');
+% % %     title(sprintf('up HG response by trial (%3.2f, %3.2f)', clims(1), clims(2)), 'FontSize', 28, 'FontName', 'Arial');
+% % % 
+% % %     subplot(224); % evolution of downs
+% % %     imagesc(t,1:size(downs,2),downsSmooth',clims);
+% % %     hold on;
+% % %     plot([0 0], ylim, 'Color', theme_colors(green,:), 'LineWidth', 4);    
+% % %     plot([post-1 post-1], ylim, 'Color', theme_colors(green,:), 'LineWidth', 4);
+% % %     plot([t(15) t(15)], ylim, 'Color', [0 0 0], 'LineWidth', 4);
+% % %     plot([-pre+1 -pre+1], ylim, 'Color', [0 0 0], 'LineWidth', 4);
+% % % %     plot(t, downdiv*ones(size(t)), 'k', 'LineWidth', 2);
+% % %     
+% % %     set(gca, 'FontSize', 24, 'FontName', 'Arial');
+% % %     xlabel('time (s), fb at t=0', 'FontSize', 28, 'FontName', 'Arial');
+% % %     ylabel('trials', 'FontSize', 28, 'FontName', 'Arial');
+% % %     title(sprintf('down HG response by trial (%3.2f,%3.2f)', clims(1), clims(2)), 'FontSize', 28, 'FontName', 'Arial');
+% % %     
+% % % %     ba = brodmannAreaForElectrodes(tallocs(trode, :));
+% % % %     [fa, fkey] = hmatValue(tallocs(trode,:));
+% % %     
+% % %     tname = trodeNameFromMontage(trode, Montage);
+% % %     
+% % % %     if (~isnan(ba))
+% % % %         if (fa > 0)
+% % % %             tit = sprintf('%s-%s (BA: %d, HMAT: %s)', id, tname, ba, fkey{fa});
+% % % %         else
+% % % %             tit = sprintf('%s-%s (BA: %d)', id, tname, ba);
+% % % %         end
+% % % %     else
+% % % %         if (fa > 0)
+% % % %             tit = sprintf('%s-%s (HMAT: %s)', id, tname, fkey{fa});
+% % % %         else
+% % %             tit = sprintf('%s-%s', id, tname);
+% % % %         end
+% % % %     end
+% % %     
+% % % %     mtit(tit, 'xoff', 0, 'yoff', .1, 'FontSize', 28, 'FontName',
+% % % %     'Arial');
+% % %     
+% % %     cleantname = strrep(strrep(tname, ')', ''), '(', '');
+% % % %     hgsave(fullfile(pwd, 'figs', ['bytime.' subjid '.' cleantname '.fig']));
+% % %     
+% % % %     SaveFig(fullfile(pwd, 'figs'), ['bytime.' subjid '.' cleantname '.sm']);
+% % %     maximize; 
+% % %     mtit(tit, 'xoff', 0, 'yoff', .03, 'FontSize', 28, 'FontName', 'Arial');
+% % %     SaveFig(fullfile(pwd, 'figs'), ['bytime.' subjid '.' cleantname '.lg'], 'eps');    
+% % %     
+% % % %     SaveFig(fullfile(pwd, 'figs'), [subjid '-' tname]);
+% % % end
+% % % 
+% % % % %% summary for table
+% % % % 
+% % % % areas = brodmannAreaForElectrodes(tallocs(interestingTrodes, :));
+% % % % counter = 1;
+% % % % 
+% % % % for trode = interestingTrodes'
+% % % %     ba = areas(counter);
+% % % %     counter = counter + 1;
+% % % %     
+% % % %     [fa, fkey] = hmatValue(tallocs(trode,:));
+% % % %     tname = trodeNameFromMontage(trode, Montage);
+% % % %     
+% % % %     if (isnan(ba))
+% % % %         ba = 0;
+% % % %     end
+% % % %     
+% % % %     if fa == 0
+% % % %         fstr = 'none';
+% % % %     else
+% % % %         fstr = fkey{fa};
+% % % %     end
+% % % %     
+% % % %     tname = trodeNameFromMontage(trode, Montage);    
+% % % %     fprintf('%s\t%s\t%s\t%d\t%s\t%3.2f\t%3.2f\t%3.2f\n', ...
+% % % %         id, subjid, tname, ba, fstr, tallocs(trode,1), tallocs(trode,2), tallocs(trode,3))
+% % % % end

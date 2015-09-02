@@ -1,0 +1,1 @@
+params.PatientCode = input('Patient code: ','s');

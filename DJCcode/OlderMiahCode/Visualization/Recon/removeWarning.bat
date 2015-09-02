@@ -1,0 +1,1 @@
+echo y | d:\dropbox\code\gridlab\Visualization\Recon\plink jdwander@krang.cs.washington.edu

@@ -1,0 +1,17 @@
+%Scale Tolerance (scale_tol) function parameter
+%
+%  <a href="matlab:doc nnparam.scale_tol">scale_tol</a> is a <a href="matlab:doc nntrain">training function</a> parameter.
+%  It must be a strictly positive scalar.
+%
+%  <a href="matlab:doc nnparam.scale_tol">scale_tol</a> determines the numerical tolerance for each search
+%  step by the line search algorithms used for training.  Tolerance is
+%  calculated as follows:
+%
+%     tolerance = step size / <a href="matlab:doc nnparam.scale_tol">scale_tol</a>
+%
+%  All search parameters are <a href="matlab:doc nnparam.alpha">alpha</a>, <a href="matlab:doc nnparam.beta">beta</a>, <a href="matlab:doc nnparam.bmax">bmax</a>,
+%  <a href="matlab:doc nnparam.gama">gama</a>, <a href="matlab:doc nnparam.delta">delta</a>, <a href="matlab:doc nnparam.low_lim">low_lim</a>, <a href="matlab:doc nnparam.up_lim">up_lim</a>,
+%  <a href="matlab:doc nnparam.min_step">min_step</a>, <a href="matlab:doc nnparam.max_step">max_step</a> and <a href="matlab:doc nnparam.scale_tol">scale_tol</a>.
+%
+%  This parameter is used by <a href="matlab:doc trainbfg">trainbfg</a>, <a href="matlab:doc traincgb">traincgb</a>, <a href="matlab:doc traincgf">traincgf</a>, <a href="matlab:doc traincgp">traincgp</a> and <a href="matlab:doc trainoss">trainoss</a>.
+ 

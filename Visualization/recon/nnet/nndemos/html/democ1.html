@@ -1,0 +1,124 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Competitive Learning</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="democ1.m"><link rel="stylesheet" type="text/css" href="../../../matlab/helptools/private/style.css"></head><body><div class="header"><div class="left"><a href="matlab:edit democ1">Open democ1.m in the Editor</a></div><div class="right"><a href="matlab:echodemo democ1">Run in the Command Window</a></div></div><div class="content"><h1>Competitive Learning</h1><!--introduction--><p>Neurons in a competitive layer learn to represent different regions of the input space where input vectors occur.</p><!--/introduction--><p>P is a set of randomly generated but clustered test data points.  Here the data points are plotted.</p><p>A competitive network will be used to classify these points into natural classes.</p><pre class="codeinput"><span class="comment">% Create inputs X.</span>
+bounds = [0 1; 0 1];   <span class="comment">% Cluster centers to be in these bounds.</span>
+clusters = 8;          <span class="comment">% This many clusters.</span>
+points = 10;           <span class="comment">% Number of points in each cluster.</span>
+std_dev = 0.05;        <span class="comment">% Standard deviation of each cluster.</span>
+x = nngenc(bounds,clusters,points,std_dev);
+
+<span class="comment">% Plot inputs X.</span>
+plot(x(1,:),x(2,:),<span class="string">'+r'</span>);
+title(<span class="string">'Input Vectors'</span>);
+xlabel(<span class="string">'x(1)'</span>);
+ylabel(<span class="string">'x(2)'</span>);
+</pre><img vspace="5" hspace="5" src="democ1_01.png" alt=""> <p>Here COMPETLAYER takes two  arguments, the number of neurons and the learning rate.</p><p>We can configure the network inputs (normally done automatically by TRAIN) and plot the initial weight vectors to see their  attempt at classification.</p><p>The weight vectors (o's) will be trained so that they occur centered in clusters of input vectors (+'s).</p><pre class="codeinput">net = competlayer(8,.1);
+net = configure(net,x);
+w = net.IW{1};
+plot(x(1,:),x(2,:),<span class="string">'+r'</span>);
+hold <span class="string">on</span>;
+circles = plot(w(:,1),w(:,2),<span class="string">'ob'</span>);
+</pre><img vspace="5" hspace="5" src="democ1_02.png" alt=""> <p>Set the number of epochs to train before stopping and train this competitive layer (may take several seconds).</p><p>Plot the updated layer weights on the same graph.</p><pre class="codeinput">net.trainParam.epochs = 7;
+net = train(net,x);
+w = net.IW{1};
+delete(circles);
+plot(w(:,1),w(:,2),<span class="string">'ob'</span>);
+</pre><img vspace="5" hspace="5" src="democ1_03.png" alt=""> <p>Now we can use the competitive layer as a classifier, where each neuron corresponds to a different category.  Here we define am input vector X1 as [0; 0.2].</p><p>The output Y, indicates which neuron is responding, and thereby which class the input belongs.</p><pre class="codeinput">x1 = [0; 0.2];
+y = net(x1)
+</pre><pre class="codeoutput">
+y =
+
+     0
+     1
+     0
+     0
+     0
+     0
+     0
+     0
+
+</pre><p class="footer">Copyright 1992-2011 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br><br>
+		  MATLAB and Simulink are registered trademarks of The MathWorks, Inc.  Please see <a href="http://www.mathworks.com/trademarks">www.mathworks.com/trademarks</a> for a list of other trademarks owned by The MathWorks, Inc.  Other product or brand names are trademarks or registered trademarks of their respective owners.
+      </p></div><!--
+##### SOURCE BEGIN #####
+%% Competitive Learning
+% Neurons in a competitive layer learn to represent different regions of the
+% input space where input vectors occur.
+% 
+% Copyright 1992-2011 The MathWorks, Inc.
+% $Revision: 1.18.2.5 $  $Date: 2011/05/09 00:58:51 $
+
+%%
+% P is a set of randomly generated but clustered test data points.  Here the
+% data points are plotted.
+%
+% A competitive network will be used to classify these points into natural
+% classes.
+
+% Create inputs X.
+bounds = [0 1; 0 1];   % Cluster centers to be in these bounds.
+clusters = 8;          % This many clusters.
+points = 10;           % Number of points in each cluster.
+std_dev = 0.05;        % Standard deviation of each cluster.
+x = nngenc(bounds,clusters,points,std_dev);
+
+% Plot inputs X.
+plot(x(1,:),x(2,:),'+r');
+title('Input Vectors');
+xlabel('x(1)');
+ylabel('x(2)');
+
+%%
+% Here COMPETLAYER takes two  arguments, the number of neurons and the
+% learning rate.
+% 
+% We can configure the network inputs (normally done automatically
+% by TRAIN) and plot the initial weight vectors to see their  attempt at
+% classification.
+%
+% The weight vectors (o's) will be trained so that they occur centered in
+% clusters of input vectors (+'s).
+
+net = competlayer(8,.1);
+net = configure(net,x);
+w = net.IW{1};
+plot(x(1,:),x(2,:),'+r');
+hold on;
+circles = plot(w(:,1),w(:,2),'ob');
+
+
+%%
+% Set the number of epochs to train before stopping and train this competitive
+% layer (may take several seconds).
+% 
+% Plot the updated layer weights on the same graph.
+
+net.trainParam.epochs = 7;
+net = train(net,x);
+w = net.IW{1};
+delete(circles);
+plot(w(:,1),w(:,2),'ob');
+
+
+%%
+% Now we can use the competitive layer as a classifier, where each neuron
+% corresponds to a different category.  Here we define am input vector
+% X1 as [0; 0.2].
+% 
+% The output Y, indicates which neuron is responding, and thereby which class
+% the input belongs.
+
+x1 = [0; 0.2];
+y = net(x1)
+
+
+displayEndOfDemoMessage(mfilename)
+
+##### SOURCE END #####
+--></body></html>

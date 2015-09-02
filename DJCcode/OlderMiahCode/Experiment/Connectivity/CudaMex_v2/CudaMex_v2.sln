@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CudaMex_v2", "CudaMex_v2\CudaMex_v2.vcxproj", "{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gausswc", "gausswc\gausswc.vcxproj", "{342493BF-4B16-4396-9BF3-046FAD1F156D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Debug|Win32.Build.0 = Debug|Win32
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Debug|x64.ActiveCfg = Debug|x64
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Debug|x64.Build.0 = Debug|x64
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Release|Win32.ActiveCfg = Release|Win32
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Release|Win32.Build.0 = Release|Win32
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Release|x64.ActiveCfg = Release|x64
+		{FF30D7CC-D2F3-4B1C-90C0-E71354C79BEA}.Release|x64.Build.0 = Release|x64
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Debug|Win32.Build.0 = Debug|Win32
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Debug|x64.ActiveCfg = Debug|x64
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Debug|x64.Build.0 = Debug|x64
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Release|Win32.ActiveCfg = Release|Win32
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Release|Win32.Build.0 = Release|Win32
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Release|x64.ActiveCfg = Release|x64
+		{342493BF-4B16-4396-9BF3-046FAD1F156D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

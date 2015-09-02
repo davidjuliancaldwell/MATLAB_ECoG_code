@@ -1,0 +1,116 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Learning Vector Quantization</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="demolvq1.m"><link rel="stylesheet" type="text/css" href="../../../matlab/helptools/private/style.css"></head><body><div class="header"><div class="left"><a href="matlab:edit demolvq1">Open demolvq1.m in the Editor</a></div><div class="right"><a href="matlab:echodemo demolvq1">Run in the Command Window</a></div></div><div class="content"><h1>Learning Vector Quantization</h1><!--introduction--><p>An LVQ network is trained to classify input vectors according to given targets.</p><!--/introduction--><p>Let X be 10 2-element example input vectors and C be the classes these vectors fall into.  These classes can be transformed into vectors to be used as targets, T, with IND2VEC.</p><pre class="codeinput">x = [-3 -2 -2  0  0  0  0 +2 +2 +3;
+      0 +1 -1 +2 +1 -1 -2 +1 -1  0];
+c = [1 1 1 2 2 2 2 1 1 1];
+t = ind2vec(c);
+</pre><p>Here the data points are plotted.  Red = class 1, Cyan = class 2.  The LVQ network represents clusters of vectors with hidden neurons, and groups the clusters with output neurons to form the desired classes.</p><pre class="codeinput">colormap(hsv);
+plotvec(x,c)
+title(<span class="string">'Input Vectors'</span>);
+xlabel(<span class="string">'x(1)'</span>);
+ylabel(<span class="string">'x(2)'</span>);
+</pre><img vspace="5" hspace="5" src="demolvq1_01.png" alt=""> <p>Here LVQNET creates an LVQ layer with four hidden neurons and a learning rate of 0.1.  The network is then configured for inputs X and targets T.  (Configuration normally an unnecessary step as it is done automatically by TRAIN.)</p><pre class="codeinput">net = lvqnet(4,0.1);
+net = configure(net,x,t);
+</pre><p>The competitive neuron weight vectors are plotted as follows.</p><pre class="codeinput">hold <span class="string">on</span>
+w1 = net.IW{1};
+plot(w1(1,1),w1(1,2),<span class="string">'ow'</span>)
+title(<span class="string">'Input/Weight Vectors'</span>);
+xlabel(<span class="string">'x(1), w(1)'</span>);
+ylabel(<span class="string">'x(2), w(2)'</span>);
+</pre><img vspace="5" hspace="5" src="demolvq1_02.png" alt=""> <p>To train the network, first override the default number of epochs, and then train the network.  When it is finished, replot the input vectors '+' and the competitive neurons' weight vectors 'o'. Red = class 1, Cyan = class 2.</p><pre class="codeinput">net.trainParam.epochs=150;
+net=train(net,x,t);
+
+cla;
+plotvec(x,c);
+hold <span class="string">on</span>;
+plotvec(net.IW{1}',vec2ind(net.LW{2}),<span class="string">'o'</span>);
+</pre><img vspace="5" hspace="5" src="demolvq1_03.png" alt=""> <p>Now use the LVQ network as a classifier, where each neuron corresponds to a different category.  Present the input vector [0.2; 1].  Red = class 1, Cyan = class 2.</p><pre class="codeinput">x1 = [0.2; 1];
+y1 = vec2ind(net(x1))
+</pre><pre class="codeoutput">
+y1 =
+
+     2
+
+</pre><p class="footer">Copyright 1992-2011 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br><br>
+		  MATLAB and Simulink are registered trademarks of The MathWorks, Inc.  Please see <a href="http://www.mathworks.com/trademarks">www.mathworks.com/trademarks</a> for a list of other trademarks owned by The MathWorks, Inc.  Other product or brand names are trademarks or registered trademarks of their respective owners.
+      </p></div><!--
+##### SOURCE BEGIN #####
+%% Learning Vector Quantization
+% An LVQ network is trained to classify input vectors according to given
+% targets.
+%
+% Copyright 1992-2011 The MathWorks, Inc.
+% $Revision: 1.14.2.3 $  $Date: 2011/05/09 00:59:01 $
+
+%%
+% Let X be 10 2-element example input vectors and C be the classes these vectors
+% fall into.  These classes can be transformed into vectors to be used as
+% targets, T, with IND2VEC.
+
+x = [-3 -2 -2  0  0  0  0 +2 +2 +3;
+      0 +1 -1 +2 +1 -1 -2 +1 -1  0];
+c = [1 1 1 2 2 2 2 1 1 1];
+t = ind2vec(c);
+
+%%
+% Here the data points are plotted.  Red = class 1, Cyan = class 2.  The LVQ
+% network represents clusters of vectors with hidden neurons, and groups the
+% clusters with output neurons to form the desired classes.
+
+colormap(hsv);
+plotvec(x,c)
+title('Input Vectors');
+xlabel('x(1)');
+ylabel('x(2)');
+
+%%
+% Here LVQNET creates an LVQ layer with four hidden neurons and a
+% learning rate of 0.1.  The network is then configured for inputs X
+% and targets T.  (Configuration normally an unnecessary step as it
+% is done automatically by TRAIN.)
+
+net = lvqnet(4,0.1);
+net = configure(net,x,t);
+
+%%
+% The competitive neuron weight vectors are plotted as follows.
+
+hold on
+w1 = net.IW{1};
+plot(w1(1,1),w1(1,2),'ow')
+title('Input/Weight Vectors');
+xlabel('x(1), w(1)');
+ylabel('x(2), w(2)');
+
+%%
+% To train the network, first override the default number of epochs, and then
+% train the network.  When it is finished, replot the input vectors '+' and the
+% competitive neurons' weight vectors 'o'. Red = class 1, Cyan = class 2.
+
+net.trainParam.epochs=150;
+net=train(net,x,t);
+
+cla;
+plotvec(x,c);
+hold on;
+plotvec(net.IW{1}',vec2ind(net.LW{2}),'o');
+
+%%
+% Now use the LVQ network as a classifier, where each neuron corresponds to a
+% different category.  Present the input vector [0.2; 1].  Red = class 1, Cyan =
+% class 2.
+
+x1 = [0.2; 1];
+y1 = vec2ind(net(x1))
+
+
+displayEndOfDemoMessage(mfilename)
+
+##### SOURCE END #####
+--></body></html>

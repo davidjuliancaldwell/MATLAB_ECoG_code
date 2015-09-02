@@ -1,0 +1,16 @@
+for s1 (fc),
+when comparing outhits to all others, there was a significant difference, 
+grid(5) -> p = 0.0026, grid(24) -> p = 0.0012
+
+for s2 (hole),
+making the same comparison
+grid(25) -> p = 0.0487, grid(26) -> p = 0.0622
+
+
+
+%Notes
+In S1: PFC and SMA showed initial, in-trial increases in HG activity.  In precision trials, as well as non-precision trials where corrections were being made, this pattern continued throughout the trial.  In non-precision trials where the user was on track to successfully complete the trial, activity in these areas lessened. (PSMA 14 12 6 Grid 20)
+Peri-control motor and pre-motor areas showed pre-trial increases in HG power for non-precision targets. (Grid 5, Grid 24)
+Though more spatially distributed, electrodes showing in-trial decreases in activity selectively returned to baseline in the case of non-precision targets where success was eminent (asma 16, grid 8? Grid 14)
+
+ increased in-trial HG during all precision targets, as well as non-precision targets where the user was making corrections

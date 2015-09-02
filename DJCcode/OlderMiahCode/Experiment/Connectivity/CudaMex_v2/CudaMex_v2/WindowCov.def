@@ -1,0 +1,2 @@
+LIBRARY "WindowCov.mexw64"
+EXPORTS mexFunction

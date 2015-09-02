@@ -1,0 +1,44 @@
+SIDS = {'30052b', 'fc9643'};
+SCODES = {'S1', 'S2'};
+
+OUTPUT_DIR = fullfile(myGetenv('output_dir'), '1DBCI_Interaction', 'figures');
+META_DIR = fullfile(myGetenv('output_dir'), '1DBCI_Interaction', 'meta');
+
+TouchDir(OUTPUT_DIR);
+TouchDir(META_DIR);
+
+PFC_BAS = [46 9];
+
+%% figure out which electrodes are in the brodman areas of interest
+
+for sIdx = 1:length(SIDS)
+    subjid = SIDS{sIdx};
+   
+    [~,~,~,cChan] = interactionDataFiles(subjid);
+    brodFile = fullfile(getSubjDir(subjid),'other','brod_areas.mat');
+    load(brodFile);
+    pfcChannels = find(ismember(areas, PFC_BAS));
+    figure;
+    
+    foo = reshape(areas(1:64), [8,8]);
+    imagesc(foo);
+    for c = 1:8
+        for d = 1:8
+            ax = text(c,d,num2str(foo(c,d)));
+            set(ax, 'horizontalalignment', 'center');
+        end
+    end
+    if (sIdx == 1)
+        view(210,90);
+    else
+        view(175,90);
+    end
+    hold on;
+    plot(mod(pfcChannels-1,8)+1, floor((pfcChannels-1)/8)+1, 'go', 'markersize', 20, 'linewidth', 3);
+    plot(mod(cChan-1,8)+1, floor((cChan-1)/8)+1, 'ko', 'markersize', 20, 'linewidth', 3);
+    title(subjid);
+    SaveFig(OUTPUT_DIR, sprintf('%s-selection.mat', subjid), 'png');
+    
+    pfcChannels = 1:length(areas);
+    save(fullfile(META_DIR, sprintf('%s-data.mat', subjid)), 'pfcChannels');
+end

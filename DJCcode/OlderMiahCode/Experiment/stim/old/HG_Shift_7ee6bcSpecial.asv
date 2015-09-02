@@ -1,0 +1,225 @@
+
+%% setup for 7ee6bc, long single epoch
+epochs = [3900 4000; 10000 10100; 12500 12600] * 1000;
+
+% epochs = [ 5000 12992358 ];
+channels = 1:64;
+
+fs = 1000;
+filename = 'D:\research\subjects\7ee6bc\data\D3\clinical\rereferenced_clinical_long_NNN_1000Hz.mat';
+method = 'hilbert';
+% method = 'pwelch';
+
+%%
+windowLengthInSeconds = 1;
+windowShiftInSeconds = 1;
+
+chanCount = length(channels);
+windowCount = 0;
+for c = 1:size(epochs,1)
+    windowCount = windowCount + (epochs(c,2)-epochs(c,1))/(windowShiftInSeconds*fs);
+end
+totalCount = windowCount * chanCount;
+counter = 1;
+
+beta = [12 18];
+gamma = [75 115];
+
+betaAvs     = cell(size(epochs,1),1);
+gammaAvs    = cell(size(epochs,1),1);
+spikeRecord = cell(size(epochs,1),1);
+spectra = cell(size(epochs,1),1);
+
+for chan = channels
+    fprintf('working on channel %d\n', chan);
+    idx = find(channels == chan);
+    
+    % get data
+    load(strrep(filename, 'NNN', num2str(chan)));
+    channelData = notch(channelData, [60 120 180], fs, 4);
+     
+    for epochNum = 1:size(epochs,1)        
+        data = channelData(epochs(epochNum,1):epochs(epochNum,2),:);
+
+%         data = bandpass(data, 3, 200, fs, 4);
+        
+        if (strcmp(method, 'hilbert') == 1)
+%             fprintf('performing hilbert transform\n');
+            betaSig = log(hilbAmp(data, beta, fs).^2);
+            gammaSig = log(hilbAmp(data, gamma, fs).^2);
+        end
+       
+        winStart = 1;
+        winEnd = winStart + windowLengthInSeconds * fs - 1;
+        winNum = 1;
+       
+        while(winEnd < length(data))
+            score = abs([0; diff(zscore(data(winStart:winEnd))) ]);
+            if (max(score) > 2)
+                [peaks, locs] = findpeaks(score, 'minpeakheight', 2);
+                spikeRecord{epochNum}(idx, winNum) = length(locs);
+            end
+
+            switch (method)
+                case 'hilbert'
+%                     fprintf('hilbert for window\n');
+                    betaAvs{epochNum}(idx, winNum) = mean(betaSig(winStart:winEnd));
+                    gammaAvs{epochNum}(idx, winNum) = mean(gammaSig(winStart:winEnd));
+                    
+                case 'pwelch'
+%                     fprintf('pwelch for window\n');
+                    [f, hz] = pwelch(data(winStart:winEnd), winEnd-winStart+1, floor((winEnd-winStart+1)/2), floor((winEnd-winStart+1)/2), fs);
+                    pwr = log(f);
+
+                    betaPwr = sum(pwr(hz > beta(1) & hz < beta(2))) / length(find(hz > beta(1) & hz < beta(2)));
+                    gammaPwr = sum(pwr(hz > gamma(1) & hz < gamma(2))) / length(find(hz > gamma(1) & hz < gamma(2)));
+
+                    betaAvs{epochNum}(idx, winNum)  = betaPwr;
+                    gammaAvs{epochNum}(idx, winNum) = gammaPwr;
+                    
+%                     fVals(winNum,:) = f;
+            end
+            
+            winNum = winNum + 1;
+            winStart = winStart + windowShiftInSeconds * fs;
+            winEnd   = winEnd   + windowShiftInSeconds * fs;
+            counter = counter + 1;
+        end        
+    end
+end
+
+%% display results
+
+weights = zeros(size(channels));
+
+for chan = channels
+    rsas = zeros(3,1);
+    
+    for num = 1:3
+        rsas(num) = signedSquaredXCorrValue(gammaAvs{num}(chan,:), gammaAvs{1}(chan,:), 2);
+    end
+    
+    weights(chan) = mean(rsas(2:3));
+end
+
+load('d:\research\subjects\7ee6bc\cortex.mat');
+load('d:\research\subjects\7ee6bc\trodes.mat');
+
+weights([5 7 64]) = NaN;
+
+ctmr_dot_plot(cortex, Grid, weights, 'r', [-1 1], 20);
+plot3(Grid(47,1),Grid(47,2),Grid(47,3), 
+% %% display results
+% 
+% spikes = [];
+% gammas = [];
+% betas = [];
+% 
+% for c = 1:length(spikeRecord)
+%     spikes = [spikes spikeRecord{c}];
+%     gammas = [gammas gammaAvs{c}];
+%     betas  = [betas betaAvs{c}];
+% end
+% 
+% for c = 1:length(channels)
+%     fprintf('averages for channel %d: \n', channels(c));
+%     for d = 1:length(spikeRecord)
+%         fprintf('  gamma from epoch %d: %f\n', d, mean(gammaAvs{d}(c,:)));
+%     end
+%     fprintf('\n');
+%     for d = 1:length(spikeRecord)
+%         fprintf('  beta from epoch %d: %f\n', d, mean(betaAvs{d}(c,:)));
+%     end
+% end
+% 
+% for c = 1:length(channels)
+%     figure;
+% 
+%     ax(1) = subplot(311); 
+% %     foo = downsample(channelData,1000);
+%     
+% %     plot(foo(1:length(gammas)));
+%     dsData = downsample(channelData,10);
+%     t = (1:length(dsData))/fs*10;
+%     plot(t,dsData);
+%     ylabel('raw time-series');
+%     xlabel('time(s)');
+%     
+%     axis tight;
+%     for d = 1:size(epochs)
+%         highlight(gca, round(epochs(d,:)/1000), [], [0.9 0.9 0.9]);
+%     end
+%     
+%     ax(2) = subplot(312);
+%     plot(gammas(c,:), 'b.'); hold on;
+%     plot(find(spikes(c,:)>=1), gammas(c,(spikes(c,:)>=1)), 'r.'); 
+% 
+%     ylim = get(gca, 'YLim');
+%     idx = 0;
+%     for d = 1:size(epochs)-1
+%         idx = idx + length(gammaAvs{d});
+%         plot([idx idx], ylim, 'g');
+%     end
+%     
+% %     av = zeros(size(gammas(c,:)));
+% %     for d = 2:length(gammas(c,:))
+% %         start = max(1, d-25);
+% %         av(d) = sum(gammas(c,start:d)) / (d-start);
+% %     end
+%     temp = gammas(c,:);
+%     temp(spikes(c,:)>=1) = NaN;
+%     av = windowedAverage(temp', 25);
+%     
+%     plot(av, 'k', 'LineWidth', 2);
+%     
+%     hold off;
+%     switch (method)
+%         case 'hilbert'
+%             ylabel('mean log hilbert gamma power');
+%         case 'pwelch'
+%             ylabel('mean log fft gamma power');
+%     end
+%     xlabel('windows');
+%     maximize(gcf);
+% %     highlight(gca, [length(spikeRecord{1})+1 length(spikeRecord{1}) + length(spikeRecord{2})], [], [0.9 0.9 0.9]);
+%     axis tight;
+% 
+%     ax(3) = subplot(313);
+%     plot(betas(c,:), 'b.'); hold on;
+%     plot(find(spikes(c,:)>=1), betas(c, (spikes(c,:)>=1)), 'r.'); 
+% 
+%     ylim = get(gca, 'YLim');
+%     idx = 0;
+%     for d = 1:size(epochs)-1
+%         idx = idx + length(betaAvs{d});
+%         plot([idx idx], ylim, 'g');
+%     end
+%     
+% %     av = zeros(size(betas(c,:)));
+% %     for d = 2:length(betas(c,:))
+% %         start = max(1, d-25);
+% %         av(d) = sum(betas(c,start:d)) / (d-start);
+% %     end
+%     temp = betas(c,:);
+%     temp(spikes(c,:)>=1) = NaN;
+%     av = windowedAverage(temp', 25);
+% 
+%     plot(av, 'k', 'LineWidth', 2);
+% 
+%     hold off;
+%     switch (method)
+%         case 'hilbert'
+%             ylabel('mean log hilbert beta power');
+%         case 'pwelch'
+%             ylabel('mean log fft beta power');
+%     end
+%     xlabel('windows');
+%     axis tight;
+% %     highlight(gca, [length(spikeRecord{1})+1 length(spikeRecord{1}) + length(spikeRecord{2})], [], [0.9 0.9 0.9]);
+% 
+%     linkaxes(ax, 'x');
+%     mtit(sprintf('baseline analysis - electrode %d', channels(c)));
+%     
+% %     SaveFig([pwd '\7ee6bc'], sprintf('electrode %d', channels(c)));
+% %     close;
+% end

@@ -1,0 +1,15 @@
+% DMN Suppression during BCI and trial to trial performance analysis
+% methodology.
+
+% (1) There is a task-correlated suppression of HG activity in DMN
+% electrodes
+
+% can be done with epoch based analyses?
+% if effect is more suble I could look for a significant decrease in time
+% series
+
+% (2) Task performance can be correlated to pre trial power in dmn
+% electrodes
+
+% determine HG power during rest and targeting and test for significant
+% correlations

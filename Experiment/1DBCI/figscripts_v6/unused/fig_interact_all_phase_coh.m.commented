@@ -1,0 +1,165 @@
+for c = 1:length(interest)
+    switch (fas(interest(c)))
+        case 1
+            class{c} = 'M1';
+        case 2
+            class{c} = 'M1';
+        case 3
+            class{c} = 'S1';
+        case 4
+            class{c} = 'S1';
+        case 9
+            class{c} = 'PMd';
+        case 10
+            class{c} = 'PMd';
+        case 11
+            class{c} = 'PMv';
+        case 12
+            class{c} = 'PMv';
+        otherwise
+            if (ismember(bas(interest(c)), [8 9 46]))
+                class{c} = 'PFC';
+            end
+    end
+end
+
+%% do phase coherence analyses
+
+coh_cache = fullfile(myGetenv('output_dir'), '1DBCI', 'cache', sprintf('phase_coh.%s.mat', subjid));
+
+if (~exist(coh_cache, 'file'))
+    t = (isi+tgt)*fs : ((isi+tgt+fb)*fs-1/fs);
+    win = allwindows(t,:,:);
+
+    nfft = 128;
+
+    [~,f,nseg] = compute_coherence_multi_channel_phase_bci(win(:,1,1),nfft,fs);
+
+    hg_f = f(f > 70 & f < 200);
+
+    phase_cohs = zeros(size(win,2),size(win,2),length(f),size(win,3));
+
+    for trial = 1:size(win,3)
+        fprintf('trial %d of %d\n', trial, size(win,3));
+
+        phase_cohs(:,:,:,trial) = ...
+            compute_coherence_multi_channel_phase_bci(win(:,:,trial), nfft, fs);
+    end
+
+    % ps = 1 - random_phase_cdf(abs(phase_cohs(:)), nseg);
+
+    save(coh_cache, 'Montage', 'allresults', 'alltargets', 'bads', 'bas', 'class', 'div', 'f', 'fas', 'fs', 'interest', 'key', 'nfft', 'nseg', 'phase_cohs', 'side', 'subjid');
+else
+    load(coh_cache);
+end
+
+%% visualize as individual plots
+individual_plots = false;
+
+clear alldechs allinchs;
+
+for ctl_idx = 1:length(interest)        
+    % plot this guy
+    freqs = f(f <= 200);        
+
+    if (individual_plots)
+        fignum = ceil(length(interest)/36);
+
+        if (fignum == 1)
+            dim = ceil(sqrt(length(interest)));
+        else
+            dim = 6;
+        end
+
+        clear h;
+        for c = 1:fignum
+            h(c) = figure;
+        end
+
+        mval = 0;
+    end
+    
+    vals = abs(squeeze(phase_cohs(ctl_idx,:,f <= 200,:)));
+        
+    mvals = vals(:, freqs > 70, :);
+    mvalsmu = squeeze(mean(mvals, 2));
+    didx = 1:size(mvalsmu,2);
+    
+    [dechs, decps] = ttest2(mvalsmu(:,didx<div),mvalsmu(:,didx>=div),0.05/size(mvalsmu,1), 'right', 'unequal', 2);
+    dechs(isnan(dechs)) = 0;
+    alldechs(:,ctl_idx) = dechs;
+
+    [inchs, incps] = ttest2(mvalsmu(:,didx<div),mvalsmu(:,didx>=div),0.05/size(mvalsmu,1), 'left', 'unequal', 2);
+    inchs(isnan(inchs)) = 0;
+    allinchs(:,ctl_idx) = inchs;
+    
+    if (individual_plots)
+        fwidth = max(1,[floor(length(freqs)/10) floor(size(vals,3)/10)]);
+        sigmas = max(1,floor(fwidth/3));        
+
+        for c = 1:size(vals,1)
+            temp = squeeze(vals(c,:,:));    
+    %         mu = mean(temp,2);
+    %         temp = temp ./ repmat(mu, 1, size(temp,2));
+
+            fidx = floor((c-1)/36)+1;
+            figure(h(fidx));
+
+            subplot(dim,dim,c-((fidx-1)*36)); 
+
+    %         temp = GaussianSmooth2(temp, fwidth, sigmas);
+            imagesc(freqs, 1:size(vals,3), temp'); 
+            set(gca, 'clim', [0 1]);
+
+            hold on;
+
+            plot(xlim, [div div], 'k', 'LineWidth', 2);     
+
+            if (hs(c) == 1) color = 'r';
+            else color = 'k';
+            end
+
+            title(sprintf('%s (%f)', [trodeNameFromMontage(interest(c), Montage) ' - ' class{c}], ps(c)), 'Color', color);
+            xlabel('frequency (Hz)');
+            ylabel('trial');
+
+            if (interest(c) ~= interest(ctl_idx))
+                mval = max(mval, max(max(temp)));
+            end
+
+        end
+
+
+    %     for c = 1:size(vals,2)
+    %         fidx = floor((c-1)/36)+1;
+    %         figure(h(fidx));
+    % 
+    %         subplot(dim,dim,c-((fidx-1)*36));
+    %         set(gca,'clim', [0 mval]);
+    % 
+    %     end
+    % 
+        for c = 1:fignum
+            figure(h(c));
+            maximize;
+            mtit (sprintf('reference channel: %d, max mscoherence: %f', interest(ctl_idx), mval),'xoff',0,'yoff',.05); 
+            SaveFig(fullfile(myGetenv('output_dir'), '1DBCI', 'figs'), sprintf('fig_interact.%s.%d.%d.plv', subjid, interest(ctl_idx), c), 'png');
+        end
+    end
+%     close(h);
+
+end
+
+%% make connectivity plot
+hand = makeConnectivityPlot(interest, alldechs, subjid, class);
+maximize(hand);
+SaveFig(fullfile(myGetenv('output_dir'), '1DBCI', 'figs'), sprintf('fig_interact.%s.connectivity.plv.dec', subjid), 'eps');
+SaveFig(fullfile(myGetenv('output_dir'), '1DBCI', 'figs'), sprintf('fig_interact.%s.connectivity.plv.dec', subjid), 'png');
+
+hand = makeConnectivityPlot(interest, allinchs, subjid, class);
+maximize(hand);
+SaveFig(fullfile(myGetenv('output_dir'), '1DBCI', 'figs'), sprintf('fig_interact.%s.connectivity.plv.inc', subjid), 'eps');
+SaveFig(fullfile(myGetenv('output_dir'), '1DBCI', 'figs'), sprintf('fig_interact.%s.connectivity.plv.inc', subjid), 'png');
+
+save(coh_cache, 'alldechs', 'allinchs', '-append');
+

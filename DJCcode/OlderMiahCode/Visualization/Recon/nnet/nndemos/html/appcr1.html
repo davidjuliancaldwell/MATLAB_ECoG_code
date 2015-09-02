@@ -1,0 +1,151 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Character Recognition</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="appcr1.m"><link rel="stylesheet" type="text/css" href="../../../matlab/helptools/private/style.css"></head><body><div class="header"><div class="left"><a href="matlab:edit appcr1">Open appcr1.m in the Editor</a></div><div class="right"><a href="matlab:echodemo appcr1">Run in the Command Window</a></div></div><div class="content"><h1>Character Recognition</h1><!--introduction--><p>This example illustrates how to train a neural network to perform simple character recognition.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Defining the Problem</a></li><li><a href="#3">Creating the First Neural Network</a></li><li><a href="#4">Training the first Neural Network</a></li><li><a href="#5">Training the Second Neural Network</a></li><li><a href="#8">Testing Both Neural Networks</a></li></ul></div><h2>Defining the Problem<a name="1"></a></h2><p>The script <b>prprob</b> defines a matrix X with 26 columns, one for each letter of the alphabet.  Each column has 35 values which can either be 1 or 0.  Each column of 35 values defines a 5x7 bitmap of a letter.</p><p>The matrix T is a 26x26 identity matrix which maps the 26 input vectors to the 26 classes.</p><pre class="codeinput">[X,T] = prprob;
+</pre><p>Here A, the first letter, is plotted as a bit map.</p><pre class="codeinput">plotchar(X(:,1))
+</pre><img vspace="5" hspace="5" src="appcr1_01.png" alt=""> <h2>Creating the First Neural Network<a name="3"></a></h2><p>To solve this problem we will use a feedforward neural network set up for pattern recognition with 25 hidden neurons.</p><p>Since the neural network is initialized with random initial weights, the results after training vary slightly every time the example is run. To avoid this randomness, the random seed is set to reproduce the same results every time. This is not necessary for your own applications.</p><pre class="codeinput">setdemorandstream(pi);
+
+net1 = feedforwardnet(25);
+view(net1)
+</pre><img vspace="5" hspace="5" src="appcr1_02.png" alt=""> <h2>Training the first Neural Network<a name="4"></a></h2><p>The function <b>train</b> divides up the data into training, validation and test sets.  The training set is used to update the network, the validation set is used to stop the network before it overfits the training data, thus preserving good generalization.  The test set acts as a completely independent measure of how well the network can be expected to do on new samples.</p><p>Training stops when the network is no longer likely to improve on the training or validation sets.</p><pre class="codeinput">net1.divideFcn = <span class="string">''</span>;
+net1 = train(net1,X,T,nnMATLAB);
+</pre><h2>Training the Second Neural Network<a name="5"></a></h2><p>We would like the network to not only recognize perfectly formed letters, but also noisy versions of the letters.  So we will try training a second network on noisy data and compare its ability to genearlize with the first network.</p><p>Here 30 noisy copies of each letter Xn are created.  Values are limited by <b>min</b> and <b>max</b> to fall between 0 and 1.  The corresponding targets Tn are also defined.</p><pre class="codeinput">numNoise = 30;
+Xn = min(max(repmat(X,1,numNoise)+randn(35,26*numNoise)*0.2,0),1);
+Tn = repmat(T,1,numNoise);
+</pre><p>Here is a noise version of A.</p><pre class="codeinput">figure
+plotchar(Xn(:,1))
+</pre><img vspace="5" hspace="5" src="appcr1_03.png" alt=""> <p>Here the second network is created and trained.</p><pre class="codeinput">net2 = feedforwardnet(25);
+net2 = train(net2,Xn,Tn,nnMATLAB);
+</pre><h2>Testing Both Neural Networks<a name="8"></a></h2><pre class="codeinput">noiseLevels = 0:.05:1;
+numLevels = length(noiseLevels);
+percError1 = zeros(1,numLevels);
+percError2 = zeros(1,numLevels);
+<span class="keyword">for</span> i = 1:numLevels
+  Xtest = min(max(repmat(X,1,numNoise)+randn(35,26*numNoise)*noiseLevels(i),0),1);
+  Y1 = net1(Xtest);
+  percError1(i) = sum(sum(abs(Tn-compet(Y1))))/(26*numNoise*2);
+  Y2 = net2(Xtest);
+  percError2(i) = sum(sum(abs(Tn-compet(Y2))))/(26*numNoise*2);
+<span class="keyword">end</span>
+
+figure
+plot(noiseLevels,percError1*100,<span class="string">'--'</span>,noiseLevels,percError2*100);
+title(<span class="string">'Percentage of Recognition Errors'</span>);
+xlabel(<span class="string">'Noise Level'</span>);
+ylabel(<span class="string">'Errors'</span>);
+legend(<span class="string">'Network 1'</span>,<span class="string">'Network 2'</span>,<span class="string">'Location'</span>,<span class="string">'NorthWest'</span>)
+</pre><img vspace="5" hspace="5" src="appcr1_04.png" alt=""> <p>Network 1, trained without noise, has more errors due to noise than does Network 2, which was trained with noise.</p><p class="footer">Copyright 2011-2012 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br><br>
+		  MATLAB and Simulink are registered trademarks of The MathWorks, Inc.  Please see <a href="http://www.mathworks.com/trademarks">www.mathworks.com/trademarks</a> for a list of other trademarks owned by The MathWorks, Inc.  Other product or brand names are trademarks or registered trademarks of their respective owners.
+      </p></div><!--
+##### SOURCE BEGIN #####
+%% Character Recognition
+% This example illustrates how to train a neural network to perform
+% simple character recognition.
+
+% Copyright 2011-2012 The MathWorks, Inc.
+
+%% Defining the Problem
+% The script *prprob* defines a matrix X with 26 columns, one for
+% each letter of the alphabet.  Each column has 35 values which can either
+% be 1 or 0.  Each column of 35 values defines a 5x7 bitmap of a letter.
+%
+% The matrix T is a 26x26 identity matrix which maps the 26 input
+% vectors to the 26 classes.
+
+[X,T] = prprob;
+
+%%
+% Here A, the first letter, is plotted as a bit map.
+
+plotchar(X(:,1))
+
+%% Creating the First Neural Network
+% To solve this problem we will use a feedforward neural network set up
+% for pattern recognition with 25 hidden neurons.
+%
+% Since the neural network is initialized with random initial weights, the
+% results after training vary slightly every time the example is run.
+% To avoid this randomness, the random seed is set to reproduce the
+% same results every time. This is not necessary for your own applications.
+
+setdemorandstream(pi);
+
+net1 = feedforwardnet(25);
+view(net1)
+
+%% Training the first Neural Network
+% The function *train* divides up the data into training, validation and
+% test sets.  The training set is used to update the network, the
+% validation set is used to stop the network before it overfits the
+% training data, thus preserving good generalization.  The test set acts
+% as a completely independent measure of how well the network can be
+% expected to do on new samples.
+%
+% Training stops when the network is no longer likely to improve on the
+% training or validation sets.
+
+net1.divideFcn = '';
+net1 = train(net1,X,T,nnMATLAB);
+
+%% Training the Second Neural Network
+% We would like the network to not only recognize perfectly formed
+% letters, but also noisy versions of the letters.  So we will try training
+% a second network on noisy data and compare its ability to genearlize
+% with the first network.
+%
+% Here 30 noisy copies of each letter Xn are created.  Values are limited
+% by *min* and *max* to fall between 0 and 1.  The corresponding targets
+% Tn are also defined.
+
+numNoise = 30;
+Xn = min(max(repmat(X,1,numNoise)+randn(35,26*numNoise)*0.2,0),1);
+Tn = repmat(T,1,numNoise);
+
+%%
+% Here is a noise version of A.
+
+figure
+plotchar(Xn(:,1))
+
+%%
+% Here the second network is created and trained.
+
+net2 = feedforwardnet(25);
+net2 = train(net2,Xn,Tn,nnMATLAB);
+
+%% Testing Both Neural Networks
+
+noiseLevels = 0:.05:1;
+numLevels = length(noiseLevels);
+percError1 = zeros(1,numLevels);
+percError2 = zeros(1,numLevels);
+for i = 1:numLevels
+  Xtest = min(max(repmat(X,1,numNoise)+randn(35,26*numNoise)*noiseLevels(i),0),1);
+  Y1 = net1(Xtest);
+  percError1(i) = sum(sum(abs(Tn-compet(Y1))))/(26*numNoise*2);
+  Y2 = net2(Xtest);
+  percError2(i) = sum(sum(abs(Tn-compet(Y2))))/(26*numNoise*2);
+end
+
+figure
+plot(noiseLevels,percError1*100,'REPLACE_WITH_DASH_DASH',noiseLevels,percError2*100);
+title('Percentage of Recognition Errors');
+xlabel('Noise Level');
+ylabel('Errors');
+legend('Network 1','Network 2','Location','NorthWest')
+
+%%
+% Network 1, trained without noise, has more errors due to noise than
+% does Network 2, which was trained with noise.
+
+displayEndOfDemoMessage(mfilename)
+
+ 
+
+##### SOURCE END #####
+--></body></html>
