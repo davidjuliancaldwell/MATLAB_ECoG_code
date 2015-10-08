@@ -1,10 +1,10 @@
 %% Constants
 Z_Constants;
-addpath C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code\JDW_Code_2.10.2015\Experiment\BetaTriggeredStim;
+addpath ./scripts/ %DJC edit 7/17/2015
 
 %% Load in the trigger data
 
-sid = SIDS{6};
+sid = SIDS{5};
 
 if (strcmp(sid, '8adc5c'))
     tp = 'd:\research\subjects\8adc5c\data\d6\8adc5c_BetaTriggeredStim';

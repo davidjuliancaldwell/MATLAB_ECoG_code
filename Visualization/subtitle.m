@@ -11,7 +11,7 @@ function [ax,h]=subtitle(text)
 % title
 ax=axes('Units','Normal','Position',[.1 .1 .85 .85],'Visible','off');
 set(get(ax,'Title'),'Visible','on')
-title(text);
+title(text, 'FontSize', 20); % modified DJC 9-8-2015 for bigger size 
 if (nargout < 2)
     return
 end

@@ -552,3 +552,17 @@ b = find(same==1)+1;
 
 end
 
+%% which doors are open 
+
+function y = which_doors_open(n)
+
+y = zeros(1,n);
+
+for i = 1:n
+    y(i:i:end) = ~y(i:i:end);
+end
+
+y = find(y~=0);
+
+end
+

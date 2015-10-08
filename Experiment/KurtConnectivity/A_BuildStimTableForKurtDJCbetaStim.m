@@ -30,7 +30,7 @@ toc;
 % Wave-4 looks like the stim command
 tic;
 mode = tank.readWaveEvent('Wave', 2)';
-ttype = tank.readWaveEvent('Wave', 1)';
+ttype = 0*mode;
 
 beta = tank.readWaveEvent('Blck', 1)';
 %     [beta, ~] = tdt_loadStream(tp, block, 'Blck', 1);
@@ -119,4 +119,4 @@ for bursti = 1:size(bursts, 2)
 end
 
 %% save the result to intermediate file for future use
-save(fullfile(META_DIR, ['9ab7ab_Kurt' '_tables.mat']), 'bursts', 'fs', 'stims');
+save(fullfile(META_DIR, ['9ab7ab' '_tables.mat']), 'bursts', 'fs', 'stims');

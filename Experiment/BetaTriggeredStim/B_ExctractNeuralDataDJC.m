@@ -60,6 +60,7 @@ for idx = 1:length(SIDS)
     chans(ismember(chans, stims)) = [];
     
     %% load in the trigger data
+    % 9-2-2015 DJC added mod DJC
     load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
     
     % drop any stims that happen in the first 500 milliseconds
@@ -183,7 +184,7 @@ for idx = 1:length(SIDS)
         %% preprocess eco
         %             presamps = round(0.050 * efs); % pre time in sec
         presamps = round(0.025 * efs); % pre time in sec
-        postsamps = round(0.120 * efs); % post time in sec
+        postsamps = round(0.30 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
         
         sts = round(stims(2,:) / fac);
         edd = zeros(size(sts));
@@ -281,12 +282,25 @@ for idx = 1:length(SIDS)
         
         baselines = pstims(5,:) > 2 * fs;
         
+        % modified 9-10-2015 - DJC, find pre condition for each type of
+        % test pulse 
+        
+        pre = pstims(7,:) < 0.250*fs;
+        
         if (sum(baselines) < 100)
             warning('N baselines = %d.', sum(baselines));
         end
         
         types = unique(bursts(5,pstims(4,:)));
+        
+        %DJC - modify suffix to list conditioning type 
         suffix = arrayfun(@(x) num2str(x), types, 'uniformoutput', false);
+%         
+        suffix = cell(1,4);
+        suffix{1} = 'Negative phase of Beta';
+        suffix{2} = 'Positive phase of Beta';
+        suffix{3} = 'null condition'; 
+        suffix{4} = 'Random phase of Beta';
         
         nullType = 2;
         
@@ -345,13 +359,13 @@ for idx = 1:length(SIDS)
                 yl(1) = min(-10, max(yl(1),-120));
                 yl(2) = max(10, min(yl(2),100));
                 ylim(yl);
-                highlight(gca, [0 t(ct)*1e3], [], [.8 .8 .8])
+                highlight(gca, [0 t(ct)*1e3], [], [.8 .8 .8]) %this is the part that plots that stim window 
                 vline(0);
                 
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
-                title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-                
+%                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                title(sprintf('Evoked Potentials by # of conditioning pulses for Channel %d, stimuli in {%s}',chan,suffix{typei}))
                 leg = {'Pre'};
                 for d = 1:length(labelGroupStarts)
                     if d == length(labelGroupStarts)
@@ -406,9 +420,8 @@ for idx = 1:length(SIDS)
                 %
                 %     sigstar(pair, p);
                 
-                %
-                %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'eps', '-r600');
-                %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'png', '-r600');
+                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'eps', '-r600');
+                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'png', '-r600');
                 
                 %     saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)));
                 %     saveas(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)),'eps');
