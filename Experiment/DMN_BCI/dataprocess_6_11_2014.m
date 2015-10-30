@@ -1,5 +1,5 @@
 %%acquire data from 4 patients 
-addpath(genpath(fullfile('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects')))
+% addpath(genpath(fullfile('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects')))
 
 %patient a557cc
 %no real data?
@@ -8,69 +8,69 @@ addpath(genpath(fullfile('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subject
 %patient 3f5a8c - 6/16/2014- updated to include notes from laboratory
 %notebook 
 %day 6 - 2 target
-%[sig_3f5a8c_d6_r01, sta_3f5a8c_d6_r01, par_3f5a8c_d6_r01] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R01.dat');
-[sig_3f5a8c_d6_r02, sta_3f5a8c_d6_r02, par_3f5a8c_d6_r02] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R02.dat');
-[sig_3f5a8c_d6_r03, sta_3f5a8c_d6_r03, par_3f5a8c_d6_r03] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R03.dat');
-[sig_3f5a8c_d6_r04, sta_3f5a8c_d6_r04, par_3f5a8c_d6_r04] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R04.dat');
+%[sig_3f5a8c_d6_r01, sta_3f5a8c_d6_r01, par_3f5a8c_d6_r01] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R01.dat');
+[sig_3f5a8c_d6_r02, sta_3f5a8c_d6_r02, par_3f5a8c_d6_r02] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R02.dat');
+[sig_3f5a8c_d6_r03, sta_3f5a8c_d6_r03, par_3f5a8c_d6_r03] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R03.dat');
+[sig_3f5a8c_d6_r04, sta_3f5a8c_d6_r04, par_3f5a8c_d6_r04] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R04.dat');
 
 %day 7 - 2 target 
-%[sig_3f5a8c_d7_r01, sta_3f5a8c_d7_r01, par_3f5a8c_d7_r01] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R01.dat');
-%[sig_3f5a8c_d7_r02, sta_3f5a8c_d7_r02, par_3f5a8c_d7_r02] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R02.dat');
-%[sig_3f5a8c_d7_r03, sta_3f5a8c_d7_r03, par_3f5a8c_d7_r03] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R03.dat');
-[sig_3f5a8c_d7_r04, sta_3f5a8c_d7_r04, par_3f5a8c_d7_r04] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R04.dat');
-[sig_3f5a8c_d7_r05, sta_3f5a8c_d7_r05, par_3f5a8c_d7_r05] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R05.dat');
+%[sig_3f5a8c_d7_r01, sta_3f5a8c_d7_r01, par_3f5a8c_d7_r01] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R01.dat');
+%[sig_3f5a8c_d7_r02, sta_3f5a8c_d7_r02, par_3f5a8c_d7_r02] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R02.dat');
+%[sig_3f5a8c_d7_r03, sta_3f5a8c_d7_r03, par_3f5a8c_d7_r03] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R03.dat');
+[sig_3f5a8c_d7_r04, sta_3f5a8c_d7_r04, par_3f5a8c_d7_r04] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R04.dat');
+[sig_3f5a8c_d7_r05, sta_3f5a8c_d7_r05, par_3f5a8c_d7_r05] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R05.dat');
 
 %day6/7 - 3 target
-[sig_3f5a8c_d6_3targ_r01, sta_3f5a8c_d6_3targ_r01, par_3f5a8c_d6_3targ_r01] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R01.dat');
-[sig_3f5a8c_d6_3targ_r02, sta_3f5a8c_d6_3targ_r02, par_3f5a8c_d6_3targ_r02] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R02.dat');
+[sig_3f5a8c_d6_3targ_r01, sta_3f5a8c_d6_3targ_r01, par_3f5a8c_d6_3targ_r01] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R01.dat');
+[sig_3f5a8c_d6_3targ_r02, sta_3f5a8c_d6_3targ_r02, par_3f5a8c_d6_3targ_r02] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R02.dat');
 
-[sig_3f5a8c_d7_r06, sta__3f5a8c_d7_r06, par_3f5a8c_d7_r06] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R06.dat');
+[sig_3f5a8c_d7_r06, sta__3f5a8c_d7_r06, par_3f5a8c_d7_r06] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R06.dat');
 
 %patient 9d10c8
 %day 13 - 2 target 
-%[sig_9d10c8_d13_r01, sta_9d10c8_d13_r01, par_9d10c8_d13_r01] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R01.dat');
-[sig_9d10c8_d13_r02, sta_9d10c8_d13_r02, par_9d10c8_d13_r02] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R02.dat');
-[sig_9d10c8_d13_r03, sta_9d10c8_d13_r03, par_9d10c8_d13_r03] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R03.dat');
-[sig_9d10c8_d13_r04, sta_9d10c8_d13_r04, par_9d10c8_d13_r04] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R04.dat');
-%[sig_9d10c8_d13_r05, sta_9d10c8_d13_r05, par_9d10c8_d13_r05] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R05.dat');
-%[sig_9d10c8_d13_r07, sta_9d10c8_d13_r07, par_9d10c8_d13_r07] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R07.dat');
-%[sig_9d10c8_d13_r08, sta_9d10c8_d13_r08, par_9d10c8_d13_r08] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R08.dat');
+%[sig_9d10c8_d13_r01, sta_9d10c8_d13_r01, par_9d10c8_d13_r01] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R01.dat');
+[sig_9d10c8_d13_r02, sta_9d10c8_d13_r02, par_9d10c8_d13_r02] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R02.dat');
+[sig_9d10c8_d13_r03, sta_9d10c8_d13_r03, par_9d10c8_d13_r03] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R03.dat');
+[sig_9d10c8_d13_r04, sta_9d10c8_d13_r04, par_9d10c8_d13_r04] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R04.dat');
+%[sig_9d10c8_d13_r05, sta_9d10c8_d13_r05, par_9d10c8_d13_r05] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R05.dat');
+%[sig_9d10c8_d13_r07, sta_9d10c8_d13_r07, par_9d10c8_d13_r07] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R07.dat');
+%[sig_9d10c8_d13_r08, sta_9d10c8_d13_r08, par_9d10c8_d13_r08] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R08.dat');
 
 % day 13 - 3 target
-[sig_9d10c8_d13_r06, sta_9d10c8_d13_r06, par_9d10c8_d13_r06] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R06.dat');
+[sig_9d10c8_d13_r06, sta_9d10c8_d13_r06, par_9d10c8_d13_r06] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R06.dat');
 
 %patient bf889c
 %day 4
-[sig_bf889c_d4_r01, sta_bf889c_d4_r01, par_bf889c_d4_r01] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d4\bf889c_ud_dmn001\bf889c_ud_dmnS001R01.dat');
-[sig_bf889c_d4_r02, sta_bf889c_d4_r02, par_bf889c_d4_r02] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d4\bf889c_ud_dmn001\bf889c_ud_dmnS001R02.dat');
+[sig_bf889c_d4_r01, sta_bf889c_d4_r01, par_bf889c_d4_r01] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d4\bf889c_ud_dmn001\bf889c_ud_dmnS001R01.dat');
+[sig_bf889c_d4_r02, sta_bf889c_d4_r02, par_bf889c_d4_r02] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d4\bf889c_ud_dmn001\bf889c_ud_dmnS001R02.dat');
 
 %day 5
-[sig_bf889c_d5_r01, sta_bf889c_d5_r01, par_bf889c_d5_r01] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R01.dat');
-[sig_bf889c_d5_r02, sta_bf889c_d5_r02, par_bf889c_d5_r02] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R02.dat');
-[sig_bf889c_d5_r03, sta_bf889c_d5_r03, par_bf889c_d5_r03] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R03.dat');
-[sig_bf889c_d5_r04, sta_bf889c_d5_r04, par_bf889c_d5_r04] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R04.dat');
-[sig_bf889c_d5_r05, sta_bf889c_d5_r05, par_bf889c_d5_r05] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R05.dat');
-[sig_bf889c_d5_r06, sta_bf889c_d5_r06, par_bf889c_d5_r06] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R06.dat');
+[sig_bf889c_d5_r01, sta_bf889c_d5_r01, par_bf889c_d5_r01] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R01.dat');
+[sig_bf889c_d5_r02, sta_bf889c_d5_r02, par_bf889c_d5_r02] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R02.dat');
+[sig_bf889c_d5_r03, sta_bf889c_d5_r03, par_bf889c_d5_r03] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R03.dat');
+[sig_bf889c_d5_r04, sta_bf889c_d5_r04, par_bf889c_d5_r04] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R04.dat');
+[sig_bf889c_d5_r05, sta_bf889c_d5_r05, par_bf889c_d5_r05] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R05.dat');
+[sig_bf889c_d5_r06, sta_bf889c_d5_r06, par_bf889c_d5_r06] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\bf889c\data\d5\bf889c_ud_dmn001\bf889c_ud_dmnS001R06.dat');
     
 %% after loading, use sta to look at types of data available and PlotStates to look at data overall (this here is the general procedure)
 [sig, sta, par] = load_bcidatUI();
-sta
-PlotStates(sta, par)
+sta;
+PlotStates(sta, par);
 
 % compute number of trials completed using .Feedbac
 x = diff(double(sta.Feedback)); %compute difference along vector of Feedback
 ind = find(x<0); %find indices of feedback transition from 1 to 0 (difference of -1), representing a completed trial
 y = size(ind); % vector of completed trials 
-num_trials_complete = y(1)
+num_trials_complete = y(1);
 
 %Compare target and results at each point of completed trial
-target = double(sta.TargetCode(ind))
-result = double(sta.ResultCode(ind+1)) %to account for delay
+target = double(sta.TargetCode(ind));
+result = double(sta.ResultCode(ind+1)); %to account for delay
 
-success = sum(target==result)/length(target)
+success = sum(target==result)/length(target);
 
 %binom chance
-[chance, hv, lv] = chanceBinom(.5,num_trials_complete,1000)
+[chance, hv, lv] = chanceBinom(.5,num_trials_complete,1000);
 
 %plot bar graph 
 y = [chance, success]
@@ -253,6 +253,7 @@ end
 success_bf889c_comb = sum(patient_bf889c_comparesum)/sum(num_trials_complete3);
 %% bar graph 
 
+figure
 bar_data = [success_3f5a8c_comb chance_3f5a8c_comb; success_9d10c8_comb chance_9d10c8_comb; success_bf889c_comb chance_bf889c_comb; success_3f5a8c_3targ_comb chance_3f5a8c_3targ_comb; success_9d10c8_3targ_comb chance_9d10c8_3targ_comb];
 bar(bar_data)
 title('Success vs. Chance for DMN BCI','fontsize',14,'fontweight','bold')
@@ -269,7 +270,54 @@ line([4 4.3], [hv_3f5a8c_3targ_comb hv_3f5a8c_3targ_comb], 'linestyle', '--','li
 line([5 5.3], [hv_9d10c8_3targ_comb hv_9d10c8_3targ_comb], 'linestyle', '--','linewidth',3)
 legend('Success', 'Chance', '95% confidence interval')
 
+%% 10-14-2015 overlay bar graph for SFN
+figure
+bar_2targ_data = [success_3f5a8c_comb success_9d10c8_comb success_bf889c_comb];
+bar_2targ_chance = [chance_3f5a8c_comb chance_9d10c8_comb chance_bf889c_comb];
+bar_2targ_hv = [hv_3f5a8c_comb hv_9d10c8_comb hv_bf889c_comb];
+w1 = 0.5;
+bar(bar_2targ_data,w1,'FaceColor','r')
+hold on
+error_2 = (bar_2targ_hv-bar_2targ_chance);
+w2 = 0.25;
+bar(bar_2targ_chance,w2,'FaceColor','k')
 
+errorbar((1:length(bar_2targ_chance)),bar_2targ_chance,error_2,'linestyle','none','linew',4','color','k')
+
+
+
+% xlabel('Patients and Task','fontsize',16,'fontweight','bold')
+ylabel('Proportion Success','fontsize',14,'fontweight','bold')
+
+
+set(gca,'XtickLabel',{'3f5a8c 2 target','9d10c8 2 target', 'bf889c 2 target'},'fontsize',14,'fontweight','bold')
+ylim([0,1])
+% hold on
+% line([0.7 1], [hv_3f5a8c_comb hv_3f5a8c_comb], 'linestyle', '-','linewidth',3)
+% line([1.7 2], [hv_9d10c8_comb hv_9d10c8_comb], 'linestyle', '-','linewidth',3)
+% line([2.7 3], [hv_bf889c_comb hv_bf889c_comb], 'linestyle', '-','linewidth',3)
+
+figure
+bar_3targ_data = [success_3f5a8c_3targ_comb success_9d10c8_3targ_comb];
+bar_3targ_hv = [hv_3f5a8c_3targ_comb hv_9d10c8_3targ_comb];
+bar_3targ_chance = [chance_3f5a8c_3targ_comb chance_9d10c8_3targ_comb];
+
+error_3 = (bar_3targ_hv - bar_3targ_chance);
+bar(bar_3targ_data,w1,'FaceCOlor','r')
+hold on
+bar(bar_3targ_chance,w2,'FaceColor','k')
+
+
+errorbar((1:length(bar_3targ_chance)),bar_3targ_chance,error_3,'linestyle','none','linew',4','color','k')
+
+
+% xlabel('Patients and Task','fontsize',12,'fontweight','bold')
+ylabel('Proportion Success','fontsize',14,'fontweight','bold')
+set(gca,'XtickLabel',{'3f5a8c 3 target', '9d10c8 3 target'},'fontsize',14,'fontweight','bold')
+ylim([0,1])
+hold on
+% line([4 4.3], [hv_3f5a8c_3targ_comb hv_3f5a8c_3targ_comb], 'linestyle', '--','linewidth',4)
+% line([5 5.3], [hv_9d10c8_3targ_comb hv_9d10c8_3targ_comb], 'linestyle', '--','linewidth',4)
 
 %% new way to do data all at once? 
 for i = 1:9
@@ -294,10 +342,10 @@ end
 
 %patient 3f5a8c
 %day6/7 - 3 target - input data 
-[sig_3f5a8c_d6_3targ_r01, sta_3f5a8c_d6_3targ_r01, par_3f5a8c_d6_3targ_r01] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R01.dat');
-[sig_3f5a8c_d6_3targ_r02, sta_3f5a8c_d6_3targ_r02, par_3f5a8c_d6_3targ_r02] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R02.dat');
+[sig_3f5a8c_d6_3targ_r01, sta_3f5a8c_d6_3targ_r01, par_3f5a8c_d6_3targ_r01] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R01.dat');
+[sig_3f5a8c_d6_3targ_r02, sta_3f5a8c_d6_3targ_r02, par_3f5a8c_d6_3targ_r02] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d6\3f5a8c_ud_dmn_3targ001\3f5a8c_ud_dmn_3targS001R02.dat');
 
-[sig_3f5a8c_d7_r06, sta__3f5a8c_d7_r06, par_3f5a8c_d7_r06] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R06.dat');
+[sig_3f5a8c_d7_r06, sta__3f5a8c_d7_r06, par_3f5a8c_d7_r06] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\3f5a8c\data\d7\3f5a8c_ud_dmn001\3f5a8c_ud_dmnS001R06.dat');
 
 % convert data to cell from structure
 patient_3f5a8c_3targ = [sta_3f5a8c_d6_3targ_r01 sta_3f5a8c_d6_3targ_r02 sta__3f5a8c_d7_r06]';
@@ -358,7 +406,7 @@ success_3f5a8c_3targ_comb = sum(patient_3f5a8c_3targ_comparesum)/sum(num_trials_
 %%
 %patient 9d10c8
 % day 13 - 3 target
-[sig_9d10c8_d13_r06, sta_9d10c8_d13_r06, par_9d10c8_d13_r06] = load_bcidat('C:\Users\David\Desktop\Research\Rao Lab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R06.dat');
+[sig_9d10c8_d13_r06, sta_9d10c8_d13_r06, par_9d10c8_d13_r06] = load_bcidat('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9d10c8\data\d13\9d10c8_ud_dmn001\9d10c8_ud_dmnS001R06.dat');
 
 patient_9d10c8_3targ = [sta_9d10c8_d13_r06]';
 patient_9d10c8_3targ_feedback = {patient_9d10c8_3targ(1).Feedback};

@@ -74,14 +74,21 @@ targetDiff = diff(double(sta.TargetCode));
 
 targetStart = find(targetDiff > 0)+1;
 
+% plot with time vector 10-13-2015
+time = (prettyEnd-prettyStart);
+time = time(1);
+
+t = [1:1:time]./fs;
+
 figure;
-prettyline(prettySigInterest, sta.TargetCode(targetStart),[0 0 .5; .5 0 0; .3 .3 1; 1 .3 .3])
-vline(1200); % draw lines dividing prettyLine into sections of interest 
-vline(3600);
-vline(3600+3520);
+%adjusted to plot with time, rather than samples 
+prettyline(t,prettySigInterest, sta.TargetCode(targetStart),[0 0 .5; .5 0 0; .3 .3 1; 1 .3 .3])
+vline(1200/fs); % draw lines dividing prettyLine into sections of interest 
+vline(3600/fs);
+vline((3600+3520)/fs);
 title('All Trials - Gaussian Smoothed')
-xlabel('Samples')
-ylabel('logHGPower')
+xlabel('Time (seconds)')
+ylabel('log HG Power')
 legend('Up targets','Down targets')
 % 
 % figure;
@@ -108,12 +115,12 @@ resultInterest = results(results==targets);
 
 %pretty_sig_interest_success_gaussian = GaussianSmooth(pretty_sig_interest_success,200);
 figure;
-prettyline(prettySigInterestSuccess,resultInterest,[0 0 .5; .5 0 0; .3 .3 1; 1 .3 .3])
-vline(1200); % draw lines dividing prettyLine into sections of interest 
-vline(3600);
-vline(3600+3520);
+prettyline(t,prettySigInterestSuccess,resultInterest,[0 0 .5; .5 0 0; .3 .3 1; 1 .3 .3])
+vline(1200/fs); % draw lines dividing prettyLine into sections of interest 
+vline(3600/fs);
+vline((3600+3520)/fs);
 title('Successful Trials - Gaussian Smoothed')
-xlabel('Samples')
+xlabel('Time (seconds)')
 ylabel('logHGPower')
 legend('Up targets','Down targets')
 
@@ -135,5 +142,69 @@ activityHGmeansUp = activityHGmeans(:,class==1);
 activityHGmeansDown = activityHGmeans(:,class==2);
 restHGmeansUp = restHGmeans(:,class==1);
 restHGmeansDown = restHGmeans(:,class==2);
+
+
+%% DJC 10-14-2015
+% plot cursor trajectory
+cursorX = getEpochSignal(sta.CursorPosX, prettyStart,prettyEnd);
+cursorY = getEpochSignal(sta.CursorPosY, prettyStart,prettyEnd);
+
+cursorX = squeeze(cursorX);
+cursorY = squeeze(cursorY);
+
+cursorXUp = cursorX(:,class==1);
+cursorYUp = cursorY(:,class==1);
+cursorXDown = cursorX(:,class==2);
+cursorYDown = cursorY(:,class==2);
+
+figure
+hold on
+for i = 1:size(cursorYUp,2)
+    plot(t,cursorYUp(:,i),'color','b','linewidth',4)
+end
+
+for i = 1:size(cursorYDown,2)
+    plot(t,cursorYDown(:,i),'color','r','linewidth',4)
+end
+
+set(gca,'Ydir','reverse')
+ylim([0 1024])
+vline(1200/fs); % draw lines dividing prettyLine into sections of interest 
+vline(3600/fs);
+vline((3600+3520)/fs);
+hline((1024/2));
+
+%% DJC 10-14-2015
+% plot cursor trajectory success
+cursorX = getEpochSignal(sta.CursorPosX, prettyStartSuccess,prettyEndSuccess);
+cursorY = getEpochSignal(sta.CursorPosY, prettyStartSuccess,prettyEndSuccess);
+
+cursorX = squeeze(cursorX);
+cursorY = squeeze(cursorY);
+
+cursorXUp = cursorX(:,resultInterest==1);
+cursorYUp = cursorY(:,resultInterest==1);
+cursorXDown = cursorX(:,resultInterest==2);
+cursorYDown = cursorY(:,resultInterest==2);
+
+figure
+hold on
+for i = 1:size(cursorYUp,2)
+    plot(t,cursorYUp(:,i),'color','r')
+end
+
+for i = 1:size(cursorYDown,2)
+    plot(t,cursorYDown(:,i),'color','b')
+end
+
+vline(1200/fs); % draw lines dividing prettyLine into sections of interest 
+vline(3600/fs);
+vline((3600+3520)/fs);
+
+
+%% feedback 10-14-2015
+feedback = getEpochSignal(sta.Feedback, prettyStart,prettyEnd);
+feedback = squeeze(feedback);
+
 
 end

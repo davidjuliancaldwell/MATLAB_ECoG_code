@@ -33,7 +33,16 @@ electrodes = input('What electrodes are of interest for plotting? e.g. [1:64] ')
 
 %% difference between Pre and Post conditions for channels of interest
 
+%added in for channel to exclude 10-19-2015 DJC
+%
+badChans = input('What are the bad channels?');
+
 diffs = PLVpost - PLVpre;
+for bad = badChans
+    diffs(bad,:) = NaN;
+    
+end
+
 
 for chan = chansInt
     

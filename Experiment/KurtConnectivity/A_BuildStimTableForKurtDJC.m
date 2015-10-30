@@ -58,13 +58,13 @@ end_ind = stimtab(3,:);
 smon_epoch = squeeze(getEpochSignal(smon',start_ind-10,end_ind))';
 stim_epoch = squeeze(getEpochSignal(stim',start_ind-10,end_ind))';
 
-% figure
-% subplot(2,1,1)
-% plot([-9:1:length(smon_epoch)-10],smon_epoch)
-% title('Smon')
-% subplot(2,1,2)
-% plot([-9:1:length(stim_epoch)-10],stim_epoch)
-% title('Stim')
+figure
+subplot(2,1,1)
+plot([-9:1:length(smon_epoch)-10],smon_epoch)
+title('Smon')
+subplot(2,1,2)
+plot([-9:1:length(stim_epoch)-10],stim_epoch)
+title('Stim')
 
 % want to make sure stim was delivered everytime that trigger occured
 %%

@@ -47,14 +47,26 @@ postsamps = round(0.2 * efs); % post time in sec
 t = (-presamps:postsamps)/efs;
 
 sigs = cell2mat(muCell);
-
-% look at 10 ms after until end of signal, so
+stdError = cell2mat(stdErrCell);
+%% Below is for 20 ms before until end of stimulus 10-23-2015
+% look at 20 ms before stimuli until end of signal, so
 % presamps+1+round(10*efs/1000)
 
-sigsTrim = sigs((presamps+1+round(10*efs/1000)):end,:);
+sigsTrim = sigs((presamps-round(0.02*efs)):end,:);
+stdErrorTrim = stdError((presamps-round(0.02*efs)):end,:);
 
 tTemp = t';
-tTrim = tTemp((presamps+1+round(10*efs/1000)):end,:);
+tTrim = tTemp((presamps-round(0.02*efs)):end,:);
+tTrim = tTrim';
+
+%% Here is for at stim until end of stim 10-23-2015
+
+sigsTrim = sigs(presamps:end,:);
+stdErrorTrim = stdError(presamps:end,:);
+
+
+tTemp = t';
+tTrim = tTemp(presamps:end,:);
 tTrim = tTrim';
 %% plot muCell
 
@@ -65,6 +77,9 @@ hold on
 title('Average CCEP values for each channel')
 xlabel('time in ms')
 ylabel('amplitude in uV')
+xlim([-20 200])
+ylim([-10e-5 10e-5])
+vline([0])
 
 %% look at MuCell from 10 ms after stimulation to 200 ms
 % covariance, singular value decomposition
@@ -98,18 +113,70 @@ hold on
 
 for i = 1:size(sigs,2)
     
-   [C,lag] = xcorr(sigs(:,chan),sigs(:,i));
+   [C,lag] = xcorr(sigsTrim(:,chan),sigsTrim(:,i));
    corrsCell{i} = C;
    lagsCell{i} = lag;
    
    subplot(8,8,i)
-   plot(lag/efs,C);
+   plot(1e3*lag/efs,C);
    
-   title(sprintf('Channel %d',i))
+   title(sprintf('%d',i))
    
-   
+   if i == 64
+      xlabel('Time in ms') 
+   end
    
     
 end
-subtitle('Cross correlation for CCEPs between channels in grid and Beta-Triggered Channel')
+
+hold on
+subtitle(sprintf('Cross correlation for CCEPs between channel %d and all other channels',chan))
+
+%% 10-23-2015 - CCEP map for larry
+
+%% do a plot of all channels 
+
+betaChan = input('What was the beta triggered channel?  ');
+
+figure
+
+for i = chans
+    mu = sigsTrim(:,i);
+    stdErr = stdErrorTrim(:,i);
+    chan = i;
+    subplot(8,8,i)
+    
+    plot(1e3*tTrim, 1e6*mu);
+    xlim(1e3*[-0.02 0.2]);
+    %     xlim(1e3*[min(t) max(t)]);
+    %     yl = ylim;
+    %     yl(1) = min(-10, max(yl(1),-120));
+    %     yl(2) = max(10, min(yl(2),100));
+    %     ylim(yl);
+%     ylim([-30 30])
+    hold on
+    vline(0);
+    
+    hold on
+    plot(1e3*tTrim, 1e6*(mu+stdErr))
+    hold on
+    
+    plot(1e3*tTrim, 1e6*(mu-stdErr))
+    title(sprintf('Chan %d', chan))
+    %
+    %     xlabel('time (ms)');
+    %     ylabel('ECoG (uV)');
+    %
+    %     title(sprintf('CCEP, Channel %d', chan))
+    
+    if i == 64
+        xlabel('Time in ms')
+        ylabel('Voltage in \muV')
+    end
+    
+end
+
+subtitle(sprintf('CCEP map for subject %s, Beta-Trigger Channel %d',sid,betaChan));
+
+
 
