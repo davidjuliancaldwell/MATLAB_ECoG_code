@@ -1,9 +1,8 @@
 %% From Power Spectral Density Estimates Using FFT
 % Periodogram of signal using FFT
 % x is the signal, Fs is the sampling frequency 
-% this is from http://www.mathworks.com/help/signal/ug/psd-estimate-using-fft.html
 
-function [freq,psdx] = fftDJC(x,Fs)
+function [freq,psdx
 N = length(x);
 Fs = double(Fs);
 xdft = fft(x);
@@ -17,4 +16,3 @@ grid on
 title('Periodogram Using FFT')
 xlabel('Frequency (Hz)')
 ylabel('Power/Frequency (dB/Hz)')
-end 

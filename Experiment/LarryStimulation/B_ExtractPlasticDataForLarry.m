@@ -1,10 +1,12 @@
-%% 10-28-2015 - Extract data from beta triggered stimulation files that may be of interest for Larry
-% use existing stim tables, select pulses 250 ms away from beta burst
-% extract data 250 ms before, 500 ms after, save results in META_DIR so
-% that plots can be recreated
+%% 11-3-2015
+% Extract data from beta triggered stimulation files that may be of
+% interest for Larry use existing stim tables, select test pulses after
+% conditioning train, for falling and rising  Extract 250 ms before, 500 ms
+% after, save results in META_DIR so that plots can be recreated, no
+% preprocessing
 
 %% Constants
-Z_ConstantsLarryStimulation;
+Z_ConstantsLarryStim;
 addpath ./experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
 
 %%
@@ -103,57 +105,10 @@ for chan = chans
     fac = fs/efs;
     
     toc;
-    %% preprocess eco
-        presamps = round(0.025 * efs); % pre time in sec
-        postsamps = round(0.12 * efs); % post time in sec
     
-        sts = round(stims(2,:) / fac);
-        edd = zeros(size(sts));
-    
-    
-        temp = squeeze(getEpochSignal(eco', sts-presamps, sts+postsamps+1));
-        foo = mean(temp,2);
-        lastsample = round(0.040 * efs);
-        foo(lastsample:end) = foo(lastsample-1);
-    
-        last = find(abs(zscore(foo))>1,1,'last');
-        last2 = find(abs(diff(foo))>30e-6,1,'last')+1;
-    
-        zc = false;
-    
-        if (isempty(last2))
-            if (isempty(last))
-                error ('something seems wrong in the triggered average');
-            else
-                ct = last;
-            end
-        else
-            if (isempty(last))
-                ct = last2;
-            else
-                ct = max(last, last2);
-            end
-        end
-    
-        while (~zc && ct <= length(foo))
-            zc = sign(foo(ct-1)) ~= sign(foo(ct));
-            ct = ct + 1;
-        end
-    
-        if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
-            ct = max(last, last2);
-        end
-    
-        for sti = 1:length(sts)
-            win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-    
-            % interpolation approach
-            eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-        end
-        %
-        eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
-        eco = toRow(notch(eco, 60, efs, 2, 'causal'));
-    
+    %     eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+    %     eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+    %
     %% Process Triggers 9-3-2015
     
     pts = stims(3,:)==0;
@@ -171,98 +126,103 @@ for chan = chans
     awins = wins-repmat(mean(wins(t<0,:),1), [size(wins, 1), 1]);
     
     pstims = stims(:,pts);
-    
-    % baselines picked to be ones greater 500 ms after beta burst AND more
-    % than 500 ms before next beta burst
-    
-    % try 0.25, similar to Miah's baselines from other script
-    keeper = ((pstims(5,:)>(0.25*fs))&(pstims(7,:)>(0.25*fs)));
-    
     types = unique(bursts(5,pstims(4,:)));
     
-    kwins = awins(:,keeper);
+    for typei = 1:length(types)
+        figure
+        if (types(typei) ~= nullType)
+            %     % if (all)
+            %     probes = pstims(5,:) < .250*fs;
+            %     % if (falling)
+            probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))==types(typei);
+            
+            keeper = probes;
+            kwins = awins(:,keeper);
+            kwinsTotal{typei,chan} = kwins;
+            
+            mu = mean(kwins,2);
+            stdErr = (std(kwins,0,2)/sqrt(size(kwins,2)));
+            
+            muCell{typei,chan} = mu;
+            stdErrCell{chan} = stdErr;
+            
+            %% plot dat
+            
+            subplot(8,8,chan)
+            
+            plot(1e3*t, 1e6*mu);
+            xlim(1e3*[min(t) max(t)]);
+            %     yl = ylim;
+            %     yl(1) = min(-10, max(yl(1),-120));
+            %     yl(2) = max(10, min(yl(2),100));
+            %     ylim(yl);
+            hold on
+            vline(0);
+            
+            hold on
+            plot(1e3*t, 1e6*(mu+stdErr))
+            hold on
+            
+            plot(1e3*t, 1e6*(mu-stdErr))
+            
+            %     xlabel('time (ms)');
+            %     ylabel('ECoG (uV)');
+            title(sprintf('Chan %d', chan))
+            
+            
+        end
+        
+        %% put subtitle on graph, units
+        
+        hold on
+        xlabel('time (ms)');
+        ylabel('ECoG (uV)');
+        
+        subtitle('ecb43e Baseline Cortico-Cortical Evoked Potentials - Band passed and notched ')
+        
+    end
     
+    %% do a plot of all channels
     
+    figure
     
-    kwinsTotal{chan} = kwins;
-    
-    mu = mean(kwins,2);
-    stdErr = (std(kwins,0,2)/sqrt(size(kwins,2)));
-    
-    muCell{chan} = mu;
-    stdErrCell{chan} = stdErr;
-
-    %% plot dat
-    
-    subplot(8,8,chan)
-    
-    plot(1e3*t, 1e6*mu);
-    xlim(1e3*[min(t) max(t)]);
-    %     yl = ylim;
-    %     yl(1) = min(-10, max(yl(1),-120));
-    %     yl(2) = max(10, min(yl(2),100));
-    %     ylim(yl);
-    hold on
-    vline(0);
-    
-    hold on
-    plot(1e3*t, 1e6*(mu+stdErr))
-    hold on
-    
-    plot(1e3*t, 1e6*(mu-stdErr))
-    
-    %     xlabel('time (ms)');
-    %     ylabel('ECoG (uV)');
-    title(sprintf('Chan %d', chan))
-    
-    
+    for i = chans
+        mu = muCell{i};
+        stdErr = stdErrCell{i};
+        chan = i;
+        subplot(8,8,i)
+        
+        plot(1e3*t, 1e6*mu);
+        
+        xlim(1e3*[min(t) max(t)]);
+        %     yl = ylim;
+        %     yl(1) = min(-10, max(yl(1),-120));
+        %     yl(2) = max(10, min(yl(2),100));
+        %     ylim(yl);
+        hold on
+        %     vline(0);
+        %
+        %     hold on
+        %     plot(1e3*t, 1e6*(mu+stdErr))
+        %     hold on
+        %
+        %     plot(1e3*t, 1e6*(mu-stdErr))
+        title(sprintf('Chan %d', chan))
+        %
+        %     xlabel('time (ms)');
+        %     ylabel('ECoG (uV)');
+        %
+        %     title(sprintf('CCEP, Channel %d', chan))
+        
+        
+        
+    end
 end
 
-%% put subtitle on graph, units
 
-hold on
-xlabel('time (ms)');
-ylabel('ECoG (uV)');
-
-subtitle('ecb43e Baseline Cortico-Cortical Evoked Potentials - Band passed and notched ')
-
-
-
-%% do a plot of all channels
-
-figure
-
-for i = chans
-    mu = muCell{i};
-    stdErr = stdErrCell{i};
-    chan = i;
-    subplot(8,8,i)
-    
-    plot(1e3*t, 1e6*mu);
-    
-    xlim(1e3*[min(t) max(t)]);
-    %     yl = ylim;
-    %     yl(1) = min(-10, max(yl(1),-120));
-    %     yl(2) = max(10, min(yl(2),100));
-    %     ylim(yl);
-    hold on
-    %     vline(0);
-    %
-    %     hold on
-    %     plot(1e3*t, 1e6*(mu+stdErr))
-    %     hold on
-    %
-    %     plot(1e3*t, 1e6*(mu-stdErr))
-    title(sprintf('Chan %d', chan))
-    %
-    %     xlabel('time (ms)');
-    %     ylabel('ECoG (uV)');
-    %
-    %     title(sprintf('CCEP, Channel %d', chan))
-    
-    
-    
 end
+
+
 
 %% plot channel of interest
 
@@ -274,7 +234,7 @@ figure
 plot(1e3*t,1e6*mu)
 
 %%
-save(fullfile(META_DIR, [sid '_LarryStatsNotchedAndBandPassed.mat']), 't', 'kwinsTotal', 'muCell','stdErrCell','-v7.3');
+save(fullfile(META_DIR, [sid '_LarryStatsRAWPlastic.mat']), 't', 'kwinsTotal', 'muCell','stdErrCell','-v7.3');
 
 %% plot cortex
 

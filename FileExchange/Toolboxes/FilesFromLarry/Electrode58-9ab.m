@@ -1,0 +1,15 @@
+load('/Users/imac2/Desktop/NonPlasticFromDavid/9ab7ab_LarryStatsRAW.mat')
+figure;plot(abs(FT1))
+figure;plot(abs(FT2))
+figure;plot(x1)
+figure;plot(x2)
+t1=t(1:3000);
+t2=t(3101:6100);
+figure;plot(t1,x1)
+figure;plot(t2,x2)
+figure;plot(real(FT1))
+figure;plot(real(FT2))
+figure;plot(imag(FT1))
+figure;plot(imag(FT2))
+figure;plot(angle(FT1))
+figure;plot(angle(FT2))
