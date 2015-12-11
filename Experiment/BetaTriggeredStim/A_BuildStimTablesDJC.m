@@ -9,7 +9,7 @@ addpath ./scripts/ %DJC edit 7/17/2015
 sid = SIDS{7};
 
 if (strcmp(sid, '8adc5c'))
-    tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
+    tp = 'D:\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
     block = 'Block-67';
     
     % SMon-2 is the stim command
@@ -38,7 +38,7 @@ if (strcmp(sid, '8adc5c'))
     ttype(1:1.1e7) = 0;
     
 elseif (strcmp(sid, 'd5cd55'))
-    tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\d5cd55\data\D8\d5cd55_BetaTriggeredStim';
+    tp = 'D:\Subjects\d5cd55\data\D8\d5cd55_BetaTriggeredStim';
     block = 'Block-49';
     
     % SMon-1 is the system enable
@@ -83,7 +83,7 @@ elseif (strcmp(sid, 'd5cd55'))
     %     smon(1:4.5e6) = [];
     
 elseif (strcmp(sid, 'c91479'))
-    tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
+    tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
     block = 'BetaPhase-14';
     
     % SMon-1 is the system enable
@@ -125,7 +125,7 @@ elseif (strcmp(sid, 'c91479'))
     stim(1:2e7) = 0;
     raw(1:2e7) = 0;
 elseif (strcmp(sid, '7dbdec'))
-    tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+    tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
     block = 'BetaPhase-17';
     
     % SMon-1 is the system enable
@@ -148,7 +148,7 @@ elseif (strcmp(sid, '7dbdec'))
     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);
     toc;
 elseif (strcmp(sid, '9ab7ab'))
-    tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+    tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
     block = 'BetaPhase-3';
     
     % SMon-1 is the system enable
@@ -179,7 +179,7 @@ elseif (strcmp(sid, '9ab7ab'))
     toc;
 elseif (strcmp(sid, '702d24'))
     tank = TTank;
-    tank.openTank('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\702d24\data\d7\702d24_BetaStim');
+    tank.openTank('D:\Subjects\702d24\data\d7\702d24_BetaStim');
     tank.selectBlock('BetaPhase-4');
     %     tp = 'd:\research\subjects\702d24\data\d7\702d24_BetaStim';
     %     block = 'BetaPhase-4';
@@ -217,7 +217,7 @@ elseif (strcmp(sid, '702d24'))
 elseif (strcmp(sid, 'ecb43e'))
     
     tank = TTank;
-    tank.openTank('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\ecb43e\data\d7\BetaStim');
+    tank.openTank('D:\Subjects\ecb43e\data\d7\BetaStim');
     tank.selectBlock('BetaPhase-3');
     
     tic;
