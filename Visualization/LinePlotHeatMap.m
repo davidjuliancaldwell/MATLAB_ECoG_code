@@ -20,7 +20,7 @@
 %  % # final heat map colormap(hot) [N,C] = hist3([xx_f' yy'],[100 100]);
 %  imagesc(C{1},C{2},N')
 
-load('ecb43e_LarryStatsRAW.mat');
+load('D:\BigDataFiles\FilesForLarry\ecb43e_LarryStatsRAW.mat');
 sigInterest = kwinsTotal;
 sigMat = zeros(length(kwinsTotal),size(kwinsTotal{1},1),size(kwinsTotal{1},2));
 for i = 1:size(sigInterest)

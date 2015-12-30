@@ -6,7 +6,7 @@ addpath ./scripts/ %DJC edit 7/20/2015;
 
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(7);
+SIDS = SIDS(8);
 
 for idx = 1:length(SIDS)
     sid = SIDS{idx};
@@ -53,6 +53,16 @@ for idx = 1:length(SIDS)
             block = 'BetaPhase-3';
             stims = [56 64];
             chans = [47 55];
+        case '0b5a2e' % added DJC 7-23-2015
+            tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
+            block = 'BetaPhase-2';
+            stims = [22 30];
+            chans = [23 31];
+        case '0b5a2ePlayback' % added DJC 7-23-2015
+            tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
+            block = 'BetaPhase-4';
+            stims = [22 30];
+            chans = [23 31];
         otherwise
             error('unknown SID entered');
     end
@@ -61,7 +71,7 @@ for idx = 1:length(SIDS)
     
     %% load in the trigger data
     % 9-2-2015 DJC added mod DJC
-    load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+    load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
     
     % drop any stims that happen in the first 500 milliseconds
     stims(:,stims(2,:) < fs/2) = [];
@@ -236,8 +246,8 @@ for idx = 1:length(SIDS)
             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
         end
         %
-                    eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
-                    eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+        eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+        eco = toRow(notch(eco, 60, efs, 2, 'causal'));
         %
         %% process triggers
         
@@ -256,6 +266,8 @@ for idx = 1:length(SIDS)
             pts = stims(3,:)==0;
             %modified DJC 7-27-2015
         elseif (strcmp(sid, 'ecb43e'))
+            pts = stims(3,:) == 0;
+        elseif (strcmp(sid, '0b5a2e'))
             pts = stims(3,:) == 0;
         else
             error 'unknown sid';
@@ -283,7 +295,7 @@ for idx = 1:length(SIDS)
         baselines = pstims(5,:) > 2 * fs;
         
         % modified 9-10-2015 - DJC, find pre condition for each type of
-        % test pulse 
+        % test pulse
         
         pre = pstims(7,:) < 0.250*fs;
         
@@ -293,13 +305,13 @@ for idx = 1:length(SIDS)
         
         types = unique(bursts(5,pstims(4,:)));
         
-        %DJC - modify suffix to list conditioning type 
+        %DJC - modify suffix to list conditioning type
         suffix = arrayfun(@(x) num2str(x), types, 'uniformoutput', false);
-%         
+        %
         suffix = cell(1,4);
         suffix{1} = 'Negative phase of Beta';
         suffix{2} = 'Positive phase of Beta';
-        suffix{3} = 'null condition'; 
+        suffix{3} = 'null condition';
         suffix{4} = 'Random phase of Beta';
         
         nullType = 2;
@@ -359,12 +371,12 @@ for idx = 1:length(SIDS)
                 yl(1) = min(-10, max(yl(1),-120));
                 yl(2) = max(10, min(yl(2),100));
                 ylim(yl);
-                highlight(gca, [0 t(ct)*1e3], [], [.8 .8 .8]) %this is the part that plots that stim window 
+                highlight(gca, [0 t(ct)*1e3], [], [.8 .8 .8]) %this is the part that plots that stim window
                 vline(0);
                 
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
-%                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
                 title(sprintf('Evoked Potentials by # of conditioning pulses for Channel %d, stimuli in {%s}',chan,suffix{typei}))
                 leg = {'Pre'};
                 for d = 1:length(labelGroupStarts)
@@ -419,11 +431,11 @@ for idx = 1:length(SIDS)
                 %     ylim([-12 15]);
                 %
                 %     sigstar(pair, p);
-                
-                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'eps', '-r600');
-                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'png', '-r600');
-                
-                %     saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)));
+%                 
+%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'eps', '-r600');
+%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'png', '-r600');
+%                 
+%                 %     saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)));
                 %     saveas(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)),'eps');
             end
         end

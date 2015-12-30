@@ -97,6 +97,7 @@ ecoTotPre = cell(1,64);
  end
 tank.closeTank;
 
+
 %% openTank Post
 tank = TTank;
 tank.openTank(tp);
@@ -128,5 +129,62 @@ ecoTotPost = cell(1,64);
 
 tank.closeTank;
 
-%% 
+%% save it 
 
+save(fullfile(META_DIR, [sid '_PreAndPostStimResting.mat']), 'efs', 'ecoTotPre', 'ecoTotPost', 'sid');
+%% pre
+
+tpre = [0:length(ecoTotPre{1})-1]/efs;
+
+p = numSubplots(length(chans));
+
+
+figure
+hold on
+
+
+
+for i = chans
+    subplot(p(1),p(2),i);
+    plot(tpre,ecoTotPre{i})
+    title(sprintf('Chan %d',i))
+    
+end
+
+xlabel('Time in seconds')
+ylabel('Amplitude in uV')
+subtitle(sprintf('Pre Raw Data for %s',sid))
+
+SaveFig(OUTPUT_DIR, sprintf('PreStimRawTrace-%s', sid), 'png', '-r600');
+%% post 
+
+tpost = [0:length(ecoTotPost{1})-1]/efs;
+
+
+figure
+hold on
+
+for i = chans
+    subplot(p(1),p(2),i);
+    plot(tpost,ecoTotPost{i})
+    title(sprintf('Chan %d',i))
+    
+end
+
+xlabel('Time in seconds')
+ylabel('Amplitude in uV')
+subtitle(sprintf('Post Raw Data for %s',sid))
+
+
+SaveFig(OUTPUT_DIR, sprintf('PostStimRawTrace-%s', sid), 'png', '-r600');
+
+
+%% convert the cell to a matrix
+
+matrixSig = zeros(length(eco),length(chans));
+
+for i = chans
+    
+    
+    
+end

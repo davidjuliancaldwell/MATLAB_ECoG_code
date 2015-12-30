@@ -15,7 +15,7 @@ chans = [1:64]; % want to look at all channels, DJC 8-28-2015
 %9ab7ab
 switch(sid)
     case '9ab7ab'
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
         block = 'BetaPhase-3';
         stimChans = [59 60];
         chans = [1:64]; % want to look at all channels, DJC 8-28-2015
@@ -25,37 +25,37 @@ switch(sid)
         %%
         %'ecb43e'
     case 'ecb43e'
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\ecb43e\data\d7\BetaStim';
+        tp = 'D:\Subjects\ecb43e\data\d7\BetaStim';
         block = 'BetaPhase-3';
         stimChans = [56 64];
         chans = [1:64];
         %         chans = [47 55]; want to look at all channels
     case '8adc5c'
         % sid = SIDS{1};
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
+        tp = 'D:\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
         block = 'Block-67';
         stims = [31 32];
         %         chans = [8 7 48];
     case 'd5cd55'
         % sid = SIDS{2};
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\d5cd55\data\D8\d5cd55_BetaTriggeredStim';
+        tp = 'D:\Subjects\d5cd55\data\D8\d5cd55_BetaTriggeredStim';
         block = 'Block-49';
         stims = [54 62];
         %         chans = [53 61 63];
     case 'c91479'
         % sid = SIDS{3};
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
+        tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
         block = 'BetaPhase-14';
         stims = [55 56];
         %         chans = [64 63 48];
     case '7dbdec'
         % sid = SIDS{4};
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+        tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
         block = 'BetaPhase-17';
         stims = [11 12];
         %         chans = [4 5 14];
     case '702d24'
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\702d24\data\d7\702d24_BetaStim';
+        tp = 'D:\Subjects\702d24\data\d7\702d24_BetaStim';
         block = 'BetaPhase-4';
         stims = [13 14];
         %         chans = [4 5 21];

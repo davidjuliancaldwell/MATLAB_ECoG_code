@@ -6,7 +6,7 @@ addpath ./scripts/ %DJC edit 7/17/2015
 %DJC 7/20/2015 - changed tp to fit David paths
 
 % select the subject from list
-sid = SIDS{7};
+sid = SIDS{8};
 
 if (strcmp(sid, '8adc5c'))
     tp = 'D:\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
@@ -266,6 +266,56 @@ elseif (strcmp(sid, 'ecb43e'))
     %     [beta, ~] = tdt_loadStream(tp, block, 'Blck', 1);
     %     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);
     %     toc;
+elseif (strcmp(sid, '0b5a2e'))
+    
+    tank = TTank;
+    tank.openTank('D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+    tank.selectBlock('BetaPhase-2');
+    
+    tic;
+    [smon, info] = tank.readWaveEvent('SMon', 2);
+    smon = smon';
+    
+    fs = info.SamplingRateHz;
+    
+    stim = tank.readWaveEvent('SMon', 4)';
+    toc;
+    
+    tic;
+    mode = tank.readWaveEvent('Wave', 2)';
+    ttype = tank.readWaveEvent('Wave', 1)';
+    
+    beta = tank.readWaveEvent('Blck', 1)';
+    
+    raw = tank.readWaveEvent('Blck', 2)';
+    
+    toc;
+elseif (strcmp(sid, '0b5a2ePlayback'))
+    
+    tank = TTank;
+    tank.openTank('D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+    tank.selectBlock('BetaPhase-4');
+    
+    tic;
+    [smon, info] = tank.readWaveEvent('SMon', 2);
+    smon = smon';
+    
+    fs = info.SamplingRateHz;
+    
+    stim = tank.readWaveEvent('SMon', 4)';
+    toc;
+    
+    tic;
+    mode = tank.readWaveEvent('Wave', 2)';
+    ttype = tank.readWaveEvent('Wave', 1)';
+    
+    beta = tank.readWaveEvent('Blck', 1)';
+    
+    raw = tank.readWaveEvent('Blck', 2)';
+    
+    toc;
+    
+    
     
 else
     error('unknown sid entered');
@@ -343,10 +393,10 @@ for stimi = 1:size(stims,2)
         %NOT part of the null condition (no stimuli delivered during these
         %bursts so dont want to index them as last bursts)
         tempPreBurst = find(stims(2,stimi) - bursts(3,:) > 0);
-%         tempPreBurst = tempPreBurst(bursts(5,tempPreBurst(1):tempPreBurst(end))~=2);
+        %         tempPreBurst = tempPreBurst(bursts(5,tempPreBurst(1):tempPreBurst(end))~=2);
         if (isempty(tempPreBurst))
             stims(4:5, stimi) = NaN;
-           
+            
         else
             prebursti = tempPreBurst(end);
             stims(4, stimi) = prebursti; % labels the stim number with the preburst number
@@ -355,7 +405,7 @@ for stimi = 1:size(stims,2)
         
         %modified DJC 9-2-2015
         tempPostBurst = find(bursts(2,:) - stims(2, stimi) > 0);
-%         tempPostBurst = tempPostBurst(bursts(5,tempPostBurst(1):tempPostBurst(end))~=2);
+        %         tempPostBurst = tempPostBurst(bursts(5,tempPostBurst(1):tempPostBurst(end))~=2);
         
         if (isempty(tempPostBurst))
             stims(6:7) = NaN;
@@ -369,7 +419,7 @@ for stimi = 1:size(stims,2)
     end
 end
 
-% DJC - moved enumarating to AFTER, in order to account for deletions 
+% DJC - moved enumarating to AFTER, in order to account for deletions
 % DJC 9-2-2015 - get rid of any place where stim type was 2 (null
 % condition), and considered conditioning stimulation
 

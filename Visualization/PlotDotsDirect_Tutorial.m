@@ -15,7 +15,7 @@ PlotDotsDirect(subjid, ... % the subject on who's brain the electrodes will be d
                weights, ... % the weights to use for coloring
                'r', ... % the hemisphere of the brain to draw (can be 'l', 'r', or 'b')
                [-abs(max(weights)) abs(max(weights))], ... % the color limits for the weights
-               10, ... % the size of the dots, in points I believe
+               15, ... % the size of the dots, in points I believe
                'recon_colormap', ... % the colormap to use for dot coloration
                1:64, ... % labels for the electrodes, I think this can be a cell array 
                true, ... % a boolean switch as to whether or not to draw the labels

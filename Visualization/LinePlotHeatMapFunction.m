@@ -44,21 +44,21 @@ end
 bins = [1000 1000];
 
 %imagesc heatmap in 2D
-figure
+% figure
 [N,C] = hist3([tVec sigMatVec],bins);
 imagesc(C{1},C{2},N');
 set(gca,'YDir','normal')
-xlabel('Time (seconds)'); ylabel('Amplitude (\muV)');
-colorbar
+% xlabel('Time (ms)'); ylabel('Amplitude (\muV)');
+% colorbar
 
-%3d histogram
-figure
-hist3([tVec sigMatVec],bins,'FaceAlpha',.65);
-xlabel('Time (seconds)'); ylabel('Amplitude (\muV)');
-set(gcf,'renderer','opengl');
-set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
-colorbar
-end
+% %3d histogram
+% figure
+% hist3([tVec sigMatVec],bins,'FaceAlpha',.65);
+% xlabel('Time (seconds)'); ylabel('Amplitude (\muV)');
+% set(gcf,'renderer','opengl');
+% set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
+% colorbar
+% end
 
 
 %% Inspiration from http://www.hitmaroc.net/287989-6584-plotting-many-lines-heatmap.html

@@ -1,0 +1,68 @@
+Modulation Toolbox Version 2.1 (official release)
+
+The toolbox was written and tested in Matlab R2007b.
+
+
+Revision History:
+-----------------
+
+April 17, 2013 (revision 2.2)
+- fixed a bug where the tutorial1 script was not working in newer versions
+  of Matlab. This is because the medfilt1 function in Matlab R2012a (approx)
+  and later no longer accepts logical inputs, which were being returned
+  from the detect_voicing function at line 167 in detectpitch.m.
+
+September, 2010 (revision 2.1)
+- added high-level functions moddecomp(), modspectrum(), modfilter(), and modsynth().
+- the detectpitch() algorithm has been substantially revised for increased accuracy and more
+  intuitive parameter control.
+- the detectpitch() function now returns the pitch in normalized frequency units, where 1 corresponds
+  to the Nyquist rate, for consistency with toolbox convention.
+- modfilt(), modfiltdesign(), and modfiltfreqz() have been renamed narrowbandfilter(),
+  designfilter() and filterfreqz(). The only new feature is that narrobandfilter() is capable of 
+  directly filtering an ensemble of signals without a predefined filter object.
+- the lowpass extraction filter inside moddecompharm() has a reduced transition bandwidth.
+- carrier-window length is now a required parameter for moddecompcog().
+- designfilterbank() now only allows one downsampling factor to use with all subbands. filtersubbands()
+  and filterbanksynth(), however, are still compatible with subband-specific downsampling factors.
+- Removed vestigial help references to viewsmooth() and moddecompsmooth() in help comments and
+  tutorial1.
+- replaced the viewcog() and viewhilb() functions with a general viewcarriers().
+- filterbanksynth() discards imaginary quantization error if below a heuristic threshold.
+- fixed bugs in filtersubbands() and filterbanksynth() so they can accurately process complex signals.
+
+
+April 17, 2009 (revision 1.7, turned into release version 2.0)
+Added some window sizes to the modulation spectrogram GUI.
+Changed the 'cutoff' parameter in detectpitch() to the number of components used in estimating the fit to a harmonic model.
+Fixed the 'play entire signal' and 'play selected frame' controls in modspecgramgui().
+Removed references to 'specgramframe' which were halting any change made to parameter settings in modspecgramgui().
+Improved the checksubfolders() subfunction within modspecgram(), modspecgramgui(), and removed it from moddecompharm().
+
+March 31, 2009 (revision 1.6)
+Removed the 'noise suppression' demo and replaced it with the harmonic speech synthesis demo.
+Added 'play entire signal' and 'play current frame' options to modulation spectrogram GUI
+Added a 'stop playback' button to the modulation spectrogram GUI
+
+February 27, 2009 (revision 1.5)
+Removed the 'phase-smoothing' coherent demodulation option. The only available demodulation options
+now are center-of-gravity, harmonic, and Hilbert. Also fixed group-delay correction in modfilt().
+
+December 01, 2009 (revision 1.4)
+Added new coherent modulation methods, and replaced the HLT option with two wavelet-transforms.
+
+March 25, 2005 (revision 1.23)
+Added colormap option to the GUI menu.
+
+April 8, 2004 (revision 1.20)
+Added GUI option to evaluate functions on the modulation spectrogram.
+
+January 20, 2004 (revision 1.15)
+Replaced Matlab 6.5's logical operators (|| and &&) with the pre-6.5 binary operators
+(| and &) for compatibility
+
+July 7, 2003 (revision 1.00)
+First release of the modulation toolbox under a non-profit license. See download instructions
+for information on how to obtain your copy of the software.
+
+

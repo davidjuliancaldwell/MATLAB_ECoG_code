@@ -31,7 +31,11 @@ switch sid
         tank = TTank;
         tank.openTank('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\ecb43e\data\d7\BetaStim');
         tank.selectBlock('EP-1')
-        
+    case '0b5a2e'
+        sid = '0b5a2e';
+        tank = TTank;
+        tank.openTank('D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+        tank.selectBlock('BetaPhase-2');
 end
 
 
@@ -48,11 +52,17 @@ stimCurrentSamplingFrequency = round(stimVoltageSamplingFrequency/(length(stimVo
 
 figure
 subplot(2,1,1)
-plot(stimCurrent)
-title('Stim Current')
+tC = 1e3*(0:length(stimCurrent)-1)/stimCurrentSamplingFrequency;
+plot(tC,stimCurrent)
+title('Stimulation Current')
+ylabel('Current (\muA)')
+xlabel('time (ms)')
 
 subplot(2,1,2)
-plot(stimVoltage)
-title('Stim Voltage')
+tV = 1e3*(0:length(stimVoltage)-1)/stimVoltageSamplingFrequency;
+plot(tV,stimVoltage)
+title('Stimulation Voltage')
+ylabel('Voltage (V)')
+xlabel('times (ms)')
 %% save the file
 save(fullfile(META_DIR, [sid '_StimulationInformation.mat']), 'stimVoltage','stimVoltageSamplingFrequency','stimCurrent','stimCurrentSamplingFrequency');
