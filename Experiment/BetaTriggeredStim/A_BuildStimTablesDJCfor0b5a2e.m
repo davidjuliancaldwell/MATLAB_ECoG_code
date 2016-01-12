@@ -1,4 +1,5 @@
 %% Constants
+close all;clear all;clc
 Z_Constants;
 addpath ./scripts/ %DJC edit 7/17/2015
 
@@ -7,7 +8,7 @@ addpath ./scripts/ %DJC edit 7/17/2015
 % modified 12/15/2015 to try and work with 0b5a2e
 
 % select the subject from list
-sid = SIDS{8};
+sid = SIDS{9};
 
 if (strcmp(sid, '8adc5c'))
     tp = 'D:\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
@@ -471,6 +472,14 @@ postSamp = round(0.100 * fs);
 
 utype = unique(ttype); %ttype is the trigger type, reports different unique types
 
+% DJC 1-11-2016 to account for 
+if strcmp(sid,'0b5a2ePlayback')
+
+    utype = [0 1 2];
+    
+end
+
+
 cts = stims(3,:)==1; % Stims that are conditioning stimuli
 
 dat = squeeze(getEpochSignal(beta', stims(2, cts)-preSamp, stims(2, cts)+postSamp+1)); %getting segments of beta signals
@@ -488,9 +497,16 @@ t = (-preSamp:postSamp) / fs;
 
 stimtypes = stims(8, cts);
 
-for idx = 1:length(utype)
+
+suffix = cell(1,3);
+suffix{1} = 'Negative phase of Beta';
+suffix{2} = 'Positive phase of Beta';
+suffix{3} = 'Null Condition';
+
+
+for idx = 1:length(utype)-1 % modified to discount null condition for 0b5a2e, which is utype(3)
     mtype = utype(idx);
-    subplot(length(utype),2,2*(idx-1)+1);
+    subplot(length(utype)-1,2,2*(idx-1)+1);
     
     mdat = squeeze(dat(:, stimtypes==mtype));
     badmoment = diff(mdat,1,1)==0;
@@ -503,13 +519,13 @@ for idx = 1:length(utype)
     plot(1e3*t, 1e6*nanmean(squeeze(mdat),2), 'r', 'linew', 2);
     xlabel('Time (msec)');
     ylabel('Trigger signal (uV)');
-    title(sprintf('average \\beta trigger; cond type = %d', mtype));
+    title(sprintf('average \\beta trigger; cond type = %s', suffix{idx}));
     xlim([min(1e3*t) max(1e3*t)]);
     
     %     ylim([-120 120]);
     vline(0, 'k:');
     
-    subplot(length(utype),2,2*(idx-1)+2);
+    subplot(length(utype)-1,2,2*(idx-1)+2);
     mrdat = squeeze(rdat(:, stimtypes==mtype));
     plot(1e3*t, 1e6*mrdat(:,1:10:end)','color', [0.5 0.5 0.5]);
     hold on;
@@ -517,7 +533,7 @@ for idx = 1:length(utype)
     plot(1e3*t, 1e6*mean(squeeze(mrdat),2), 'r', 'linew', 2);
     xlabel('Time (msec)');
     ylabel('Trigger signal (uV)');
-    title(sprintf('average raw response; cond type = %d', mtype));
+    title(sprintf('average raw response; cond type = %s', suffix{idx}));
     xlim([min(1e3*t) max(1e3*t)]);
     ylim([-120 120]);
     vline(0, 'k:');
@@ -525,8 +541,16 @@ for idx = 1:length(utype)
     
 end
 
-SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'eps', '-r600'); % changed OUTPUT_DIR to allow figure to save
-SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'png', '-r600');
+
+
+subtitle(sprintf('%s',sid))
+% 
+% SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+% SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+
+
+% SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'eps', '-r600'); % changed OUTPUT_DIR to allow figure to save
+% SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'png', '-r600');
 
 % %%
 % figure

@@ -25,6 +25,19 @@ switch(sid)
         
         % get electrode locations
         locs = trodeLocsFromMontage(sid, Montage, false);
+    case '0b5a2e'
+                % this is for ecb43e
+        
+        %there appears to be no montage for this subject currently
+        Montage.Montage = 64;
+        Montage.MontageTokenized = {'Grid(1:64)'};
+        Montage.MontageString = Montage.MontageTokenized{:};
+        Montage.MontageTrodes = zeros(64, 3);
+        Montage.BadChannels = [];
+        Montage.Default = true;
+        
+        % get electrode locations
+        locs = trodeLocsFromMontage(sid, Montage, false);
 end
 
 % build a PLV matrix 
@@ -69,7 +82,7 @@ for chan = chansInt
     % bunch of input arguments
     figure;
     
-    clims = [0 1];
+    clims = [-1 1];
     PlotDotsDirect(sid, ... % the subject on who's brain the electrodes will be drawn
         locs, ... % the location of the electrodes
         PLVchanTrimmed(:,chan), ... % the weights to use for coloring

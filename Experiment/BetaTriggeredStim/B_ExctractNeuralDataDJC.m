@@ -1,4 +1,5 @@
 %% Constants
+close all;clear all;clc;
 Z_Constants;
 addpath ./scripts/ %DJC edit 7/20/2015;
 
@@ -6,7 +7,7 @@ addpath ./scripts/ %DJC edit 7/20/2015;
 
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(8);
+SIDS = SIDS(7);
 
 for idx = 1:length(SIDS)
     sid = SIDS{idx};
@@ -71,7 +72,10 @@ for idx = 1:length(SIDS)
     
     %% load in the trigger data
     % 9-2-2015 DJC added mod DJC
-    load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
+    % below is for original miah style burst tables
+    load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+    % below is for modified burst tables
+    %         load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
     
     % drop any stims that happen in the first 500 milliseconds
     stims(:,stims(2,:) < fs/2) = [];
@@ -194,7 +198,7 @@ for idx = 1:length(SIDS)
         %% preprocess eco
         %             presamps = round(0.050 * efs); % pre time in sec
         presamps = round(0.025 * efs); % pre time in sec
-        postsamps = round(0.30 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
+        postsamps = round(0.120 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
         
         sts = round(stims(2,:) / fac);
         edd = zeros(size(sts));
@@ -242,13 +246,13 @@ for idx = 1:length(SIDS)
         for sti = 1:length(sts)
             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
             
-            % interpolation approach
+%             interpolation approach
             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
         end
-        %
-        eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
-        eco = toRow(notch(eco, 60, efs, 2, 'causal'));
-        %
+        
+                eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+                eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+                %
         %% process triggers
         
         if (strcmp(sid, '8adc5c'))
@@ -309,8 +313,8 @@ for idx = 1:length(SIDS)
         suffix = arrayfun(@(x) num2str(x), types, 'uniformoutput', false);
         %
         suffix = cell(1,4);
-        suffix{1} = 'Negative phase of Beta';
-        suffix{2} = 'Positive phase of Beta';
+        suffix{1} = 'Negative peak of Beta';
+        suffix{2} = 'Positive peak of Beta';
         suffix{3} = 'null condition';
         suffix{4} = 'Random phase of Beta';
         
@@ -361,23 +365,34 @@ for idx = 1:length(SIDS)
                 
                 prettyline(1e3*t, 1e6*awins(:, keeps), label(keeps), colors);
                 %     ylim([-130 50]);
-                xlim(1e3*[min(t) max(t)]);
+                
+                % xlim modified by DJC 1-7-2016
+                
+%                 xlim(1e3*[min(t) max(t)]);
+                xlim([-5 80]);
+                
+                
                 %     vline([6 20 40], 'k');
                 %     highlight(gca, [25 33], [], [.6 .6 .6])
                 %             highlight(gca, [0 4], [], [.3 .3 .3]);
                 %             vline(0.030*1e3);
                 %             vline(0.080*1e3);
                 yl = ylim;
-                yl(1) = min(-10, max(yl(1),-120));
+                yl(1) = min(-10, max(yl(1),-140));
                 yl(2) = max(10, min(yl(2),100));
                 ylim(yl);
+                xlim([-5 80]);
                 highlight(gca, [0 t(ct)*1e3], [], [.8 .8 .8]) %this is the part that plots that stim window
                 vline(0);
                 
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
                 %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-                title(sprintf('Evoked Potentials by # of conditioning pulses for Channel %d, stimuli in {%s}',chan,suffix{typei}))
+                title(sprintf('%s CCEPs for Channel %d, stimuli in %s ',sid,chan,suffix{typei}))
+
+                %1-7-2016 - below is for d5cd55
+%                 title(sprintf('%s CCEPs for Channel %d, stimuli on zero crossing ',sid,chan))
+
                 leg = {'Pre'};
                 for d = 1:length(labelGroupStarts)
                     if d == length(labelGroupStarts)
@@ -390,52 +405,52 @@ for idx = 1:length(SIDS)
                 %     leg{end+1} = 'EP_P';
                 legend(leg, 'location', 'Southeast')
                 
-                %     dep_n = 1e6*min(awins(t>0.005 & t < 0.020, keeps));
-                %     dep_n = dep_n - mean(dep_n(label(keeps)==0));
-                %
-                %     dep_p = 1e6*max(awins(t>0.025 & t < 0.033, keeps));
-                %     dep_p = dep_p - mean(dep_p(label(keeps)==0));
-                %
-                %     subplot(2,2,3);
-                %     prettybar(dep_n, label(keeps), colors, gcf);
-                %     set(gca, 'xtick', []);
-                %     ylabel('\DeltaEP_N (uV)');
-                %     [~,table] = anova1(dep_n', label(keeps), 'off');
-                %     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-                %
-                %     pair = {};
-                %     p = [];
-                %     ulabels = unique(label);
-                %     for c = 2:length(ulabels)
-                %         [~,p(c-1)] = ttest2(dep_n(label(keeps)==0), dep_n(label(keeps)==ulabels(c)));
-                %         pair{c-1} = {1,c};
-                %     end
-                %     ylim([-12 15]);
-                %
-                %     sigstar(pair, p);
-                %
-                %     subplot(2,2,4);
-                %     prettybar(dep_p, label(keeps), colors, gcf);
-                %     set(gca, 'xtick', []);
-                %     ylabel('\DeltaEP_P (uV)');
-                %     [~,table] = anova1(dep_p', label(keeps), 'off');
-                %     title(sprintf('Change in EP_P by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-                %
-                %     pair = {};
-                %     p = [];
-                %     ulabels = unique(label);
-                %     for c = 2:length(ulabels)
-                %         [~,p(c-1)] = ttest2(dep_p(label(keeps)==0), dep_p(label(keeps)==ulabels(c)));
-                %         pair{c-1} = {1,c};
-                %     end
-                %     ylim([-12 15]);
-                %
-                %     sigstar(pair, p);
+%                     dep_n = 1e6*min(awins(t>0.005 & t < 0.020, keeps));
+%                     dep_n = dep_n - mean(dep_n(label(keeps)==0));
 %                 
-%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'eps', '-r600');
-%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'png', '-r600');
+%                     dep_p = 1e6*max(awins(t>0.025 & t < 0.033, keeps));
+%                     dep_p = dep_p - mean(dep_p(label(keeps)==0));
 %                 
-%                 %     saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)));
+%                     subplot(2,2,3);
+%                     prettybar(dep_n, label(keeps), colors, gcf);
+%                     set(gca, 'xtick', []);
+%                     ylabel('\DeltaEP_N (uV)');
+%                     [~,table] = anova1(dep_n', label(keeps), 'off');
+%                     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
+%                 
+%                     pair = {};
+%                     p = [];
+%                     ulabels = unique(label);
+%                     for c = 2:length(ulabels)
+%                         [~,p(c-1)] = ttest2(dep_n(label(keeps)==0), dep_n(label(keeps)==ulabels(c)));
+%                         pair{c-1} = {1,c};
+%                     end
+%                     ylim([-12 15]);
+%                 
+%                     sigstar(pair, p);
+%                 
+%                     subplot(2,2,4);
+%                     prettybar(dep_p, label(keeps), colors, gcf);
+%                     set(gca, 'xtick', []);
+%                     ylabel('\DeltaEP_P (uV)');
+%                     [~,table] = anova1(dep_p', label(keeps), 'off');
+%                     title(sprintf('Change in EP_P by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
+%                 
+%                     pair = {};
+%                     p = [];
+%                     ulabels = unique(label);
+%                     for c = 2:length(ulabels)
+%                         [~,p(c-1)] = ttest2(dep_p(label(keeps)==0), dep_p(label(keeps)==ulabels(c)));
+%                         pair{c-1} = {1,c};
+%                     end
+%                     ylim([-12 15]);
+%                 
+%                     sigstar(pair, p);
+                
+                                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                
+                %                 %     saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)));
                 %     saveas(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)),'eps');
             end
         end

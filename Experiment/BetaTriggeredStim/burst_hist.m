@@ -4,13 +4,26 @@ function [] = burst_hist(bursts)
 % bursts in each size, binned.
 
 figure
+
+% for histc
+X = 0:15;
+
+sid = '0b5a2e';
+
+suffix = cell(1,3);
+suffix{1} = 'Negative phase of Beta';
+suffix{2} = 'Positive phase of Beta';
+suffix{3} = 'Null Condition';
+
+
 for n = 0:2
     ax(n+1) = subplot(3,1,n+1);
-    hist(bursts(4, bursts(5,:)==n),100);
-    title(sprintf('condition %d', n));
+    histogram(bursts(4, bursts(5,:)==n),X);
+    title(sprintf('%s', suffix{n+1}));
 end
 linkaxes(ax, 'x');
 xlabel('Number of pulses in train');
-ylabel('Number of instances of given number of pulses');
+ylabel('Total');
+subtitle(sprintf('%s - Histogram of number of stimulations in burst',sid))
 
 end

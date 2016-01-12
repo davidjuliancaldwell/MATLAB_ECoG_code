@@ -2,24 +2,27 @@
 % DJC 8/19/2015
 % modified DJC 12/28/2015 to look at 0b5a2e, idea is to look at pre and
 % post stim resting state - here we are only looking at 64 channels sampled
-% at high sampling rate 
+% at high sampling rate
 
 %% Constants
+clear all
+close all
+cd .\Experiment\BetaTriggeredStim
 Z_Constants;
-addpath ./scripts/ %DJC edit 7/17/2015
+addpath .\scripts\ %DJC edit 7/17/2015
 
 %% load in the converted Data file of interest - here is POST stim
-sid = SIDS{8}; %sid 8 is 0b5a2e 
+sid = SIDS{8}; %sid 8 is 0b5a2e
 chans = 1:64;
 
 switch(sid)
     case '0b5a2e'
         % sid = SIDS{1};
-            tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
-            block = 'BetaPhase-5';
-            stims = [22 30];
-            chans = [23 31]; % these are the channels we thought we saw beta in
-            chans = 1:64; % here we want to look at all of the channels to start 
+        tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
+        block = 'BetaPhase-5';
+        stims = [22 30];
+        chans = [23 31]; % these are the channels we thought we saw beta in
+        chans = 1:64; % here we want to look at all of the channels to start
 end
 
 tank = TTank;
@@ -58,11 +61,11 @@ chans = 1:64;
 switch(sid)
     case '0b5a2e'
         % sid = SIDS{1};
-            tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
-            block = 'BetaPhase-12'; % this is the PRE stim for 0b5a2e 
-            stims = [22 30];
-            chans = [23 31]; % these are the channels to look at first for beta during beta triggered stim 
-            chans = 1:64; % we want to start looking at all of the channels 
+        tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
+        block = 'BetaPhase-12'; % this is the PRE stim for 0b5a2e
+        stims = [22 30];
+        chans = [23 31]; % these are the channels to look at first for beta during beta triggered stim
+        chans = 1:64; % we want to start looking at all of the channels
 end
 
 tank = TTank;
@@ -92,25 +95,49 @@ end
 %% save it to output directory
 save(fullfile(META_DIR, [sid '_preStimRest.mat']),'efs', 'Blck','-v7.3');
 
+%% load in post stim
+
+load('D:\Output\BetaTriggeredStim\meta\0b5a2e_postStimRest.mat')
+
+%% load in pre stim
+
+load('D:\Output\BetaTriggeredStim\meta\0b5a2e_preStimRest.mat')
+
 %% look at resting states one by one
 
 
 
 figure
 
-    t = (0:size(Blck,1)-1)/efs;
-    
+t = (0:size(Blck,1)-1)/efs;
+
 for i = 1:size(Blck,2)
     
-
+    figure
     plot(1e3*t,1e6*Blck(:,i))
     title(sprintf('Channel %d',i))
     xlabel('Time (ms)')
     ylabel('Amplitude (uV)')
-    pause(1)
+  
+    figure
+    xc = xcorr(Blck(:,i),Blck(:,i));
+    plot(xc)
+%         pause(0.5)
+   
+    figure
+    ft = fft(Blck(:,i));
+    loglog(abs(ft))
+%     pause(0.5)
+    
     
     
 end
+
+%% subtract means
+
+BlckMeanSub = bsxfun(@minus, Blck, mean(Blck));
+
+Blck = BlckMeanSub;
 
 %% plot ffts like larry
 
@@ -119,9 +146,12 @@ figure
 for i = 1:size(Blck,2)
     subplot(8,8,i)
     ft = fft(Blck(:,i));
-    plot(abs(ft))
+    df = efs/length(ft);
+    f = (0:(length(ft)-1))*df;
+    loglog(abs(ft))
     title(sprintf('Channel %d',i))
-
+    
+    
     
     
 end
@@ -135,9 +165,10 @@ figure
 
 for i = 1:size(Blck,2)
     subplot(8,8,i)
-    plot(1e3*t,1e6*Blck(:,i))
+    xc = xcorr(Blck(:,i),Blck(:,i));
+    plot(xc)
     title(sprintf('Channel %d',i))
-
+    
     
     
 end

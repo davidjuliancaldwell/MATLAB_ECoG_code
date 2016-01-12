@@ -2,6 +2,7 @@
 % starting with subject 0b5a2e
 
 %% initialize output and meta dir
+close all; clear all; clc
 Z_ConstantsBrocas;
 addpath ./Experiment/BetaTriggeredStim/scripts
 
@@ -193,7 +194,7 @@ figure
 for i = 1:64
     hold on
     subplot(8,8,i)
-    plot(t,1e6*dataEpochedMean(:,i))
+    plot(t,1e6*dataEpochedMean(:,i),'m','LineWidth',2)
     
     ylim([-50 50])
     xlim([0 150])
@@ -209,7 +210,7 @@ figure
 for i = 65:128
     hold on
     subplot(8,8,i-64)
-    plot(t,1e6*dataEpochedMean(:,i))
+    plot(t,1e6*dataEpochedMean(:,i),'m','LineWidth',2)
     
     ylim([-50 50])
     xlim([0 150])
@@ -280,7 +281,7 @@ figure
 for i = 1:64
     hold on
     subplot(8,8,i)
-    plot(t,1e6*dataEpochedMeanSub(:,i))
+    plot(t,1e6*dataEpochedMeanSub(:,i),'m','LineWidth',2)
     
     ylim([-50 50])
     xlim([0 150])
@@ -296,7 +297,7 @@ figure
 for i = 65:128
     hold on
     subplot(8,8,i-64)
-    plot(t,1e6*dataEpochedMeanSub(:,i))
+    plot(t,1e6*dataEpochedMeanSub(:,i),'m','LineWidth',2)
     
     ylim([-50 50])
     xlim([0 150])
@@ -308,7 +309,34 @@ subtitle('Individual traces for all stimulations - means subtracted')
 xlabel('Time (ms)')
 ylabel('Voltage (uV)')
 
+%% plot one at a time
 
+figure
+
+for i = 1:128
+
+    plot(t,1e6*dataEpochedMeanSub(:,i),'m','LineWidth',2);
+
+    %     xlim(1e3*[min(t) max(t)]);
+    %     yl = ylim;
+    %     yl(1) = min(-10, max(yl(1),-120));
+    %     yl(2) = max(10, min(yl(2),100));
+    %     ylim(yl);
+    ylim([-100 100])
+    hold on
+%     vline(0);
+
+    title(sprintf('Chan %d', i))
+    %
+    %     xlabel('time (ms)');
+    %     ylabel('ECoG (uV)');
+    %
+    %     title(sprintf('CCEP, Channel %d', chan))
+    pause(1)
+    clf
+    
+    
+end
 
 %% This is to plot the individual traces
 figure

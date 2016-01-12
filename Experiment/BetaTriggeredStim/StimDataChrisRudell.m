@@ -50,6 +50,18 @@ stimCurrent = tank.readWaveEvent('Para',7');
 
 stimCurrentSamplingFrequency = round(stimVoltageSamplingFrequency/(length(stimVoltage)/length(stimCurrent)));
 
+% added DJC 1/5/2016 to try and look for more information about current
+mode = tank.readWaveEvent('Wave', 2)';
+ttype = tank.readWaveEvent('Wave', 1)';
+
+beta = tank.readWaveEvent('Blck', 1)';
+
+raw = tank.readWaveEvent('Blck', 2)';
+
+[smon, info] = tank.readWaveEvent('SMon', 2);
+
+
+
 figure
 subplot(2,1,1)
 tC = 1e3*(0:length(stimCurrent)-1)/stimCurrentSamplingFrequency;

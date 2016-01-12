@@ -1,9 +1,8 @@
-%% Extract neural data for Kurt Connectivity - start with subject 9ab7ab
-% idea is to look at Beta-triggered stim data as starter, consider
-% CONDITIONING pulses that are not after (which would be a test pulse
-% anyways) Beta stimulation, nor the pulse right before a beta stim train
+%% Extract neural data for screening CCEPs.
+% modified from the Kurt script 1-10-2016 by DJC
 
 %% Constants
+close all;clear all;clc
 Z_ConstantsKurtConnectivity;
 addpath ./experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
 
@@ -151,16 +150,16 @@ for chan = chans
         ct = max(last, last2);
     end
     
-    % look at NON interpolated signal, DJC, 1-10-2016 
-%     for sti = 1:length(sts)
-%         win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-%         
-%         % interpolation approach
-%         eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-%     end
-%     %
-%     eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
-%     eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+    % look at NON interpolated signal, DJC, 1-10-2016
+    %     for sti = 1:length(sts)
+    %         win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+    %
+    %         % interpolation approach
+    %         eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+    %     end
+    %     %
+    %     eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+    %     eco = toRow(notch(eco, 60, efs, 2, 'causal'));
     
     %% Process Triggers 9-3-2015
     
@@ -179,12 +178,13 @@ for chan = chans
     awins = wins-repmat(mean(wins(t<0,:),1), [size(wins, 1), 1]);
     
     pstims = stims(:,pts);
+    types = unique(bursts(5,pstims(4,:)));
     
-    % baselines picked to be ones greater 500 ms after beta burst AND more
-    % than 500 ms before next beta burst
-    
-    % try 0.25, similar to Miah's baselines from other script
-    keeper = ((pstims(5,:)>(0.25*fs))&(pstims(7,:)>(0.25*fs)));
+    % using idea of probes from Extracting neural data, <250 ms after the end
+    % of the beta burst, AND NOT EQUAL TO NULL
+    probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))==types(2);
+    %     keeper = ((pstims(5,:)>(0.25*fs))&(pstims(7,:)>(0.25*fs)));
+    keeper = probes;
     
     types = unique(bursts(5,pstims(4,:)));
     
@@ -197,7 +197,7 @@ for chan = chans
     
     % peak begin at 10 ms
     peakBegin = 0.010;
-    peakEnd = size(kwins,1);
+    peakEnd = 0.080;
     peakRange = find(t>=peakBegin & t<=peakEnd);
     
     %for now, doing PEAK of average signal
@@ -298,9 +298,9 @@ for chan = chans
     
     subplot(8,8,chan)
     
-    plot(1e3*t, 1e6*mu);
+    plot(1e3*t, 1e6*mu,'m','LineWidth',2);
     %     xlim(1e3*[min(t) max(t)]);
-    xlim(1e3*[-0.025 0.2]);
+    xlim(1e3*[-0.025 0.08]);
     %     yl = ylim;
     %     yl(1) = min(-10, max(yl(1),-120));
     %     yl(2) = max(10, min(yl(2),100));
@@ -429,8 +429,44 @@ for i = chans
     
     
 end
+%% do a plot of all channels one by one
+
+figure
+
+for i = chans
+    mu = muCell{i};
+    stdErr = stdErrCell{i};
+    chan = i;
+    
+    plot(1e3*t, 1e6*mu);
+    xlim(1e3*[-0.025 0.08]);
+    %     xlim(1e3*[min(t) max(t)]);
+    %     yl = ylim;
+    %     yl(1) = min(-10, max(yl(1),-120));
+    %     yl(2) = max(10, min(yl(2),100));
+    %     ylim(yl);
+    ylim([-100 100])
+    hold on
+    vline(0);
+    
+    hold on
+    plot(1e3*t, 1e6*(mu+stdErr))
+    hold on
+    
+    plot(1e3*t, 1e6*(mu-stdErr))
+    title(sprintf('Chan %d', chan))
+    %
+    %     xlabel('time (ms)');
+    %     ylabel('ECoG (uV)');
+    %
+    %     title(sprintf('CCEP, Channel %d', chan))
+    pause(2)
+    clf
+    
+    
+end
 %%
-save(fullfile(META_DIR, [sid '_Stats.mat']), 'zCell', 'muCell','stdErrCell');
+save(fullfile(META_DIR, [sid '_StatsCCEPhunt.mat']), 'zCell', 'muCell','stdErrCell');
 
 %% plot cortex
 

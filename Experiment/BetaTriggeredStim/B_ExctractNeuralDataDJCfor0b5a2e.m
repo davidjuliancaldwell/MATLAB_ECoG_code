@@ -1,4 +1,6 @@
 %% Constants
+close all; clear all;clc
+cd 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim'
 Z_Constants;
 addpath ./scripts/ %DJC edit 7/20/2015;
 
@@ -57,12 +59,12 @@ for idx = 1:length(SIDS)
             tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
             block = 'BetaPhase-2';
             stims = [22 30];
-            chans = [23 31];
+            chans = [23 31 21 14 15 32 40];
         case '0b5a2ePlayback' % added DJC 7-23-2015
             tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
             block = 'BetaPhase-4';
             stims = [22 30];
-            chans = [23 31];
+            chans = [23 31 21 14 15 32 40];
         otherwise
             error('unknown SID entered');
     end
@@ -100,6 +102,10 @@ for idx = 1:length(SIDS)
         
         delay = 577869;
     else
+        
+        % below is for original miah style burst tables 
+%         load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+        % below is for modified burst tables
         load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
     end
     % drop any stims that happen in the first 500 milliseconds
@@ -232,7 +238,7 @@ for idx = 1:length(SIDS)
         %% preprocess eco
         %             presamps = round(0.050 * efs); % pre time in sec
         presamps = round(0.025 * efs); % pre time in sec
-        postsamps = round(0.30 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
+        postsamps = round(0.120 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
         
         sts = round(stims(2,:) / fac);
         edd = zeros(size(sts));
@@ -261,12 +267,13 @@ for idx = 1:length(SIDS)
                 ct = max(last, last2);
             end
         end
-        
-        while (~zc && ct <= length(foo))
-            zc = sign(foo(ct-1)) ~= sign(foo(ct));
-            ct = ct + 1;
-        end
-        
+        % try getting rid of this part for 0b5a2e to conserve that initial
+        % spike DJC 1-7-2016 
+%         while (~zc && ct <= length(foo))
+%             zc = sign(foo(ct-1)) ~= sign(foo(ct));
+%             ct = ct + 1;
+%         end
+        % consider 3 ms? DJC - 1-5-2016
         if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
             ct = max(last, last2);
         end
@@ -277,16 +284,16 @@ for idx = 1:length(SIDS)
         %             plot(foo);
         %             vline(ct);
         %
-        for sti = 1:length(sts)
-            win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-            
-            % interpolation approach
-            eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-        end
-        %
-        %                 eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
-        %         eco = toRow(notch(eco, 60, efs, 2, 'causal'));
-        %
+%         for sti = 1:length(sts)
+%             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+%             
+% %             interpolation approach
+%             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+%         end
+% %         tried doing 1-200 rather than 1-40 - DJC 1-7-2016
+%                         eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+%                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+%         
         %% process triggers
         
         if (strcmp(sid, '8adc5c'))
@@ -313,9 +320,11 @@ for idx = 1:length(SIDS)
             error 'unknown sid';
         end
         
+        
         ptis = round(stims(2,pts)/fac);
         
         t = (-presamps:postsamps)/efs;
+        
         
         wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
         %     awins = adjustStims(wins);
@@ -381,14 +390,18 @@ for idx = 1:length(SIDS)
                 
                 prettyline(1e3*t, 1e6*awins(:, keeps), label(keeps), colors);
                 %     ylim([-130 50]);
-                xlim(1e3*[min(t) max(t)]);
+                
+                % changed DJC 1-7-2016 to look at -8 to 80 
+%                 xlim(1e3*[min(t) max(t)]);
+                 xlim([-5 80]);
+
                 %     vline([6 20 40], 'k');
                 %     highlight(gca, [25 33], [], [.6 .6 .6])
                 %             highlight(gca, [0 4], [], [.3 .3 .3]);
                 %             vline(0.030*1e3);
                 %             vline(0.080*1e3);
                 yl = ylim;
-                yl(1) = min(-10, max(yl(1),-120));
+                yl(1) = min(-10, max(yl(1),-140));
                 yl(2) = max(10, min(yl(2),100));
                 ylim(yl);
                 highlight(gca, [0 t(ct)*1e3], [], [.8 .8 .8]) %this is the part that plots that stim window
@@ -397,16 +410,16 @@ for idx = 1:length(SIDS)
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
                 %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-                title(sprintf('Evoked Potentials for Channel %d, Null Condition',chan))
+                title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
                 leg = {'Pre','Post'};
                 
                 leg{end+1} = 'Stim Window';
                 %     leg{end+1} = 'EP_P';
                 legend(leg, 'location', 'Southeast')
 %                 
-%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'eps', '-r600');
-%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'png', '-r600');
-%                 
+                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                
 %                 
             elseif (types(typei) ~= nullType)
                 %     % if (all)
@@ -452,7 +465,10 @@ for idx = 1:length(SIDS)
                 
                 prettyline(1e3*t, 1e6*awins(:, keeps), label(keeps), colors);
                 %     ylim([-130 50]);
-                xlim(1e3*[min(t) max(t)]);
+                
+                % changed DJC 1-7-2016 
+%                 xlim(1e3*[min(t) max(t)]);
+                                 xlim([-5 80]);
                 %     vline([6 20 40], 'k');
                 %     highlight(gca, [25 33], [], [.6 .6 .6])
                 %             highlight(gca, [0 4], [], [.3 .3 .3]);
@@ -468,7 +484,7 @@ for idx = 1:length(SIDS)
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
                 %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-                title(sprintf('Evoked Potentials by # of conditioning pulses for Channel %d\n stimuli in {%s}',chan,suffix{typei}))
+                title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
                 leg = {'Pre'};
                 for d = 1:length(labelGroupStarts)
                     if d == length(labelGroupStarts)
@@ -523,9 +539,9 @@ for idx = 1:length(SIDS)
                 %
                 %     sigstar(pair, p);
                 %
-%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'eps', '-r600');
-%                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%d' suffix{typei}], sid, chan), 'png', '-r600');
-                %
+                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                
                 %                 %     saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)));
                 %     saveas(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)),'eps');
             end

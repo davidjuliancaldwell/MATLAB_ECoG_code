@@ -1,9 +1,10 @@
 %% Constants
+% modified by DJC 1-10-2016 
 Z_Constants;
 addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(end);
+SIDS = SIDS(6);
 
 for idx = 1:length(SIDS) 
     subjid = SIDS{idx};
@@ -40,7 +41,7 @@ for idx = 1:length(SIDS)
     
     figure
     PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 20, 'america', 1:size(Grid, 1), true);
-    SaveFig(OUTPUT_DIR, ['coverage-' subjid], 'png', '-r300');
+%     SaveFig(OUTPUT_DIR, ['coverage-' subjid], 'png', '-r300');
 end
 
 % stims = [55 56];
