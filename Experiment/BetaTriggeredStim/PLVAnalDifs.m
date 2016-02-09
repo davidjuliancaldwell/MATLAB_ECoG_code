@@ -1,6 +1,8 @@
 %% this is a function that you input PLV values for a channel in two different states, for example, pre and post
 function [diffs] = PLVAnalDifs(PLVpre,PLVpost)
 
+Z_ConstantsPLV;
+
 % enter the subject ID
 sid = input('What is the subject ID? ','s');
 
@@ -10,6 +12,20 @@ freqs = input('What is the frequency range of interest? e.g. 12-25 ','s');
 
 switch(sid)
     case 'ecb43e'
+        
+        % this is for ecb43e
+        
+        %there appears to be no montage for this subject currently
+        Montage.Montage = 64;
+        Montage.MontageTokenized = {'Grid(1:64)'};
+        Montage.MontageString = Montage.MontageTokenized{:};
+        Montage.MontageTrodes = zeros(64, 3);
+        Montage.BadChannels = [];
+        Montage.Default = true;
+        
+        % get electrode locations
+        locs = trodeLocsFromMontage(sid, Montage, false);
+    case '0b5a2e'
         
         % this is for ecb43e
         
@@ -46,7 +62,7 @@ end
 
 for chan = chansInt
     
-    % bar graph of differences 
+    % bar graph of differences
     figure
     bar(diffs(:,chan))
     title(sprintf('PLV differences between post and pre rest states for %s Hz in relation to Channel %d',freqs,chan))

@@ -6,7 +6,7 @@ addpath ./scripts/ %DJC edit 7/17/2015
 %DJC 7/20/2015 - changed tp to fit David paths
 
 % select the subject from list
-sid = SIDS{8};
+sid = SIDS{5};
 
 if (strcmp(sid, '8adc5c'))
     tp = 'D:\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';

@@ -44,6 +44,8 @@ load(strcat(subjid,'_basicanalysis'), 'Montage', 'biHemi', 'ReconHemi', 'numChan
 
 windowSize = round(10 * fs); %sliding window will be 10 second long segments
 
+% should add multiple comparisons 
+
 fprintf('alpha\n');
 [diff_alpha_plv, alpha_pmin, alpha_pmax] = changeTScoreWithStats(alpha, post_alpha, windowSize);
 masked_alpha_plvdiff = NaN(numChans, numChans);

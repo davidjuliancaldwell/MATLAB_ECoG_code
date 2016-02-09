@@ -1,23 +1,21 @@
 %% beta stimulation phase locking value - 9-16-2015 - djc
-% right now for subject ecb43e
+% right now for subject 0b5a2e, modified by DJC 1-11-2016
 
-
+close all;clear all;clc
+cd 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim'
+Z_ConstantsPLV;
+addpath .\scripts\ %DJC edit 7/17/2015
 sid = '0b5a2e';
 %% pre stim
 
-load('D:\Output\BetaTriggeredStim\meta\0b5a2e_preStimRest')
+load('D:\Output\BetaTriggeredStim\meta\0b5a2e_preStimRestDecimated')
 
-%try downsampling by factor of 12
-n = 12
-BlckDown = decimate(Blck,n);
+BlckPre = Blck;
+
+% bandpass the signal to the window of interest
+sigPre = bandpass(Blck,12,25,fs,4);
 
 clear Blck;
-
-fs = efs/12;
-% bandpass the signal to the window of interest
-sigPre = bandpass(BlckDown,12,25,fs,4);
-
-
 % calculate the plv
 betaPlvPre = plv_revised(sigPre);
 [betaPLVchanPre,betaPLVchanPreTrim] = PLVAnal(betaPlvPre);
@@ -27,43 +25,46 @@ betaPlvPre = plv_revised(sigPre);
 % imagesc(betaPlvPre)
 % colorbar
 % title('PLV Values Pre resting state')
-% 
+%
 % betaPlvPre55 = betaPlvPre((1:55),55);
 % betaPlvPre55 = horzcat(betaPlvPre55',(betaPlvPre(55,(56:end))));
-% 
+%
 % betaPlvPre56 = betaPlvPre((1:56),56);
 % betaPlvPre56 = horzcat(betaPlvPre56',(betaPlvPre(56,(57:end))));
-% 
+%
 % betaPlvPre64 = betaPlvPre((1:64),64);
 % betaPlvPre64 = horzcat(betaPlvPre64',(betaPlvPre(64,(65:end))));
 
 
 %% post stim
-load('D:\Output\BetaTriggeredStim\meta\0b5a2e_postStimRest')
+load('D:\Output\BetaTriggeredStim\meta\0b5a2e_postStimRestDecimated')
 
+BlckPost = Blck;
 % bandpass the signal to the window of interest
-sigPost = bandpass(Blck,12,25,efs,4);
+sigPost = bandpass(Blck,12,25,fs,4);
 
+clear Blck;
 % calculate the plv
 betaPlvPost = plv_revised(sigPost);
 [betaPLVchanPost,betaPLVchanPostTrim] = PLVAnal(betaPlvPost);
 
-% 
+%
 % figure
 % imagesc(betaPlvPost)
 % colorbar
 % title('PLV Values Post resting state')
-% 
+%
 % betaPlvPost55 = betaPlvPost((1:55),55);
 % betaPlvPost55 = horzcat(betaPlvPost55',(betaPlvPost(55,(56:end))));
-% 
+%
 % betaPlvPost56 = betaPlvPost((1:56),56);
 % betaPlvPost56 = horzcat(betaPlvPost56',(betaPlvPost(56,(57:end))));
-% 
+%
 % betaPlvPost64 = betaPlvPost((1:64),64);
 % betaPlvPost64 = horzcat(betaPlvPost64',(betaPlvPost(64,(65:end))));
 
-%% look at the differences between two states 
+
+%% look at the differences between two states
 [betaPLVdifs] = PLVAnalDifs(betaPLVchanPreTrim,betaPLVchanPostTrim);
 
 
@@ -83,7 +84,8 @@ stimsInt = [56 64];
 diffsStim = diffs(stimsInt);
 
 %% plot it on the brain
-% this is for ecb43e
+% this is for ecb43e or 0b5a2
+% do this before looking at beta power
 
 %there appears to be no montage for this subject currently
 Montage.Montage = 64;
@@ -95,6 +97,14 @@ Montage.Default = true;
 
 % get electrode locations
 locs = trodeLocsFromMontage(sid, Montage, false);
+
+%% some more preprocessing if desired, NEED MONTAGE LOADED 
+
+BlckPreCAR = ReferenceCAR(Montage.Montage,Montage.BadChannels,BlckPre);
+BlckPostCAR = ReferenceCAR(Montage.Montage,Montage.BadChannels,BlckPost);
+
+BlckPre = BlckPreCAR;
+BlckPost = BlckPostCAR;
 
 %% brain plot for diffs
 
@@ -156,7 +166,7 @@ colorbar;
 title('Pre stim resting state PLV values for Beta Triggered Channel')
 
 
-%% post 
+%% post
 
 %select the channels that are in the grid
 betaPlvPost55selected = betaPlvPost55(1:64);
@@ -190,16 +200,42 @@ title('Post stim resting state PLV values for Beta Triggered Channel')
 %% wanting to look at power in beta band pre and post as well
 
 % extract log beta power
-logPreBeta = log(hilbAmp(sigPre,[12 25],fs).^2);
-logPostBeta = log(hilbAmp(sigPost,[12 25],fs).^2);
+logPreBeta = log(hilbAmp(BlckPre,[12 25],fs).^2);
+logPostBeta = log(hilbAmp(BlckPost,[12 25],fs).^2);
 
-% take mean power for all time points for each of the channels 
+% take mean power for all time points for each of the channels
 meanPre = mean(logPreBeta,1);
 meanPost = mean(logPostBeta,1);
 
-% select the first 64 channels that we can visualize on the grid 
+% select the first 64 channels that we can visualize on the grid
 meanPreSelect = meanPre(1:64);
 meanPostSelect = meanPost(1:64);
+
+% look at TOTAL brain beta
+meanBrainPre = mean(meanPre);
+meanBrainPost = mean(meanPost);
+
+% no multiple comparisons here 
+ptarg = 0.05;
+[hBetaBrainT,pBetaBrainT,ciBrainT,statsBrainT] = ttest2(meanPre,meanPost,ptarg,'both','unequal',2);
+
+
+[pBetaBrainR,hBetaBrainR,statsBrainR] = ranksum(meanPre,meanPost,'alpha',ptarg,'tail','both');
+
+
+% try stats out
+
+% bonferonni correction!?
+numChans = 64;
+ptarg = 0.05/numChans;
+
+% try rank sum and ttest
+[hBetaT,pBetaT,ciT,statsT] = ttest2(logPreBeta,logPostBeta,ptarg,'both','unequal',1);
+
+for i = 1:size(logPreBeta,2)
+    [pBetaR(i),hBetaR(i),statsR(i)] = ranksum(logPreBeta(:,i),logPostBeta(:,i),'alpha',ptarg,'tail','both');
+end
+
 
 
 %% bar graphs pre and post
@@ -244,7 +280,7 @@ colormap(cm);
 colorbar;
 title('Pre stim resting state log Beta power')
 
-%% plot post brain beta 
+%% plot post brain beta
 
 
 % now plot the weights on the subject specific brain. PlotDotsDirect has a
@@ -280,7 +316,7 @@ figure
 bar(betaDiffs)
 title('Difference in log Beta power Pre and Post stimulation')
 xlabel('Channel Number')
-ylabel('log Beta power')
+ylabel('Difference of log Beta power')
 
 figure
 clims = [min(betaDiffs) max(betaDiffs)];

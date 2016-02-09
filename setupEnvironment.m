@@ -4,5 +4,5 @@
 
 setenv('matlab_devel_dir', 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code');
 setenv('gridlab_dir', 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code');
-setenv('subject_dir', 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects');
-setenv('OUTPUT_DIR', 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code\Output');
+setenv('subject_dir', 'D:\Subjects');
+setenv('OUTPUT_DIR', 'D:\Output');

@@ -1,6 +1,6 @@
 %% Constants
 % modified by DJC 1-10-2016
-close all;clear all;clc
+% close all;clear all;clc
 Z_Constants;
 addpath ./scripts;
 

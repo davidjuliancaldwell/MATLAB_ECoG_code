@@ -8,7 +8,7 @@ addpath ./scripts/ %DJC edit 7/20/2015;
 % FOR 0b5a2e
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(9);
+SIDS = SIDS(8);
 
 for idx = 1:length(SIDS)
     sid = SIDS{idx};
@@ -59,7 +59,9 @@ for idx = 1:length(SIDS)
             tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
             block = 'BetaPhase-2';
             stims = [22 30];
-            chans = [23 31 21 14 15 32 40];
+%             chans = [23 31 21 14 15 32 40];
+% DJC 2-5-2016 - prototype just on channel 23
+            chans = 23;
         case '0b5a2ePlayback' % added DJC 7-23-2015
             tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
             block = 'BetaPhase-4';
@@ -103,8 +105,8 @@ for idx = 1:length(SIDS)
         delay = 577869;
     else
         
-        % below is for original miah style burst tables 
-%         load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+        % below is for original miah style burst tables
+        %         load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
         % below is for modified burst tables
         load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
     end
@@ -268,11 +270,11 @@ for idx = 1:length(SIDS)
             end
         end
         % try getting rid of this part for 0b5a2e to conserve that initial
-        % spike DJC 1-7-2016 
-%         while (~zc && ct <= length(foo))
-%             zc = sign(foo(ct-1)) ~= sign(foo(ct));
-%             ct = ct + 1;
-%         end
+        % spike DJC 1-7-2016
+        %         while (~zc && ct <= length(foo))
+        %             zc = sign(foo(ct-1)) ~= sign(foo(ct));
+        %             ct = ct + 1;
+        %         end
         % consider 3 ms? DJC - 1-5-2016
         if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
             ct = max(last, last2);
@@ -284,16 +286,16 @@ for idx = 1:length(SIDS)
         %             plot(foo);
         %             vline(ct);
         %
-%         for sti = 1:length(sts)
-%             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-%             
-% %             interpolation approach
-%             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-%         end
-% %         tried doing 1-200 rather than 1-40 - DJC 1-7-2016
-%                         eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
-%                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
-%         
+        %         for sti = 1:length(sts)
+        %             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+        %
+        % %             interpolation approach
+        %             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+        %         end
+        % %         tried doing 1-200 rather than 1-40 - DJC 1-7-2016
+        %                         eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+        %                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+        %
         %% process triggers
         
         if (strcmp(sid, '8adc5c'))
@@ -388,13 +390,26 @@ for idx = 1:length(SIDS)
                 figure
                 %     subplot(2,2,1:2);
                 
-                prettyline(1e3*t, 1e6*awins(:, keeps), label(keeps), colors);
+                % try subtracting the mean, other idea is to build two
+                % distributions from zscore
+                % 2-4-2016 - DJC post conversation with Miah
+                
+                
+                % original
+%                 prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
+                
+                % try subtracting mean of baselines, DJC 2-4-2016, post
+                % convo with miah
+                prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*mean(awins(:,baselines),2)), label(keeps), colors);
+                
+                % try zscore?
+%                 prettyline(1e3*t, zscore(1e6*awins(:, keeps)), label(keeps), colors);
                 %     ylim([-130 50]);
                 
-                % changed DJC 1-7-2016 to look at -8 to 80 
-%                 xlim(1e3*[min(t) max(t)]);
-                 xlim([-5 80]);
-
+                % changed DJC 1-7-2016 to look at -8 to 80
+                %                 xlim(1e3*[min(t) max(t)]);
+                xlim([-5 80]);
+                
                 %     vline([6 20 40], 'k');
                 %     highlight(gca, [25 33], [], [.6 .6 .6])
                 %             highlight(gca, [0 4], [], [.3 .3 .3]);
@@ -416,11 +431,11 @@ for idx = 1:length(SIDS)
                 leg{end+1} = 'Stim Window';
                 %     leg{end+1} = 'EP_P';
                 legend(leg, 'location', 'Southeast')
-%                 
-                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
-                
-%                 
+                %
+                %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                %
+                %
             elseif (types(typei) ~= nullType)
                 %     % if (all)
                 %     probes = pstims(5,:) < .250*fs;
@@ -463,12 +478,20 @@ for idx = 1:length(SIDS)
                 figure
                 %     subplot(2,2,1:2);
                 
-                prettyline(1e3*t, 1e6*awins(:, keeps), label(keeps), colors);
+                % original
+%                 prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
+%                 
+%                 % try subtracting mean of baselines, DJC 2-4-2016, post
+%                 % convo with miah
+                prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*mean(awins(:,baselines),2)), label(keeps), colors);
+%                 
+                % try zscore?
+%                 prettyline(1e3*t, zscore(1e6*awins(:, keeps)), label(keeps), colors);
                 %     ylim([-130 50]);
                 
-                % changed DJC 1-7-2016 
-%                 xlim(1e3*[min(t) max(t)]);
-                                 xlim([-5 80]);
+                % changed DJC 1-7-2016
+                %                 xlim(1e3*[min(t) max(t)]);
+                xlim([-5 80]);
                 %     vline([6 20 40], 'k');
                 %     highlight(gca, [25 33], [], [.6 .6 .6])
                 %             highlight(gca, [0 4], [], [.3 .3 .3]);
@@ -539,9 +562,9 @@ for idx = 1:length(SIDS)
                 %
                 %     sigstar(pair, p);
                 %
-                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-                SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
-                
+                %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                %
                 %                 %     saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)));
                 %     saveas(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)),'eps');
             end

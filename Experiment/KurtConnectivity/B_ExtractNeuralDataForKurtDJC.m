@@ -4,6 +4,7 @@
 % anyways) Beta stimulation, nor the pulse right before a beta stim train
 
 %% Constants
+close all;clear all;clc
 Z_ConstantsKurtConnectivity;
 addpath ./experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
 
@@ -13,7 +14,7 @@ sid = input('enter subject ID ','s');
 %9ab7ab
 switch(sid)
     case '9ab7ab'
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';        
         block = 'BetaPhase-3';
         stimChans = [59 60];
         chans = [1:64]; % want to look at all channels, DJC 8-28-2015
@@ -23,7 +24,7 @@ switch(sid)
         %%
         %'ecb43e'
     case 'ecb43e'
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\ecb43e\data\d7\BetaStim';
+        tp = 'D:\Subjects\ecb43e\data\d7\BetaStim';
         block = 'BetaPhase-3';
         stimChans = [56 64];
         chans = [1:64];
@@ -110,57 +111,58 @@ for chan = chans
     fac = fs/efs;
     
     toc;
-    %% preprocess eco
-    presamps = round(0.025 * efs); % pre time in sec
-    postsamps = round(0.120 * efs); % post time in sec
-    
-    sts = round(stims(2,:) / fac);
-    edd = zeros(size(sts));
-    
-    
-    temp = squeeze(getEpochSignal(eco', sts-presamps, sts+postsamps+1));
-    foo = mean(temp,2);
-    lastsample = round(0.040 * efs);
-    foo(lastsample:end) = foo(lastsample-1);
-    
-    last = find(abs(zscore(foo))>1,1,'last');
-    last2 = find(abs(diff(foo))>30e-6,1,'last')+1;
-    
-    zc = false;
-    
-    if (isempty(last2))
-        if (isempty(last))
-            error ('something seems wrong in the triggered average');
-        else
-            ct = last;
-        end
-    else
-        if (isempty(last))
-            ct = last2;
-        else
-            ct = max(last, last2);
-        end
-    end
-    
-    while (~zc && ct <= length(foo))
-        zc = sign(foo(ct-1)) ~= sign(foo(ct));
-        ct = ct + 1;
-    end
-    
-    if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
-        ct = max(last, last2);
-    end
-    
-    % look at NON interpolated signal, DJC, 1-10-2016 
-%     for sti = 1:length(sts)
-%         win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-%         
-%         % interpolation approach
-%         eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+    % DJC 1-11-2016, get rid of interpolation/filtering
+%     %% preprocess eco
+%     presamps = round(0.025 * efs); % pre time in sec
+%     postsamps = round(0.120 * efs); % post time in sec
+%     
+%     sts = round(stims(2,:) / fac);
+%     edd = zeros(size(sts));
+%     
+%     
+%     temp = squeeze(getEpochSignal(eco', sts-presamps, sts+postsamps+1));
+%     foo = mean(temp,2);
+%     lastsample = round(0.040 * efs);
+%     foo(lastsample:end) = foo(lastsample-1);
+%     
+%     last = find(abs(zscore(foo))>1,1,'last');
+%     last2 = find(abs(diff(foo))>30e-6,1,'last')+1;
+%     
+%     zc = false;
+%     
+%     if (isempty(last2))
+%         if (isempty(last))
+%             error ('something seems wrong in the triggered average');
+%         else
+%             ct = last;
+%         end
+%     else
+%         if (isempty(last))
+%             ct = last2;
+%         else
+%             ct = max(last, last2);
+%         end
 %     end
-%     %
-%     eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
-%     eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+%     
+%     while (~zc && ct <= length(foo))
+%         zc = sign(foo(ct-1)) ~= sign(foo(ct));
+%         ct = ct + 1;
+%     end
+%     
+%     if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
+%         ct = max(last, last2);
+%     end
+%     
+    % look at NON interpolated signal, DJC, 1-10-2016
+    %     for sti = 1:length(sts)
+    %         win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+    %
+    %         % interpolation approach
+    %         eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+    %     end
+    %     %
+    %     eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+    %     eco = toRow(notch(eco, 60, efs, 2, 'causal'));
     
     %% Process Triggers 9-3-2015
     
@@ -296,28 +298,28 @@ for chan = chans
     
     %% plot dat
     
-    subplot(8,8,chan)
-    
-    plot(1e3*t, 1e6*mu);
-    %     xlim(1e3*[min(t) max(t)]);
-    xlim(1e3*[-0.025 0.2]);
-    %     yl = ylim;
-    %     yl(1) = min(-10, max(yl(1),-120));
-    %     yl(2) = max(10, min(yl(2),100));
-    %     ylim(yl);
-    ylim([-100 100]); % change this depending on the subject
-    hold on
-    vline(0);
-    
-    hold on
-    plot(1e3*t, 1e6*(mu+stdErr))
-    hold on
-    
-    plot(1e3*t, 1e6*(mu-stdErr))
-    
-    %     xlabel('time (ms)');
-    %     ylabel('ECoG (uV)');
-    title(sprintf('Chan %d', chan))
+%     subplot(8,8,chan)
+%     
+%     plot(1e3*t, 1e6*mu);
+%     %     xlim(1e3*[min(t) max(t)]);
+%     xlim(1e3*[-0.025 0.2]);
+%     %     yl = ylim;
+%     %     yl(1) = min(-10, max(yl(1),-120));
+%     %     yl(2) = max(10, min(yl(2),100));
+%     %     ylim(yl);
+%     ylim([-abs(max(mu)) abs(max(mu))]); % change this depending on the subject
+%     hold on
+%     vline(0);
+%     
+%     hold on
+%     plot(1e3*t, 1e6*(mu+stdErr))
+%     hold on
+%     
+%     plot(1e3*t, 1e6*(mu-stdErr))
+%     
+%     %     xlabel('time (ms)');
+%     %     ylabel('ECoG (uV)');
+%     title(sprintf('Chan %d', chan))
     
     
     %%
