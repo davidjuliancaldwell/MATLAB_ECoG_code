@@ -1,11 +1,12 @@
 %% Constants
 % modified by DJC 1-10-2016
-% close all;clear all;clc
+cd c:\users\david\desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim
+close all;clear all;clc
 Z_Constants;
-addpath ./scripts;
+% addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(8);
+SIDS = SIDS(9);
 
 for idx = 1:length(SIDS)
     subjid = SIDS{idx};
@@ -43,6 +44,7 @@ for idx = 1:length(SIDS)
     
     sid = subjid;
     
+    load(strcat(subjid,'epSTATSsig.mat'))
     
     if (~strcmp(sid,'0b5a2e') && ~strcmp(sid,'0b5a2ePlayback'))
         load(fullfile(getSubjDir(subjid), 'trodes.mat'));
@@ -80,18 +82,59 @@ for idx = 1:length(SIDS)
         
     end
     
+    %%
+    close all
+    w = nan(size(Grid, 1), 1);
+    for i = 1:64
+        if (i~=22 && i~=30)
+            w(i) = min(sigChans{i}{3});
+        end
+    end
+    %     w = zeros(size(Grid,1),1);
+    %     w(stims) = -1;
+    %     w(beta) = 1;
     
+    clims = [min(w) max(w)];
     
-    w = zeros(size(Grid, 1), 1);
-    
-    w(stims) = -1;
-    w(beta) = 1;
     
     figure
-    PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 20, 'america', 1:size(Grid, 1), true);
-%     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'png', '-r300');
-%     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'eps', '-r300');
+    PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
     
+    % very often, after plotting the brain and dots, I add a colorbar for
+    % reference as to what the dot colors mean
+    load('recon_colormap'); % needs to be the same as what was used in the function call above
+    colormap(cm);
+    h = colorbar;
+        ylabel(h,'Volts (\muV)')
+   title({sid ' Average Negative CCEP Deflection','10-30 ms post Stimulus'})
+    set(gca,'fontsize', 14)
+    %     PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 20, 'america', 1:size(Grid, 1), true);
+    %     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'png', '-r300');
+    %     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'eps', '-r300');
+    
+    w = nan(size(Grid,1),1);
+    for i = 1:64
+        if (i~=22 && i~=30)
+            w(i) = min(sigChans{i}{1}(:,1));
+        end
+    end
+    
+        clims = [min(w) max(w)];
+
+    
+        figure
+    PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
+    
+    % very often, after plotting the brain and dots, I add a colorbar for
+    % reference as to what the dot colors mean
+    load('recon_colormap'); % needs to be the same as what was used in the function call above
+    colormap(cm);
+    h = colorbar;
+    title({sid ' Difference of Maximum Negative CCEP Deflection','10-30 ms post Stimulus'})
+    ylabel(h,'Volts (\muV)')
+    set(gca,'fontsize', 14)
+    
+    %%
 end
 
 % stims = [55 56];

@@ -2,6 +2,8 @@
 % written by DJC
 
 %% Constants
+close all;clear all;clc
+cd 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim'
 Z_ConstantsPrePost;
 addpath ./scripts/ %DJC edit 7/20/2015;
 
@@ -9,7 +11,7 @@ addpath ./scripts/ %DJC edit 7/20/2015;
 
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(6);
+SIDS = SIDS(2);
 
 for idx = 1:length(SIDS)
     sid = SIDS{idx};
@@ -28,21 +30,21 @@ for idx = 1:length(SIDS)
             blockPre = 'Block-47';
             blockPost = 'Block-51';
             stims = [54 62];
-            chans = [53 61 63];
+           
         case 'c91479'
             % sid = SIDS{3};
             tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
             blockPre = 'BetaPhase-9';
             blockPost = 'BetaPhase-15';
             stims = [55 56];
-            chans = [64 63 48];
+         
         case '7dbdec'
             % sid = SIDS{4};
             tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
             blockPre = 'BetaPhase-16';
             blockPost = 'BetaPhase-18';
             stims = [11 12];
-            chans = [4 5 14];
+            
         case '9ab7ab'
             %             sid = SIDS{5};
             tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
@@ -68,6 +70,7 @@ for idx = 1:length(SIDS)
     end
 end
 
+% set all of the chans to be the ones considered on the resting state
 chans = [1:64];
 
 %% openTank Pre

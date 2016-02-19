@@ -11,11 +11,11 @@ f = exp(-abs((X-0.5).*(T-1)))+sin(X.*T);
 % want. In GENERAL, use economy method 
 [u,s,v] = svd(f,'econ'); 
 
-figure(1)
+figure
 surfl(X,T,f),% shading interp, colormap(hot) 
 
 % look at diagonal of matrix S - singular values
-figure(2)
+figure
 plot(diag(s),'ko','Linewidth',[2])
 
 % to get percentage in mode
@@ -25,14 +25,15 @@ subplot(2,1,2) % plot semilog
 semilogy(diag(s)/sum(diag(s)),'ko','Linewidth',[2])
 
 % look at the modes 
-figure(3)
+figure
 plot(x,u(:,1:3),'Linewidth',[2])
 
 % look at temporal part - columns of v
+figure
 plot(t,v(:,1:3),'Linewidth',[2])
 
 % low rank reconstruction 
-figure(5)
+figure
 subplot(2,2,1), surfl(X,T,f)
 for j = 1:3
    ff = u(:,1:j)*s(1:j,1:j)*v(:,1:j)';

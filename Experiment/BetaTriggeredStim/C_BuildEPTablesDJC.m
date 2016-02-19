@@ -5,7 +5,7 @@ addpath ./scripts/ %DJC edit 7/20/2015;
 %% parameters
 
 % SIDS = SIDS(2:end);
-SIDS = SIDS(7);
+SIDS = SIDS(8);
     
 for idx = 1:length(SIDS)
     sid = SIDS{idx};

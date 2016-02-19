@@ -1,4 +1,6 @@
-SIDS = {'8adc5c', 'd5cd55', 'c91479', '7dbdec', '9ab7ab', '702d24', 'ecb43e','0b5a2e','0b5a2ePlayback'};
+% edited DJC 2-9-2016 to get rid of 8a..no good. and already did 0b5a2e, so
+% get rid of that for now 
+SIDS = {'d5cd55', 'c91479', '7dbdec', '9ab7ab', '702d24', 'ecb43e', '0b5a2e'};
 
 OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'restAnalysis','output');
 TouchDir(OUTPUT_DIR);

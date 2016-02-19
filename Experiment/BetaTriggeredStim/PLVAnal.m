@@ -88,7 +88,7 @@ for chan = chansInt
     % bunch of input arguments
     figure;
     
-    clims = [0 1];
+    clims = [min(PLVchan(:,chan)) max(PLVchan(:,chan))];
     PlotDotsDirect(sid, ... % the subject on who's brain the electrodes will be drawn
         locs, ... % the location of the electrodes
         PLVchanTrimmed(:,chan), ... % the weights to use for coloring

@@ -10,11 +10,11 @@
 clear all
 close all
 cd 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim'
-Z_ConstantsPLV;
+Z_ConstantsRest;
 addpath .\scripts\ %DJC edit 7/17/2015
 
 %% load in the converted Data file of interest - here is POST stim
-sid = SIDS{8}; %sid 8 is 0b5a2e
+sid = SIDS{6}; %sid 8 is 0b5a2e
 chans = 1:64;
 
 % downsampling rate
@@ -23,15 +23,61 @@ switch(sid)
     case '0b5a2e'
         % sid = SIDS{1};
         tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
-        block = 'BetaPhase-5';
+        blockPre = 'BetaPhase-12'; % this is the PRE stim for 0b5a2e
+        blockPost = 'BetaPhase-5';
         stims = [22 30];
         chans = [23 31]; % these are the channels we thought we saw beta in
         chans = 1:64; % here we want to look at all of the channels to start
+    case 'd5cd55'
+        % sid = SIDS{2};
+        tp = 'D:\Subjects\d5cd55\data\D8\d5cd55_baseline';
+        blockPre = 'Block-47';
+        blockPost = 'Block-51';
+        stims = [54 62];
+        chans = [53 61 63];
+        chans = 1:64; % here we want to look at all of the channels to start
+        
+    case 'c91479'
+        % sid = SIDS{3};
+        tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
+        blockPre = 'BetaPhase-9';
+        blockPost = 'BetaPhase-15';
+        stims = [55 56];
+        chans = [64 63 48];
+        chans = 1:64; % here we want to look at all of the channels to start
+        
+    case '7dbdec'
+        % sid = SIDS{4};
+        tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+        blockPre = 'BetaPhase-16';
+        blockPost = 'BetaPhase-18';
+        stims = [11 12];
+        chans = [4 5 14];
+        chans = 1:64; % here we want to look at all of the channels to start
+        
+    case '9ab7ab'
+        %             sid = SIDS{5};
+        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        blockPre = 'BetaPhase-1';
+        blockPost = 'BetaPhase-4';
+        stims = [59 60];
+        chans = [51 52 53 58 57];
+        chans = 1:64; % here we want to look at all of the channels to start
+        
+        % chans = 29;
+    case '702d24'
+        tp = 'D:\Subjects\702d24\data\d7\702d24_BetaStim';
+        blockPre = 'BetaPhase-3';
+        blockPost = 'BetaPhase-5';
+        stims = [13 14];
+        chans = [4 5 21];
+        chans = 1:64; % here we want to look at all of the channels to start
+        
 end
 
 tank = TTank;
 tank.openTank(tp);
-tank.selectBlock(block);
+tank.selectBlock(blockPost);
 
 for chan = chans
     
@@ -57,28 +103,17 @@ for chan = chans
     
 end
 
-%% save it to output directory
+% save it to output directory
 save(fullfile(META_DIR, [sid '_postStimRestDecimated.mat']),'fs','Blck','-v7.3');
 
 
-%% DO the same for PRE stim state of 8 minutes
+% DO the same for PRE stim state of 8 minutes
 % load in the converted Data file of interest
-sid = SIDS{8};
-chans = 1:64;
-
-switch(sid)
-    case '0b5a2e'
-        % sid = SIDS{1};
-        tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
-        block = 'BetaPhase-12'; % this is the PRE stim for 0b5a2e
-        stims = [22 30];
-        chans = [23 31]; % these are the channels to look at first for beta during beta triggered stim
-        chans = 1:64; % we want to start looking at all of the channels
-end
+clear Blck;
 
 tank = TTank;
 tank.openTank(tp);
-tank.selectBlock(block);
+tank.selectBlock(blockPre);
 
 % decimation
 n = 12;
@@ -108,7 +143,7 @@ for chan = chans
     
 end
 
-%% save it to output directory
+% save it to output directory
 save(fullfile(META_DIR, [sid '_preStimRestDecimated.mat']),'fs', 'Blck','-v7.3');
 
 %% load in post stim
@@ -134,16 +169,16 @@ for i = 1:size(Blck,2)
     title(sprintf('Channel %d',i))
     xlabel('Time (ms)')
     ylabel('Amplitude (uV)')
-  
+    
     figure
     xc = xcorr(Blck(:,i),Blck(:,i));
     plot(xc)
-%         pause(0.5)
-   
+    %         pause(0.5)
+    
     figure
     ft = fft(Blck(:,i));
     loglog(abs(ft))
-%     pause(0.5)
+    %     pause(0.5)
     
     
     

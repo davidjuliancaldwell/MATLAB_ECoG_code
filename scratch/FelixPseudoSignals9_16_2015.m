@@ -16,11 +16,7 @@ x = x/20;
 
 
 
-figure
-% plot(t,x,'b');
-% title(['Gaussian Pulse \sigma=', num2str(sigma),'s']);
-xlabel('Time(s)');
-ylabel('Amplitude');
+
 
 %%
 hold on
@@ -36,15 +32,57 @@ sigs = [sigs ; x_shift];
 sigs = sigs+(rand(6,1001) - 0.5);
 
 
+figure
+% plot(t,x,'b');
+% title(['Gaussian Pulse \sigma=', num2str(sigma),'s']);
+xlabel('Time(s)');
+ylabel('Amplitude');
 plot(t,sigs')
 
 
 %% covariance, singular value decomposition 
+% 
+% CovMatSig = cov(sigs');
+% [u,s,v] = svd(CovMatSig);
 
-CovMatSig = cov(sigs');
-[U,S,V] = svd(CovMatSig);
+% DJC - 2-16-2016, david additions after AMATH, the previous was from Felix
+% 
+
+[u,s,v] = svd(sigs);
 figure
-bar(diag(S))
+bar(diag(s))
+
+%%
+
+% look at diagonal of matrix S - singular values
+figure
+plot(diag(s),'ko','Linewidth',[2])
+
+% to get percentage in mode
+subplot(2,1,1) % plot normal
+plot(diag(s)/sum(diag(s)),'ko','Linewidth',[2])
+subplot(2,1,2) % plot semilog
+semilogy(diag(s)/sum(diag(s)),'ko','Linewidth',[2])
+
+% look at the modes 
+figure
+x = 1:6;
+plot(x,u(:,1:6),'Linewidth',[2])
+
+% look at temporal part - columns of v
+figure
+plot(t,v(:,1:6),'Linewidth',[2])
+
+%%
+% low rank reconstruction 
+figure
+for j = 1:4
+   ff = u(:,1:j)*s(1:j,1:j)*v(:,1:j)';
+   subplot(2,2,j)
+   surfl(x,t,ff'),shading interp
+    
+end
+
 
 
 %% PCA from matlab 

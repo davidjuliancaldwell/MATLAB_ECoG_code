@@ -1,4 +1,4 @@
-function varargout=sigstar(groups,stats,nosort,flipNeg)
+function varargout=sigstar(groups,stats,nosort)
 
 % SIGSTAR Add significance stars to bar charts, boxplots, line charts, etc,
 %
@@ -39,7 +39,7 @@ function varargout=sigstar(groups,stats,nosort,flipNeg)
 % bar([5,2,1.5])
 % sigstar({[2,3],[1,2], [1,3]},[nan,0.05,0.05])
 %
-% 3. 
+% 3.  **DOESN'T WORK IN 2014b**
 % R=randn(30,2);
 % R(:,1)=R(:,1)+3;
 % boxplot(R)
@@ -89,9 +89,6 @@ if nargin<3
 	nosort=0;
 end
 
-if (~exist('flipNeg', 'var'))
-    flipNeg = false;
-end
 
 
 
@@ -182,43 +179,11 @@ hold on
 H=ones(length(groups),2); %The handles will be stored here
 
 y=ylim;
-yd=myRange(y)*0.04; % or 5% if one-sample p's
-ydp=myRange(y)*0.07; % separate sig bars vertically by 7% across multiples
+yd=myRange(y)*0.05; %separate sig bars vertically by 5% 
 
 for ii=1:length(groups)
-% 	thisY=findMinY(xlocs(ii,:))+yd;
-    % jdwander edit
-    if (ischar(groups{ii}{1}))
-        cmp = strcmp(groups{ii}{1}, groups{ii}{2});
-    else
-        cmp = groups{ii}{1} == groups{ii}{2};
-    end
-    
-    if (cmp) % one sample p value
-        minY = findMinY(xlocs(ii,:));
-        if (flipNeg)            
-            if (minY < 0)
-                thisY = minY - yd;
-            else
-                thisY = minY + yd;
-            end
-        else
-            thisY = max(0, findMinY(xlocs(ii,:))) + yd;
-        end
-    	H(ii,:)=makeSingle(xlocs(ii,:),thisY,stats(ii));                
-    else
-        minY = findMinY(xlocs(ii,:));
-        if (flipNeg)            
-            if (minY < 0)
-                thisY = minY - ydp;
-            else
-                thisY = minY + ydp;
-            end
-        else
-            thisY = max(0, findMinY(xlocs(ii,:))) + ydp;
-        end
-    	H(ii,:)=makeBar(xlocs(ii,:),thisY,stats(ii));        
-    end
+	thisY=findMinY(xlocs(ii,:))+yd;
+	H(ii,:)=makeBar(xlocs(ii,:),thisY,stats(ii));
 end
 %-----------------------------------------------------
 
@@ -276,60 +241,27 @@ elseif p<=0.05
 elseif isnan(p)
 	stars='n.s.';
 else
-	stars=sprintf('p = %1.2f', p);
+	stars='';
 end
 		
 x=repmat(x,2,1);
 y=repmat(y,4,1);
+
 H(1)=plot(x(:),y,'-k','LineWidth',1.5);
 
 %Increase offset between line and text if we will print "n.s."
 %instead of a star. 
-if (p < 0.05)
-    offset=0.02;
+if ~isnan(p)
+    offset=0.005;
 else
-    offset=0.04;
+    offset=0.02;
 end
 
 H(2)=text(mean(x(:)),mean(y)+myRange(ylim)*offset,stars,...
    	'HorizontalAlignment','Center',...
-   	'BackGroundColor','none', ...
-    'FontSize', 10);
+   	'BackGroundColor','none');
 
 
-function H=makeSingle(x,y,p)
-%makeSingle produces the bar and defines how many asterisks we get for a 
-%given p-value
-
-
-if p<=1E-3
-	stars='***'; 
-elseif p<=1E-2
-	stars='**';
-elseif p<=0.05
-	stars='*';
-elseif isnan(p)
-	stars='n.s.';
-else
-	stars=sprintf('p = %1.2f', p);
-end
-		
-x=repmat(x,2,1);
-y=repmat(y,4,1);
-H(1)=plot(x(:),y,'-k','LineWidth',1.5);
-
-%Increase offset between line and text if we will print "n.s."
-%instead of a star. 
-if (p < 0.05)
-    offset=0.02;
-else
-    offset=0.03;
-end
-
-H(2)=text(mean(x(:)),mean(y)+myRange(ylim)*offset,stars,...
-   	'HorizontalAlignment','Center',...
-   	'BackGroundColor','none', ...
-    'FontSize', 10);
 
 
 
@@ -340,9 +272,16 @@ function Y=findMinY(x)
 %
 
 %First look for patch objects (bars in a bar-chart, most likely)
-p=findobj(gca,'Type','Patch');
-xd=get(p,'XData');
-if iscell(xd)
+if verLessThan('matlab','8.4.0')
+	p=findobj(gca,'Type','bar');
+	xd=get(p,'XData');
+else
+	p=findobj(gca,'Type','bar')
+	xd=p.XData;
+end
+
+
+if iscell(xd) & verLessThan('matlab','8.4.0')
 	xd=groupedBarFix(xd,'x');
 end
 
@@ -352,18 +291,21 @@ xd(xd>x(2))=0;
 overlapping=any(xd,1); %These x locations overlap
 
 %Find the corresponding y values 
-clear xd
-yd=get(p,'YData');
-if iscell(yd)
+if verLessThan('matlab','8.4.0')
+	yd=get(p,'YData');
+else
+	yd=p.YData;
+end
+
+if iscell(yd) & verLessThan('matlab','8.4.0')
 	yd=groupedBarFix(yd,'y');
 end
+
 yd=yd(:,overlapping);
 
 %So we must have a value of at least Y in order to miss all the 
 %plotted bar data:
 Y=max(yd(:));
-
-
 
 %Now let's check if any other plot elements (such as significance bars we've 
 %already added) exist over this range of x values.
@@ -415,6 +357,8 @@ function out=groupedBarFix(in,xy)
 		out=max(out,[],3);
     end
 
+
 %replacement for stats toolbox range function
 function rng=myRange(x)
   rng = max(x) - min(x);
+

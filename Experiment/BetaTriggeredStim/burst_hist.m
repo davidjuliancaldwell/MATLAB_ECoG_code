@@ -3,6 +3,8 @@ function [] = burst_hist(bursts)
 % where there are a given number of conditions, and plot a histogram of the number of
 % bursts in each size, binned.
 
+% modified by DJC 2-10-2016 to consider stats on the burst table 
+
 figure
 
 % for histc
@@ -14,6 +16,37 @@ suffix = cell(1,3);
 suffix{1} = 'Negative phase of Beta';
 suffix{2} = 'Positive phase of Beta';
 suffix{3} = 'Null Condition';
+
+% for stats
+% pNew = bonferroni corrected
+% dont compare to Null as there are no bursts! 
+% numConds = 2;
+pNew = 0.05;
+
+binnedBurstsNeg = bursts(4,bursts(5,:)==0);
+binnedBurstsPos = bursts(4,bursts(5,:)==1);
+binnedBurstsNull = bursts(4,bursts(5,:)==2);
+
+figure
+plot(binnedBurstsNeg)
+hold on
+plot(binnedBurstsPos)
+
+
+[pR,hR,statsR] = ranksum(binnedBurstsNeg,binnedBurstsPos)
+[hK,pK,k2stat] = kstest2(binnedBurstsNeg,binnedBurstsPos)
+% 
+% [pR,hR,statsR] = ranksum(binnedBurstsNeg,binnedBurstsNull,'alpha',pNew)
+% [hK,pK,k2stat] = kstest2(binnedBurstsNeg,binnedBurstsNull,'alpha',pNew)
+% 
+% [pR,hR,statsR] = ranksum(binnedBurstsPos,binnedBurstsNull,'alpha',pNew)
+% [hK,pK,k2stat] = kstest2(binnedBurstsPos,binnedBurstsNull,'alpha',pNew)
+
+
+
+
+% kruskal wallis? 
+% [p,tbl,stats] = kruskalwallis()
 
 
 for n = 0:2
