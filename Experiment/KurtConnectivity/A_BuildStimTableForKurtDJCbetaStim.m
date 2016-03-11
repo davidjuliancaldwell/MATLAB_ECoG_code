@@ -1,42 +1,50 @@
 %% for subject 9ab7ab, based off of beta stim work
+% modified 3/8/2016 - to look at CCEP thresholding levels for 0b5a2e
 
 %% Constants
+close all;clear all;clc
 Z_ConstantsKurtConnectivity;
-addpath ./experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
+addpath c:/users/david/desktop/research/raolab/matlab/code/experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
 
 %%
 
-tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
-block = 'BetaPhase-3';
+sid = input('What was the subject ID? 0b5a2e?','s');
 
-tank = TTank;
-tank.openTank('C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
-tank.selectBlock('BetaPhase-3');
-
-tic;
-[smon, info] = tank.readWaveEvent('SMon', 2);
-smon = smon';
-
-fs = info.SamplingRateHz;
-
-stim = tank.readWaveEvent('SMon', 4)';
-toc;
-
-% Wave-1 looks like the beta signal (SHIT!), should have been the
-% decision variable
-
-% Wave-2 is the mode
-% Wave-3 is the mode time/counter
-% Wave-4 looks like the stim command
-tic;
-mode = tank.readWaveEvent('Wave', 2)';
-ttype = 0*mode;
-
-beta = tank.readWaveEvent('Blck', 1)';
-%     [beta, ~] = tdt_loadStream(tp, block, 'Blck', 1);
-raw = tank.readWaveEvent('Blck', 2)';
-%     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);
-toc;
+switch sid
+    case '9ab7ab'
+        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        block = 'BetaPhase-3';
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock('BetaPhase-3');
+    case '0b5a2e'
+        tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_EP\0b5a2e_EP';
+        block = 'EP-1';
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        tic;
+        [smon, info] = tank.readWaveEvent('SMon', 2);
+        smon = smon';
+        
+        fs = info.SamplingRateHz;
+        
+        stim = tank.readWaveEvent('SMon', 4)';
+        toc;
+        
+        tic;
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        
+        raw = tank.readWaveEvent('Blck', 2)';
+        
+        toc;
+end
 
 %% build a burst table with the following
 % 1 - burst id

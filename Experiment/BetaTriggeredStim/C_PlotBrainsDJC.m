@@ -1,12 +1,13 @@
 %% Constants
 % modified by DJC 1-10-2016
 cd c:\users\david\desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim
-close all;clear all;clc
+% close all;clear all;clc
+close all
 Z_Constants;
 % addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(9);
+SIDS = SIDS(8);
 
 for idx = 1:length(SIDS)
     subjid = SIDS{idx};
@@ -44,7 +45,7 @@ for idx = 1:length(SIDS)
     
     sid = subjid;
     
-    load(strcat(subjid,'epSTATSsig.mat'))
+%     load(strcat(subjid,'epSTATSsig.mat'))
     
     if (~strcmp(sid,'0b5a2e') && ~strcmp(sid,'0b5a2ePlayback'))
         load(fullfile(getSubjDir(subjid), 'trodes.mat'));
@@ -74,7 +75,7 @@ for idx = 1:length(SIDS)
         Montage.MontageTrodes = zeros(64, 3);
         Montage.BadChannels = [];
         Montage.Default = true;
-        
+        sid = '0b5a2e';
         % get electrode locations
         locs = trodeLocsFromMontage(sid, Montage, false);
         Grid = locs;
@@ -84,19 +85,30 @@ for idx = 1:length(SIDS)
     
     %%
     close all
+    
+    %% plotting average deflection
     w = nan(size(Grid, 1), 1);
     for i = 1:64
-        if (i~=22 && i~=30)
-            w(i) = min(sigChans{i}{3});
+        if (i~=stims)
+            w(i) = min(sigChans{i}{1}{3});
         end
     end
     %     w = zeros(size(Grid,1),1);
     %     w(stims) = -1;
     %     w(beta) = 1;
     
-    clims = [min(w) max(w)];
     
+    if strcmp(subjid,'c91479')
+        w(1) = NaN;
+    end
     
+    if strcmp(subjid,'7dbdec')
+        w(57) = NaN;
+    end
+    
+        clims = [min(w) max(w)];
+
+        
     figure
     PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
     
@@ -106,16 +118,52 @@ for idx = 1:length(SIDS)
     colormap(cm);
     h = colorbar;
         ylabel(h,'Volts (\muV)')
-   title({sid ' Average Negative CCEP Deflection','10-30 ms post Stimulus'})
+   title({sid 'Median CCEP Magnitude ','Aggregated for all Conditions','10-30 ms post Stimulus'})
     set(gca,'fontsize', 14)
-    %     PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 20, 'america', 1:size(Grid, 1), true);
-    %     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'png', '-r300');
-    %     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'eps', '-r300');
+%     %     PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 20, 'america', 1:size(Grid, 1), true);
+%     %     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'png', '-r300');
+%     %     SaveFig(OUTPUT_DIR, sprintf(['%sBrain'],sid), 'eps', '-r300');
+%     
+%     w = nan(size(Grid,1),1);
+%     for i = 1:64
+%         if (i~=stims)
+%             w(i) = min(sigChans{i}{1}(:,1));
+%         end
+%     end
+%     
+%         clims = [min(w) max(w)];
+% 
+%     
+%         figure
+%     PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
+%     
+%     % very often, after plotting the brain and dots, I add a colorbar for
+%     % reference as to what the dot colors mean
+%     load('recon_colormap'); % needs to be the same as what was used in the function call above
+%     colormap(cm);
+%     h = colorbar;
+%     title({sid 'Baseline and Test Pulse CCEP difference','10-30 ms post Stimulus'})
+%     ylabel(h,'Volts (\muV)')
+%     set(gca,'fontsize', 14)
+%     
+%     %% z-scores
+%     w = nan(size(Grid, 1), 1);
+%     for i = 1:64
+%         if (i~=stims)
+%             for j = 1:length(sigChans{i})-1 
+%             w(i) = min(sigChans{i}{3});
+%             end
+%         end
+%     end
+%     
+%     
+   %% z score difference 
     
-    w = nan(size(Grid,1),1);
+    w = nan(size(Grid, 1), 1);
     for i = 1:64
-        if (i~=22 && i~=30)
-            w(i) = min(sigChans{i}{1}(:,1));
+        if (i~=stims)
+            
+           w(i) = CCEPbyNumStim{i}{1}{3}{1};
         end
     end
     
@@ -130,12 +178,37 @@ for idx = 1:length(SIDS)
     load('recon_colormap'); % needs to be the same as what was used in the function call above
     colormap(cm);
     h = colorbar;
-    title({sid ' Difference of Maximum Negative CCEP Deflection','10-30 ms post Stimulus'})
-    ylabel(h,'Volts (\muV)')
+    title({sid 'Z-score for > 5 stims','10-30 ms post Stimulus'})
+    ylabel(h,'Z-score')
     set(gca,'fontsize', 14)
     
-    %%
+    %% plot differences
+    
+        w = nan(size(Grid,1),1);
+    for i = 1:64
+        if (i~=stims & CCEPbyNumStim{i}{1}{3}{1} > 5 )
+            w(i) = 100*(CCEPbyNumStim{i}{1}{3}{2} - CCEPbyNumStim{i}{1}{3}{5})/CCEPbyNumStim{i}{1}{3}{5};
+        end
+    end
+    
+    clims = [min(w) max(w)];
+
+    
+        figure
+    PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
+    
+    % very often, after plotting the brain and dots, I add a colorbar for
+    % reference as to what the dot colors mean
+    load('recon_colormap'); % needs to be the same as what was used in the function call above
+    colormap(cm);
+    h = colorbar;
+    title({sid 'Percent Baseline and Test Pulse (>5 stims) CCEP difference','10-30 ms post Stimulus','z-score greater than 5'})
+    ylabel(h,'Percent Difference')
+    set(gca,'fontsize', 14)
+    
 end
+    
+%%
 
 % stims = [55 56];
 % beta = [64];

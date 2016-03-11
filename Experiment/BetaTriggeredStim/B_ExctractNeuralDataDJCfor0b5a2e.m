@@ -8,7 +8,7 @@ addpath ./scripts/ %DJC edit 7/20/2015;
 % FOR 0b5a2e
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(8);
+SIDS = SIDS(9);
 
 for idx = 1:length(SIDS)
     sid = SIDS{idx};
@@ -61,16 +61,19 @@ for idx = 1:length(SIDS)
             stims = [22 30];
             %             chans = [23 31 21 14 15 32 40];
             % DJC 2-5-2016 - prototype just on channel 23
-%             chans = [1:64];
-            chans = 23;
+            chans = [1:64];
+%                         chans = [23];
+%             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
         case '0b5a2ePlayback' % added DJC 7-23-2015
             tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
             block = 'BetaPhase-4';
             stims = [22 30];
             %             chans = [23 31 21 14 15 32 40];
             %             chans = [23 31];
-            chans = 23;
-            
+%             chans = 23;
+           chans = [1:64];
+%             chans = 40;
+
         otherwise
             error('unknown SID entered');
     end
@@ -140,11 +143,16 @@ for idx = 1:length(SIDS)
     %% process each ecog channel individually
     
     sigChans = {};
+    shuffleChans = {};
+    CCEPbyNumStim = {};
+    
     
     for chan = chans
         
         %% load in ecog data for that channel
         fprintf('loading in ecog data:\n');
+        fprintf('channel %d:\n',chan);
+
         tic;
         grp = floor((chan-1)/16);
         ev = sprintf('ECO%d', grp+1);
@@ -250,16 +258,27 @@ for idx = 1:length(SIDS)
         end
         
         
-%         presamps = round(0.10 * efs); % pre time in sec
+        %         presamps = round(0.10 * efs); % pre time in sec
         
         % if doing zscore, try 0.3, otherwise .120 is good. Looks like
         % conditioning stimuli sometimes begin around 80 ms after? so if
         % you zscore normalize bad news bears
-%         postsamps = round(0.120 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
+        %         postsamps = round(0.120 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
+        
+        presamps = round(0.1*efs);
+        postsamps = round(0.120*efs);
         
         ptis = round(stims(2,pts)/fac);
         
         t = (-presamps:postsamps)/efs;
+        
+        % 2/24/2016 - change CT so that if you pick different limits for
+        % pre and post baseline, then you're ok for "blanking out" the
+        % stimulation
+        
+        index = find(t==0);
+        ct = index + ct - round(0.025*efs);
+        
         
         
         wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
@@ -325,15 +344,72 @@ for idx = 1:length(SIDS)
                 % move stats up here DJC 2-11-2016 in order to only plot if
                 % significant
                 
-                a1 = 1e6*min((awins(t>0.010 & t < 0.030,keeps)));
-                a1NullMean = mean(a1);
-                a1 = a1 - mean(a1(label(keeps)==0));
+                a1 = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                a1Median = median(a1);
+                a1 = a1 - median(a1(label(keeps)==0));
                 [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'off');
-                [cNull,mNull,hNull,gnamesNull] = multcompare(statsNull,'display','off');
+                [c,m,h,gnames] = multcompare(statsNull,'display','off');
+                sigChans{chan}{typei} = {m c a1Median a1 label keeps};
+
+                %% zscore dat
+                total = 1e6*(awins(:,keeps));
+                base = 1e6*(awins(:,label(keeps)==0));
+                test = 1e6*(awins(:,label(keeps)==1));
+                [zT,magT,latT] = zscoreCCEP(total,test,t);
+                [zB,magB,latB] = zscoreCCEP(total,base,t);
+                CCEPbyNumStim{chan}{typei} = {zT magT latT zB magB latB};
                 
-                if anovaNull < 0.05
+                %%
+                %                 %% - DJC 2-23-2016 - looking at erp_perm_test
+                %
+                %
+                %                 % need to do for each type
+                %                 %                 CCEPbyNumStim = {};
+                %                 % dont need to reinitialize CCEPbyNumStim, as it goes
+                %                 % through the other way first
+                %                 % i is 1 in this case
+                %                 i = 1;
+                %                 Nperm = 1000;
+                %                 sp = 95;
+                %                 extractedSigs = 1e6*((awins(t>0.005 & t<0.040,keeps)));
+                %                 extractedSigsBase = extractedSigs(:,label(keeps)==0);
+                %                 extractedSigsTest = extractedSigs(:,label(keeps)==i);
+                %                 tExtract = t(t>0.005 & t<0.040);
+                %                 figure
+                %                 plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
+                %                 hold on
+                %                 plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
+                %                 plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
+                %
+                %
+                %                 [CI_loNull, CI_hiNull, sgcNull] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
+                %
+                %                 hold on
+                %                 bar(tExtract,100*sgcNull,'linewidth',[2])
+                %                 % from mathworks to find continuous segment that was at
+                %                 % least 3 ms long?
+                %
+                %                 tSearch = diff([false;sgcNull==1;false]);
+                %                 p = find(tSearch==1);
+                %                 q = find(tSearch==-1);
+                %                 [maxlen,ix] = max(q-p);
+                %                 firstSearch = p(ix);
+                %                 lastSearch = q(ix)-1;
+                %
+                %                 CCEPmed = median(extractedSigs(:,klabel==i),2);
+                %                 [minval,inx] = min(CCEPmed);
+                %                 % account for case where inx = 1 to avoid addressing matrix
+                %                 % outside of bounds
+                %                 if inx == 1
+                %                     inx = inx + 1;
+                %                 end
+                %                 CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
+                %                 CCEPbyNumStimNull{i} = CCEPmag;
+                
+                %%
+                if anova < 0.05
                     figure
-                    % this sets the figure to be the whole screen 
+                    % this sets the figure to be the whole screen
                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
                     subplot(3,1,1);
                     
@@ -366,15 +442,16 @@ for idx = 1:length(SIDS)
                     % convo with miah
                     subplot(3,1,2)
                     
-                    prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*mean(awins(:,baselines),2)), label(keeps), colors);
+                    prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
                     
                     % try zscore?
-                    %                                 prettyline(1e3*t((1e3*t)>10), zscore(1e6*awins((1e3*t)>10, keeps)), label(keeps), colors);
+                    
+                    
                     %     ylim([-130 50]);
                     
                     % changed DJC 1-7-2016 to look at -8 to 80
                     xlim(1e3*[-0.025 max(t)]);
-                    xlim(1e3*[min(t) max(t)]);
+%                     xlim(1e3*[min(t) max(t)]);
                     %                 xlim([-5 300]);
                     
                     %     vline([6 20 40], 'k');
@@ -391,6 +468,7 @@ for idx = 1:length(SIDS)
                     
                     % DJC set highlight to 1 1 1 to block it out
                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
+                    
                     vline(0);
                     %                 vline(80);
                     
@@ -398,7 +476,7 @@ for idx = 1:length(SIDS)
                     xlabel('time (ms)');
                     ylabel('ECoG (uV)');
                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-                    title('Mean Subtracted')
+                    title('Median Subtracted')
                     %                     leg = {'Pre','Post'};
                     %
                     %                     leg{end+1} = 'Stim Window';
@@ -414,16 +492,16 @@ for idx = 1:length(SIDS)
                     set(gca, 'xtick', []);
                     ylabel('\DeltaEP_N (uV)');
                     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', tableNull{2,5}, tableNull{2,6}));
-%                                     figure
-%                                     figure
-%                                     [pNull,tblNull,statsNull] = kruskalwallis(a1',label(keeps));
+                    %                                     figure
+                    %                                     figure
+                    %                                     [pNull,tblNull,statsNull] = kruskalwallis(a1',label(keeps));
+                    %
 %                     
-                    
-                                        SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-                                        SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
-                    
+%                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+%                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+% %                     
                 end
-                
+                %                 shuffleChansNull{chan} = {CI_loNull CI_hiNull sgcNull CCEPbyNumStimNull};
             elseif (types(typei) ~= nullType)
                 %     % if (all)
                 %     probes = pstims(5,:) < .250*fs;
@@ -464,13 +542,65 @@ for idx = 1:length(SIDS)
                 colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
                 
                 %%
-                a1 = 1e6*min((awins(t>0.010 & t < 0.030,keeps)));
-                a1CondMean = mean(a1);
-                a1 = a1 - mean(a1(label(keeps)==0));
-                [anovaResultCond,tableCond,statsCond] = anova1(a1', label(keeps), 'off');
-                [cCond,mCond,hCond,gnamesCond] = multcompare(statsCond,'display','off');
-                
-                if anovaResultCond < 0.05
+                a1 = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                a1Median = median(a1);
+                a1 = a1 - median(a1(label(keeps)==0));
+                [anova,table,stats] = anova1(a1', label(keeps), 'off');
+                [c,m,h,gnames] = multcompare(stats,'display','off');
+                sigChans{chan}{typei} = {m c a1Median a1 label keeps};
+
+                %% zscore dat
+                for i = 1:length(ulabels)-1
+                    total = 1e6*(awins(:,keeps));
+                    base = 1e6*(awins(:,label(keeps)==0));
+                    test = 1e6*(awins(:,label(keeps)==i));
+                    [zT,magT,latT] = zscoreCCEP(total,test,t);
+                    [zB,magB,latB] = zscoreCCEP(total,base,t);
+                    CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
+                end
+                %% trying stavros method
+                %                 %%
+                %                 % need to do for each type
+                %                 CCEPbyNumStim = {};
+                %                 for i = 1:length(ulabels)-1
+                %                     Nperm = 1000;
+                %                     sp = 95;
+                %                     extractedSigs = 1e6*((awins(t>0.005 & t<0.040,keeps)));
+                %                     extractedSigsBase = extractedSigs(:,label(keeps)==0);
+                %                     extractedSigsTest = extractedSigs(:,label(keeps)==i);
+                %                     tExtract = t(t>0.005 & t<0.040);
+                %                     figure
+                %                     plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
+                %                     hold on
+                %                     plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
+                %                     plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
+                %
+                %
+                %                     [CI_lo, CI_hi, sgc] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
+                %
+                %                     hold on
+                %                     bar(tExtract,100*sgc,'linewidth',[2])
+                %                     % from mathworks to find continuous segment that was at
+                %                     % least 3 ms long?
+                %
+                %                     tSearch = diff([false;sgc==1;false]);
+                %                     p = find(tSearch==1);
+                %                     q = find(tSearch==-1);
+                %                     [maxlen,ix] = max(q-p);
+                %                     firstSearch = p(ix);
+                %                     lastSearch = q(ix)-1;
+                %
+                %                     CCEPmed = median(extractedSigs(:,klabel==i),2);
+                %                     [minval,inx] = min(CCEPmed);
+                %                     % account for case if it's at inx = 1
+                %                     if inx == 1
+                %                         inx = inx +1;
+                %                     end
+                %                     CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
+                %                     CCEPbyNumStim{i} = CCEPmed;
+                %                 end
+                %%
+                if anova < 0.05
                     figure
                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
                     subplot(3,1,1);
@@ -482,7 +612,7 @@ for idx = 1:length(SIDS)
                     %                 % convo with miah
                     xlim(1e3*[-0.025 max(t)]);
                     
-%                     xlim(1e3*[min(t) max(t)]);
+                    %                     xlim(1e3*[min(t) max(t)]);
                     yl = ylim;
                     yl(1) = min(-10, max(yl(1),-140));
                     yl(2) = max(10, min(yl(2),100));
@@ -513,13 +643,13 @@ for idx = 1:length(SIDS)
                     % second mean subtracted
                     
                     subplot(3,1,2)
-                    prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*mean(awins(:,baselines),2)), label(keeps), colors);
+                    prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
                     
                     
                     % changed DJC 1-7-2016
                     xlim(1e3*[-0.025 max(t)]);
-
-%                     xlim(1e3*[min(t) max(t)]);
+                    
+                    %                     xlim(1e3*[min(t) max(t)]);
                     %                 xlim([-5 300]);
                     %     vline([6 20 40], 'k');
                     %     highlight(gca, [25 33], [], [.6 .6 .6])
@@ -539,7 +669,7 @@ for idx = 1:length(SIDS)
                     
                     xlabel('time (ms)');
                     ylabel('ECoG (uV)');
-                    title('Mean Subtracted')
+                    title('Median Subtracted')
                     
                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
                     %                     title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
@@ -566,16 +696,50 @@ for idx = 1:length(SIDS)
                     set(gca, 'xtick', []);
                     ylabel('\DeltaEP_N (uV)');
                     
-                    title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', tableCond{2,5}, tableCond{2,6}));
-%                                     figure
-%                                     [pCond,tblCond,statsCond] = kruskalwallis(a1',label(keeps));
-                    
-                    SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-                    SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                    title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
+                    %                                     figure
+                    %                                     [pCond,tblCond,statsCond] = kruskalwallis(a1',label(keeps));
+%                     
+%                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+%                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
                 end
+                
             end
+            
+            %             shuffleChans{chan}{typei} = {CI_lo CI_hi sgc CCEPbyNumStim};
+            
+            %             %% TFA - 2-24-2016, trying this
+            %
+            %             for i = 1:length(ulabels)-1
+            %                 fs = efs;
+            %                 fw = [1:3:200];
+            %                 extractedSigs = 1e6*(kwins);
+            %                 extractedSigsBase = extractedSigs(t>0.005,label(keeps)==0);
+            %                 extractedSigsTest = extractedSigs(t>0.01,label(keeps)==i);
+            %                 extractedSigsPre = extractedSigs(t<-0.005, label(keeps)==i);
+            %                 [C, ~, ~, ~] = time_frequency_wavelet(extractedSigsTest, fw, fs, 1, 1, 'CPUtest');
+            %                 [Cbase, ~, ~, ~] = time_frequency_wavelet(extractedSigsPre, fw, fs, 1, 1, 'CPUtest');
+            %
+            %                 normC=normalize_plv(C',Cbase');
+            %                 figure
+            %                 subplot(2,1,1)
+            %                 plot(t(t>0.01),extractedSigsTest,t(t>0.01),mean(extractedSigsTest,2),'k','linewidth',[4])
+            %                 colorbar
+            %                 subplot(2,1,2)
+            %                 imagesc(t(t>0.01),fw,normC);
+            %                 axis xy;
+            %                 colorbar;
+            %                 colormap(jet)
+            %                             set_colormap_threshold(gcf, [0 2], [0 10], [1 1 1]);   % changed to [-1 1] DJC 7/2014
+            %                 %             title(trodeNameFromMontage(interesting(chanIdx),Montage));
+            %                 %
+            %             end
+            
         end
-        sigChans{chan} = {mCond cCond a1CondMean mNull cNull a1NullMean};
-        save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans');
+        
+        
     end
+%     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim');
+    
+    %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsigShuffle.mat']), 'shuffleChans');
 end

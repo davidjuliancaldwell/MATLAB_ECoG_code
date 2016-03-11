@@ -47,7 +47,6 @@ close all,clear all;clc
 x = linspace(-10,10,100);
 t = linspace(0,10,30); 
 
-% 25 rows is space, 50 columns is time 
 [X,T] = meshgrid(x,t);
 f = sech(X).*(1-0.5*cos(2*T))+(sech(X).*tanh(X)).*(1-0.5*sin(2*T));
 [u,s,v] = svd(f','econ'); % he SVD'ed transpose 

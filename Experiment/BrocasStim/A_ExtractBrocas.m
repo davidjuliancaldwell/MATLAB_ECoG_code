@@ -4,7 +4,7 @@
 %% initialize output and meta dir
 close all; clear all; clc
 Z_ConstantsBrocas;
-addpath ./Experiment/BetaTriggeredStim/scripts
+addpath c:/users/david/desktop/research/RaoLab/MATLAB/Code/Experiment/BetaTriggeredStim/scripts
 
 %% load in subject
 

@@ -19,7 +19,8 @@ function h = prettybar(data, class, colors, fig)
         mMean = @nanmean;
         mStd = @nanstd;
     else
-        mMean = @mean;
+        % change to be median like pretty line? DJC? - 2-23-2016
+        mMean = @median;
         mStd = @std;
     end
     

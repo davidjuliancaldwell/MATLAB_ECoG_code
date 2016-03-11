@@ -3,8 +3,12 @@
 
 %% Constants
 close all;clear all;clc
-Z_ConstantsKurtConnectivity;
-addpath ./experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
+% Z_ConstantsKurtConnectivity;
+
+% changed 3-7-2016 by DJC for CCEP amath project
+Z_Constants
+
+addpath c:/users/david/desktop/research/raolab/matlab/code/experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
 
 %%
 sid = input('enter subject ID ','s');
@@ -12,7 +16,7 @@ sid = input('enter subject ID ','s');
 %9ab7ab
 switch(sid)
     case '9ab7ab'
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
         block = 'BetaPhase-3';
         stimChans = [59 60];
         chans = [1:64]; % want to look at all channels, DJC 8-28-2015
@@ -21,8 +25,49 @@ switch(sid)
         % chans(ismember(chans, stims)) = []; want to look at stim channels too!
         %%
         %'ecb43e'
+    case 'd5cd55'
+        % sid = SIDS{2};
+        tp = 'D:\Subjects\d5cd55\data\D8\d5cd55_BetaTriggeredStim';
+        block = 'Block-49';
+        stimChans = [54 62];
+        %         chans = [53 61 63];
+        chans = [1:64];
+        
+    case 'c91479'
+        % sid = SIDS{3};
+        tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
+        block = 'BetaPhase-14';
+        stimChans = [55 56];
+        %         chans = [64 63 48];
+        chans = [1:64];
+        
+    case '7dbdec'
+        % sid = SIDS{4};
+        tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+        block = 'BetaPhase-17';
+        stimChans = [11 12];
+        %         chans = [4 5 14];
+        chans = [1:64];
+        
+    case '9ab7ab'
+        %             sid = SIDS{5};
+        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        block = 'BetaPhase-3';
+        stimChans = [59 60];
+        %         chans = [51 52 53 58 57];
+        chans = [1:64];
+        
+        % chans = 29;
+    case '702d24'
+        tp = 'D:\Subjects\702d24\data\d7\702d24_BetaStim';
+        block = 'BetaPhase-4';
+        stimChans = [13 14];
+        %         chans = [4 5 21];
+        chans = [1:64];
+        %             chans = [36:64];
+        
     case 'ecb43e'
-        tp = 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Subjects\ecb43e\data\d7\BetaStim';
+        tp = 'D:\Subjects\ecb43e\data\d7\BetaStim';
         block = 'BetaPhase-3';
         stimChans = [56 64];
         chans = [1:64];
@@ -40,16 +85,67 @@ switch(sid)
         
 end
 %% load in the trigger data
+if strcmp(sid,'0b5a2ePlayback')
+    load(fullfile(META_DIR, ['0b5a2e' '_tables.mat']), 'bursts', 'fs', 'stims');
+    
+    % this was for discovering the delay, now it's known to be about
+    % 577869
+    %         tic;
+    %         [smon, info] = tank.readWaveEvent('SMon', 2);
+    %         smon = smon';
+    %
+    %         fs = info.SamplingRateHz;
+    %
+    %         stim = tank.readWaveEvent('SMon', 4)';
+    %         toc;
+    %
+    %         tic;
+    %         mode = tank.readWaveEvent('Wave', 2)';
+    %         ttype = tank.readWaveEvent('Wave', 1)';
+    %
+    %         beta = tank.readWaveEvent('Blck', 1)';
+    %
+    %         raw = tank.readWaveEvent('Blck', 2)';
+    %
+    %         toc;
+    
+    delay = 577869;
+else
+    
+    % below is for original miah style burst tables
+    %         load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+    % below is for modified burst tables
+    load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+end
 
-load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
 % drop any stims that happen in the first 500 milliseconds
 stims(:,stims(2,:) < fs/2) = [];
-
 
 % drop any probe stimuli without a corresponding pre-burst/post-burst
 % still want to do this for selecting conditioning - DJC, as this in the
 % next step ensures we only select conditioning up to last one before beta
-% stim train
+% stim train    bads = stims(3,:) == 0 & (isnan(stims(4,:)) | isnan(stims(6,:)));
+bads = stims(3,:) == 0 & (isnan(stims(4,:)) | isnan(stims(6,:)));
+
+stims(:, bads) = [];
+
+
+% adjust stim and burst tables for 0b5a2e playback case
+
+if strcmp(sid,'0b5a2ePlayback')
+    
+    stims(2,:) = stims(2,:)+delay;
+    bursts(2,:) = bursts(2,:) + delay;
+    bursts(3,:) = bursts(3,:) + delay;
+    
+end
+
+
+% drop any stims that happen in the first 500 milliseconds
+stims(:,stims(2,:) < fs/2) = [];
+
+
+
 bads = stims(3,:) == 0 & (isnan(stims(4,:)) | isnan(stims(6,:)));
 stims(:, bads) = [];
 
@@ -57,6 +153,10 @@ tank = TTank;
 tank.openTank(tp);
 tank.selectBlock(block);
 
+% after load in the stim table, switch meta directory to where we will
+% store stats table
+
+META_DIR = 'D:\Output\AMATH582\meta';
 %% find where conditioning pulses are
 
 % 9-1-2015 - this all is based off of assumption that conditioning pulses
@@ -91,7 +191,7 @@ zCell = cell(1,length(chans));
 muCell = cell(1,length(chans));
 stdErrCell = cell(1,length(chans));
 
-figure
+% figure
 
 for chan = chans
     %% load in ecog data for that channel
@@ -182,13 +282,27 @@ for chan = chans
     
     % using idea of probes from Extracting neural data, <250 ms after the end
     % of the beta burst, AND NOT EQUAL TO NULL
-    probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))==types(2);
+    
+    if strcmp('0b5a2e',sid) || strcmp('0b5a2ePlayback',sid)
+        
+        % this is for 0b5a2e
+        probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))~=types(2);
+    else
+        % this is for 9ab7ab (and others)
+        probes = pstims(5,:) < .250*fs;
+    end
+    
     %     keeper = ((pstims(5,:)>(0.25*fs))&(pstims(7,:)>(0.25*fs)));
     keeper = probes;
     
     types = unique(bursts(5,pstims(4,:)));
     
     kwins = awins(:,keeper);
+    
+    % added DJC 3/9/2016 to save individual responses, want signals x
+    % observations x channels
+    ECoGData(:,:,chan) = kwins;
+    
     
     preBegin = -0.2;
     preEnd = -0.005;
@@ -296,29 +410,29 @@ for chan = chans
     
     %% plot dat
     
-    subplot(8,8,chan)
-    
-    plot(1e3*t, 1e6*mu,'m','LineWidth',2);
-    %     xlim(1e3*[min(t) max(t)]);
-    xlim(1e3*[-0.025 0.08]);
-    %     yl = ylim;
-    %     yl(1) = min(-10, max(yl(1),-120));
-    %     yl(2) = max(10, min(yl(2),100));
-    %     ylim(yl);
-    ylim([-100 100]); % change this depending on the subject
-    hold on
-    vline(0);
-    
-    hold on
-    plot(1e3*t, 1e6*(mu+stdErr))
-    hold on
-    
-    plot(1e3*t, 1e6*(mu-stdErr))
-    
-    %     xlabel('time (ms)');
-    %     ylabel('ECoG (uV)');
-    title(sprintf('Chan %d', chan))
-    
+%     subplot(8,8,chan)
+%     
+%     plot(1e3*t, 1e6*mu,'m','LineWidth',2);
+%     %     xlim(1e3*[min(t) max(t)]);
+%     xlim(1e3*[-0.025 0.08]);
+%     %     yl = ylim;
+%     %     yl(1) = min(-10, max(yl(1),-120));
+%     %     yl(2) = max(10, min(yl(2),100));
+%     %     ylim(yl);
+%     ylim([-100 100]); % change this depending on the subject
+%     hold on
+%     vline(0);
+%     
+%     hold on
+%     plot(1e3*t, 1e6*(mu+stdErr))
+%     hold on
+%     
+%     plot(1e3*t, 1e6*(mu-stdErr))
+%     
+%     %     xlabel('time (ms)');
+%     %     ylabel('ECoG (uV)');
+%     title(sprintf('Chan %d', chan))
+%     
     
     %%
     %     subplot(8,8,chan)
@@ -349,124 +463,138 @@ for chan = chans
 end
 
 %% put subtitle on graph, units
-
-hold on
-xlabel('time (ms)');
-ylabel('ECoG (uV)');
-
-subtitle('Cortico-Cortical Evoked Potentials')
+% 
+% hold on
+% xlabel('time (ms)');
+% ylabel('ECoG (uV)');
+% 
+% subtitle('Cortico-Cortical Evoked Potentials')
 
 %% do plot of all significnat channels
 
 % figure
-for i = significantChans
-    mu = muCell{i};
-    stdErr = stdErrCell{i};
-    chan = i;
-    figure
-    
-    plot(1e3*t, 1e6*mu);
-    xlim(1e3*[-0.025 0.2]);
-    %     xlim(1e3*[min(t) max(t)]);
-    %     yl = ylim;
-    %     yl(1) = min(-10, max(yl(1),-120));
-    %     yl(2) = max(10, min(yl(2),100));
-    %     ylim(yl);
-    ylim([-100 100])
-    hold on
-    vline(0);
-    
-    hold on
-    plot(1e3*t, 1e6*(mu+stdErr))
-    hold on
-    
-    plot(1e3*t, 1e6*(mu-stdErr))
-    title(sprintf('Chan %d', chan))
-    %
-    %     xlabel('time (ms)');
-    %     ylabel('ECoG (uV)');
-    %
-    %     title(sprintf('CCEP, Channel %d', chan))
-    
-    
-    
-end
+% for i = significantChans
+%     mu = muCell{i};
+%     stdErr = stdErrCell{i};
+%     chan = i;
+%     figure
+%     
+%     plot(1e3*t, 1e6*mu);
+%     xlim(1e3*[-0.025 0.2]);
+%     %     xlim(1e3*[min(t) max(t)]);
+%     %     yl = ylim;
+%     %     yl(1) = min(-10, max(yl(1),-120));
+%     %     yl(2) = max(10, min(yl(2),100));
+%     %     ylim(yl);
+%     ylim([-100 100])
+%     hold on
+%     vline(0);
+%     
+%     hold on
+%     plot(1e3*t, 1e6*(mu+stdErr))
+%     hold on
+%     
+%     plot(1e3*t, 1e6*(mu-stdErr))
+%     title(sprintf('Chan %d', chan))
+%     %
+%     %     xlabel('time (ms)');
+%     %     ylabel('ECoG (uV)');
+%     %
+%     %     title(sprintf('CCEP, Channel %d', chan))
+%     
+%     
+%     
+% end
 
 
 %% do a plot of all channels
 
-figure
-
-for i = chans
-    mu = muCell{i};
-    stdErr = stdErrCell{i};
-    chan = i;
-    subplot(8,8,i)
-    
-    plot(1e3*t, 1e6*mu);
-    xlim(1e3*[-0.025 0.2]);
-    %     xlim(1e3*[min(t) max(t)]);
-    %     yl = ylim;
-    %     yl(1) = min(-10, max(yl(1),-120));
-    %     yl(2) = max(10, min(yl(2),100));
-    %     ylim(yl);
-    ylim([-30 30])
-    hold on
-    vline(0);
-    
-    hold on
-    plot(1e3*t, 1e6*(mu+stdErr))
-    hold on
-    
-    plot(1e3*t, 1e6*(mu-stdErr))
-    title(sprintf('Chan %d', chan))
-    %
-    %     xlabel('time (ms)');
-    %     ylabel('ECoG (uV)');
-    %
-    %     title(sprintf('CCEP, Channel %d', chan))
-    
-    
-    
-end
+% figure
+% 
+% for i = chans
+%     mu = muCell{i};
+%     stdErr = stdErrCell{i};
+%     chan = i;
+%     subplot(8,8,i)
+%     
+%     plot(1e3*t, 1e6*mu);
+%     xlim(1e3*[-0.025 0.2]);
+%     %     xlim(1e3*[min(t) max(t)]);
+%     %     yl = ylim;
+%     %     yl(1) = min(-10, max(yl(1),-120));
+%     %     yl(2) = max(10, min(yl(2),100));
+%     %     ylim(yl);
+%     ylim([-30 30])
+%     hold on
+%     vline(0);
+%     
+%     hold on
+%     plot(1e3*t, 1e6*(mu+stdErr))
+%     hold on
+%     
+%     plot(1e3*t, 1e6*(mu-stdErr))
+%     title(sprintf('Chan %d', chan))
+%     %
+%     %     xlabel('time (ms)');
+%     %     ylabel('ECoG (uV)');
+%     %
+%     %     title(sprintf('CCEP, Channel %d', chan))
+%     
+%     
+%     
+% end
 %% do a plot of all channels one by one
 
-figure
+% figure
+% 
+% for i = chans
+%     mu = muCell{i};
+%     stdErr = stdErrCell{i};
+%     chan = i;
+%     
+%     plot(1e3*t, 1e6*mu);
+%     xlim(1e3*[-0.025 0.08]);
+%     %     xlim(1e3*[min(t) max(t)]);
+%     %     yl = ylim;
+%     %     yl(1) = min(-10, max(yl(1),-120));
+%     %     yl(2) = max(10, min(yl(2),100));
+%     %     ylim(yl);
+%     ylim([-100 100])
+%     hold on
+%     vline(0);
+%     
+%     hold on
+%     plot(1e3*t, 1e6*(mu+stdErr))
+%     hold on
+%     
+%     plot(1e3*t, 1e6*(mu-stdErr))
+%     title(sprintf('Chan %d', chan))
+%     %
+%     %     xlabel('time (ms)');
+%     %     ylabel('ECoG (uV)');
+%     %
+%     %     title(sprintf('CCEP, Channel %d', chan))
+%     pause(1)
+%     clf
+%     
+%     
+% end
+% %%
+muMat = cell2mat(muCell);
 
-for i = chans
-    mu = muCell{i};
-    stdErr = stdErrCell{i};
-    chan = i;
-    
-    plot(1e3*t, 1e6*mu);
-    xlim(1e3*[-0.025 0.08]);
-    %     xlim(1e3*[min(t) max(t)]);
-    %     yl = ylim;
-    %     yl(1) = min(-10, max(yl(1),-120));
-    %     yl(2) = max(10, min(yl(2),100));
-    %     ylim(yl);
-    ylim([-100 100])
-    hold on
-    vline(0);
-    
-    hold on
-    plot(1e3*t, 1e6*(mu+stdErr))
-    hold on
-    
-    plot(1e3*t, 1e6*(mu-stdErr))
-    title(sprintf('Chan %d', chan))
-    %
-    %     xlabel('time (ms)');
-    %     ylabel('ECoG (uV)');
-    %
-    %     title(sprintf('CCEP, Channel %d', chan))
-    pause(2)
-    clf
-    
-    
-end
-%%
-save(fullfile(META_DIR, [sid '_StatsCCEPhunt.mat']), 'zCell', 'muCell','stdErrCell');
+% added DJC 3-9-2016, for stacking the individual traces 
+% subselect t, ECoGData, ECoGdata Stacked to make it more managable ,
+% otherwise it was 1.27 GB!
+
+ECoGData = ECoGData((t>-0.01 & t < 0.120),:,:);
+t = t(t>-0.01 & t< 0.120);
+
+ECoGDataStacked = reshape(ECoGData,[size(ECoGData,1)*...
+    size(ECoGData,2),size(ECoGData,3)]);
+
+save(fullfile(META_DIR, [sid '_IndividualCCEPs.mat']), 't','ECoGData','ECoGDataStacked');
+
+% save(fullfile(META_DIR, [sid '_StatsCCEPhuntNOTNULL.mat']), 'zCell', 't','muCell','muMat','stdErrCell');
 
 %% plot cortex
 

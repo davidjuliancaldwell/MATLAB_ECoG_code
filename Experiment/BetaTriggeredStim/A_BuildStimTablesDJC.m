@@ -6,7 +6,7 @@ addpath ./scripts/ %DJC edit 7/17/2015
 %DJC 7/20/2015 - changed tp to fit David paths
 
 % select the subject from list
-sid = SIDS{5};
+sid = SIDS{2};
 
 if (strcmp(sid, '8adc5c'))
     tp = 'D:\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
@@ -142,7 +142,7 @@ elseif (strcmp(sid, '7dbdec'))
     % Wave-3 is the mode time/counter
     % Wave-4 looks like the stim command
     tic;
-    [mode, ~] = tdt_loadStream(tp, block, 'Wave', 2);
+    [mode, ~] = tdt_loadStream(tp, block, 'Wavase', 2);
     [ttype, ~] = tdt_loadStream(tp, block, 'Wave', 1);
     [beta, ~] = tdt_loadStream(tp, block, 'Blck', 1);
     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);
@@ -440,7 +440,7 @@ end
 
 %% save the result to intermediate file for future use
 % added mod
-save(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
+save(fullfile(META_DIR, [sid '_tables_modDJC_2_22_2016.mat']), 'bursts', 'fs', 'stims');
 
 %% testing
 %
@@ -463,6 +463,10 @@ save(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
 %
 % visualize the average trigger signal
 figure
+
+% modified by DJC 2-21-2016 to set figure to be the full size of the window
+% 
+set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
 
 preSamp = round(0.020 * fs);
 postSamp = round(0.100 * fs);
