@@ -507,42 +507,42 @@ end
 % end
 
 
-%% do a plot of all channels
+% do a plot of all channels
 
-% figure
-% 
-% for i = chans
-%     mu = muCell{i};
-%     stdErr = stdErrCell{i};
-%     chan = i;
-%     subplot(8,8,i)
-%     
-%     plot(1e3*t, 1e6*mu);
-%     xlim(1e3*[-0.025 0.2]);
-%     %     xlim(1e3*[min(t) max(t)]);
-%     %     yl = ylim;
-%     %     yl(1) = min(-10, max(yl(1),-120));
-%     %     yl(2) = max(10, min(yl(2),100));
-%     %     ylim(yl);
-%     ylim([-30 30])
-%     hold on
-%     vline(0);
-%     
-%     hold on
-%     plot(1e3*t, 1e6*(mu+stdErr))
-%     hold on
-%     
-%     plot(1e3*t, 1e6*(mu-stdErr))
-%     title(sprintf('Chan %d', chan))
-%     %
-%     %     xlabel('time (ms)');
-%     %     ylabel('ECoG (uV)');
-%     %
-%     %     title(sprintf('CCEP, Channel %d', chan))
-%     
-%     
-%     
-% end
+figure
+
+for i = chans
+    mu = muCell{i};
+    stdErr = stdErrCell{i};
+    chan = i;
+    subplot(8,8,i)
+    
+    plot(1e3*t, 1e6*mu);
+    xlim(1e3*[-0.025 0.2]);
+    %     xlim(1e3*[min(t) max(t)]);
+    %     yl = ylim;
+    %     yl(1) = min(-10, max(yl(1),-120));
+    %     yl(2) = max(10, min(yl(2),100));
+    %     ylim(yl);
+    ylim([-30 30])
+    hold on
+    vline(0);
+    
+    hold on
+    plot(1e3*t, 1e6*(mu+stdErr))
+    hold on
+    
+    plot(1e3*t, 1e6*(mu-stdErr))
+    title(sprintf('Chan %d', chan))
+    %
+    %     xlabel('time (ms)');
+    %     ylabel('ECoG (uV)');
+    %
+    %     title(sprintf('CCEP, Channel %d', chan))
+    
+    
+    
+end
 %% do a plot of all channels one by one
 
 % figure
@@ -580,19 +580,19 @@ end
 %     
 % end
 % %%
-muMat = cell2mat(muCell);
-
-% added DJC 3-9-2016, for stacking the individual traces 
-% subselect t, ECoGData, ECoGdata Stacked to make it more managable ,
-% otherwise it was 1.27 GB!
-
-ECoGData = ECoGData((t>-0.01 & t < 0.120),:,:);
-t = t(t>-0.01 & t< 0.120);
-
-ECoGDataStacked = reshape(ECoGData,[size(ECoGData,1)*...
-    size(ECoGData,2),size(ECoGData,3)]);
-
-save(fullfile(META_DIR, [sid '_IndividualCCEPs.mat']), 't','ECoGData','ECoGDataStacked');
+% muMat = cell2mat(muCell);
+% 
+% % added DJC 3-9-2016, for stacking the individual traces 
+% % subselect t, ECoGData, ECoGdata Stacked to make it more managable ,
+% % otherwise it was 1.27 GB!
+% 
+% ECoGData = ECoGData((t>-0.01 & t < 0.120),:,:);
+% t = t(t>-0.01 & t< 0.120);
+% 
+% ECoGDataStacked = reshape(ECoGData,[size(ECoGData,1)*...
+%     size(ECoGData,2),size(ECoGData,3)]);
+% 
+% save(fullfile(META_DIR, [sid '_IndividualCCEPs.mat']), 't','ECoGData','ECoGDataStacked');
 
 % save(fullfile(META_DIR, [sid '_StatsCCEPhuntNOTNULL.mat']), 'zCell', 't','muCell','muMat','stdErrCell');
 

@@ -8,7 +8,7 @@ addpath ./scripts/ %DJC edit 7/20/2015;
 % FOR 0b5a2e
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(9);
+SIDS = SIDS(8);
 
 for idx = 1:length(SIDS)
     sid = SIDS{idx};
@@ -62,6 +62,7 @@ for idx = 1:length(SIDS)
             %             chans = [23 31 21 14 15 32 40];
             % DJC 2-5-2016 - prototype just on channel 23
             chans = [1:64];
+            chans = [23];
 %                         chans = [23];
 %             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
         case '0b5a2ePlayback' % added DJC 7-23-2015
@@ -221,12 +222,13 @@ for idx = 1:length(SIDS)
         %             plot(foo);
         %             vline(ct);
         %
-        for sti = 1:length(sts)
-            win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-            
-            %             interpolation approach
-            eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-        end
+        %% INTERPOLATION PART! 
+%         for sti = 1:length(sts)
+%             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+%             
+%             %             interpolation approach
+%             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+%         end
         % %         tried doing 1-200 rather than 1-40 - DJC 1-7-2016
         %                         eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
         %                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
@@ -347,6 +349,11 @@ for idx = 1:length(SIDS)
                 a1 = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
+                
+                % DJC - 3-25-2016. Save a1, label(keeps), in order to do
+                % multiway anova for channels of interest. Will start with
+                % just BETA 
+                
                 [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'off');
                 [c,m,h,gnames] = multcompare(statsNull,'display','off');
                 sigChans{chan}{typei} = {m c a1Median a1 label keeps};

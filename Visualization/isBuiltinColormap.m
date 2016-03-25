@@ -28,6 +28,9 @@ function retVal = isBuiltinColormap(name)
             retVal = true;
         case 'lines'
             retVal = true;
+            % DJC - 3/22/2016 - added parula
+        case 'parula'
+            retVal = true;
         otherwise
             retVal = false;
     end
