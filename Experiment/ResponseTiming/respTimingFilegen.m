@@ -9,6 +9,8 @@ ITI = input('What is the range of ITI to use? (in seconds, input as [1.5,2.5]) ?
 
 fs = input('What is the sample rate/clock rate of the TDT system in Hz?');
 
+% fs = 24414.06 
+
 
 %% make the timing file 
 ITIlo = ITI(1)+0.8;
