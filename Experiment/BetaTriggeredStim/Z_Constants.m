@@ -1,6 +1,6 @@
 SIDS = {'8adc5c', 'd5cd55', 'c91479', '7dbdec', '9ab7ab', '702d24', 'ecb43e','0b5a2e','0b5a2ePlayback'};
 
-OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'ManuscriptPrep');
+OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'CSNESiteVisit');
 TouchDir(OUTPUT_DIR);
 META_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'meta');
 TouchDir(META_DIR);
