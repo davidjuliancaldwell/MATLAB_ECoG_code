@@ -5,13 +5,13 @@ Z_Constants;
 addpath ./scripts/ %DJC edit 7/20/2015;
 
 SUB_DIR = fullfile(myGetenv('subject_dir'));
-OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
+% OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
 
 %% parameters
 % FOR 0b5a2e
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(8);
+SIDS = SIDS(9);
 
 for idx = 1:length(SIDS)
     sid = SIDS{idx};
@@ -65,7 +65,7 @@ for idx = 1:length(SIDS)
             %             chans = [23 31 21 14 15 32 40];
             % DJC 2-5-2016 - prototype just on channel 23
             chans = [1:64];
-            chans = [23];
+%             chans = [23];
 %                         chans = [23];
 %             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
         case '0b5a2ePlayback' % added DJC 7-23-2015
@@ -149,6 +149,9 @@ for idx = 1:length(SIDS)
     sigChans = {};
     shuffleChans = {};
     CCEPbyNumStim = {};
+    
+    % 4/4/2016 - added data for anova 
+    dataForAnova = {};
     
     
     for chan = chans
@@ -357,6 +360,10 @@ for idx = 1:length(SIDS)
                 % multiway anova for channels of interest. Will start with
                 % just BETA 
                 
+                % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
+                a = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                dataForAnova{chan}{typei} = {a label keeps};
+                
                 [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'off');
                 [c,m,h,gnames] = multcompare(statsNull,'display','off');
                 sigChans{chan}{typei} = {m c a1Median a1 label keeps};
@@ -555,6 +562,11 @@ for idx = 1:length(SIDS)
                 a1 = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
+                
+                % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
+                a = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                dataForAnova{chan}{typei} = {a label keeps};
+                
                 [anova,table,stats] = anova1(a1', label(keeps), 'off');
                 [c,m,h,gnames] = multcompare(stats,'display','off');
                 sigChans{chan}{typei} = {m c a1Median a1 label keeps};
@@ -749,7 +761,7 @@ for idx = 1:length(SIDS)
         
         
     end
-    save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim');
+    save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova');
     
     %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsigShuffle.mat']), 'shuffleChans');
 end

@@ -7,8 +7,9 @@ addpath ./scripts/ %DJC edit 7/17/2015
 
 %% Open up the data tank, have to point to the correct place
 
-sid = input('what is the subject id?','s');
+sid = input('what is the subject id?\n','s');
 
+ITI = input('What is the range of ITI to use? (in seconds)?\n')
 tank = TTank;
 
 
