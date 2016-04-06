@@ -1,13 +1,13 @@
 %% Constants
 % modified by DJC 1-10-2016
-cd c:\users\david\desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim
+% cd c:\users\david\desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim
 % close all;clear all;clc
 close all
 Z_Constants;
-% addpath ./scripts;
+addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(8);
+SIDS = SIDS(6);
 
 for idx = 1:length(SIDS)
     subjid = SIDS{idx};
@@ -45,43 +45,15 @@ for idx = 1:length(SIDS)
     
     sid = subjid;
     
-%     load(strcat(subjid,'epSTATSsig.mat'))
+    load(strcat(subjid,'epSTATSsig.mat'))
     
-    if (~strcmp(sid,'0b5a2e') && ~strcmp(sid,'0b5a2ePlayback'))
-        load(fullfile(getSubjDir(subjid), 'trodes.mat'));
-        
-    elseif (strcmp(sid,'0b5a2e'))
-        % this is for 0b5a2e
-        
-        %there appears to be no montage for this subject currently
-        Montage.Montage = 64;
-        Montage.MontageTokenized = {'Grid(1:64)'};
-        Montage.MontageString = Montage.MontageTokenized{:};
-        Montage.MontageTrodes = zeros(64, 3);
-        Montage.BadChannels = [];
-        Montage.Default = true;
-        
-        % get electrode locations
-        locs = trodeLocsFromMontage(sid, Montage, false);
-        Grid = locs;
-    elseif (strcmp(sid,'0b5a2ePlayback'))
-        
-        % this is for 0b5a2e
-        
-        %there appears to be no montage for this subject currently
-        Montage.Montage = 64;
-        Montage.MontageTokenized = {'Grid(1:64)'};
-        Montage.MontageString = Montage.MontageTokenized{:};
-        Montage.MontageTrodes = zeros(64, 3);
-        Montage.BadChannels = [];
-        Montage.Default = true;
-        sid = '0b5a2e';
-        % get electrode locations
-        locs = trodeLocsFromMontage(sid, Montage, false);
-        Grid = locs;
-        
-        
+    if (strcmp(sid,'0b5a2ePlayback'))
+        load(fullfile(getSubjDir('0b5a2e'), 'trodes.mat'));
+    else
+        load(fullfile(getSubjDir(subjid),'trodes.mat'))
     end
+
+    
     
     %%
     close all
