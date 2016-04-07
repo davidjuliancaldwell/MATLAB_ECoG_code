@@ -11,7 +11,7 @@ figure;a2=xcorr(S(400001:500000,63)-mmm,S(400001:500000,63)-mmm,'coeff');plot(a2
 figure;a2=xcorr(S(500001:600000,63)-mmm,S(500001:600000,63)-mmm,'coeff');plot(a2);
 figure;a2=xcorr(S(600001:700000,63)-mmm,S(600001:700000,63)-mmm,'coeff');plot(a2);
 figure;a2=xcorr(S(700001:800000,63)-mmm,S(700001:800000,63)-mmm,'coeff');plot(a2);
-figure;start=1;stop=10000;for j=1:8;a2=xcorr(S(start:stop,63)-mmm,S(start:stop,63)-mmm,'coeff');subplot(10,8,j);plot(a2);axis([0, 20000, -0.2, 1.05])hold on;start=start+10000;stop=stop+10000;end;
+figure;start=1;stop=10000;for j=1:8;a2=xcorr(S(start:stop,63)-mmm,S(start:stop,63)-mmm,'coeff');subplot(10,8,j);plot(a2);axis([0, 20000, -0.2, 1.05]);hold on;start=start+10000;stop=stop+10000;end;
 
 
 figure;start=1;stop=1000;for j=1:100;a2=xcorr(S(start:stop,63)-mmm,S(start:stop,63)-mmm,'coeff');subplot(10,10,j);plot(a2);axis([1, 2000, -0.2, 1.05]);hold on;start=start+1000;stop=stop+1000;end;
