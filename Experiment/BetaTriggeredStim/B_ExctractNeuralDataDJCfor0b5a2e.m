@@ -153,6 +153,8 @@ for idx = 1:length(SIDS)
     % 4/4/2016 - added data for anova 
     dataForAnova = {};
     
+    % 4/7/2016 - Zscored data for anova
+    ZscoredDataForAnova = {};
     
     for chan = chans
         
@@ -372,10 +374,16 @@ for idx = 1:length(SIDS)
                 total = 1e6*(awins(:,keeps));
                 base = 1e6*(awins(:,label(keeps)==0));
                 test = 1e6*(awins(:,label(keeps)==1));
-                [zT,magT,latT] = zscoreCCEP(total,test,t);
-                [zB,magB,latB] = zscoreCCEP(total,base,t);
+                [zT,magT,latT,~,~,~] = zscoreCCEP(total,test,t);
+                [zB,magB,latB,~,~,~] = zscoreCCEP(total,base,t);
                 CCEPbyNumStim{chan}{typei} = {zT magT latT zB magB latB};
                 
+                % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
+                total = 1e6*(awins(:,keeps));
+
+                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t);
+                ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
+
                 %%
                 %                 %% - DJC 2-23-2016 - looking at erp_perm_test
                 %
@@ -580,6 +588,11 @@ for idx = 1:length(SIDS)
                     [zB,magB,latB] = zscoreCCEP(total,base,t);
                     CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
                 end
+                
+                % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
+                total = 1e6*(awins(:,keeps));
+                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t);
+                ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
                 %% trying stavros method
                 %                 %%
                 %                 % need to do for each type
@@ -761,7 +774,7 @@ for idx = 1:length(SIDS)
         
         
     end
-    save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova');
+    save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
     
     %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsigShuffle.mat']), 'shuffleChans');
 end

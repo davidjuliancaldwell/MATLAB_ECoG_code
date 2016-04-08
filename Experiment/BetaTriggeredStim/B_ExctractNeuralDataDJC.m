@@ -123,7 +123,9 @@ for idx = 1:length(SIDS)
     % 4/4/2016 - added data for anova 
     dataForAnova = {};
     
-    
+        
+    % 4/7/2016 - Zscored data for anova
+    ZscoredDataForAnova = {};
     
     %% process each ecog channel individually
     for chan = chans
@@ -282,12 +284,12 @@ for idx = 1:length(SIDS)
 %         %             plot(foo);
 %         %             vline(ct);
 %         %
-%         for sti = 1:length(sts)
-%             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-%             
-%             %             interpolation approach
-%             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-%         end
+        for sti = 1:length(sts)
+            win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+            
+            %             interpolation approach
+            eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+        end
         % ORIGINAL ORDER WAS bandpass, notch
         % try reversing it DJC, 2/11/2016
         
@@ -295,7 +297,7 @@ for idx = 1:length(SIDS)
 % original notch below 
 %                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
 % 2-26-2016 - my attempt for ecb43e 
-%                 eco = toRow(notch(eco, [60 120 180], efs, 2, 'causal'));
+                eco = toRow(notch(eco, [60 120 180], efs, 2, 'causal'));
         %
         %
         %% process triggers
@@ -439,6 +441,13 @@ for idx = 1:length(SIDS)
                     [zB,magB,latB] = zscoreCCEP(total,base,t);
                     CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
                 end
+                
+                                
+                % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
+                total = 1e6*(awins(:,keeps));
+
+                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t);
+                ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
                 
                 %% - DJC 2-23-2016 - looking at erp_perm_test
                 
@@ -713,6 +722,6 @@ for idx = 1:length(SIDS)
         end
         
     end
-    save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova');
+    save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
     
 end
