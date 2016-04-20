@@ -46,3 +46,17 @@ tV = [0.130985829483120	0.259893185686590	0.292893218813453	-0.292893218813453	-
 % tV = tV(:);
 %% Plotting
 
+figure
+
+subplot(2,2,1)
+contour3(tV,'ShowText','On')
+title('contour3')
+subplot(2,2,2)
+contourf(tV,'ShowText','On')
+title('contourf')
+subplot(2,2,3)
+surf(tV)
+title('surf')
+subplot(2,2,4)
+pcolor(tV)
+title('pcolor')
