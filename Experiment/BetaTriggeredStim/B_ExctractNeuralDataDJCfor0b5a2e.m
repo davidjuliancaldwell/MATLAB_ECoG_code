@@ -11,9 +11,9 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % FOR 0b5a2e
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(9);
+% SIDS = SIDS(9);
 
-for idx = 1:length(SIDS)
+for idx = 9:length(SIDS)
     sid = SIDS{idx};
     %DJC edited 7/20/2015 to fix tp paths
     switch(sid)
@@ -159,7 +159,7 @@ for idx = 1:length(SIDS)
     for chan = chans
         
         %% load in ecog data for that channel
-        fprintf('loading in ecog data:\n');
+        fprintf('loading in ecog data for:\n',sid);
         fprintf('channel %d:\n',chan);
 
         tic;
@@ -354,7 +354,10 @@ for idx = 1:length(SIDS)
                 % move stats up here DJC 2-11-2016 in order to only plot if
                 % significant
                 
-                a1 = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                % modified DJC 4/24/2016 -
+                tMin = 0.01;
+                tMax = 0.050;
+                a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
                 
@@ -363,7 +366,7 @@ for idx = 1:length(SIDS)
                 % just BETA 
                 
                 % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
-                a = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 dataForAnova{chan}{typei} = {a label keeps};
                 
                 [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'off');
@@ -374,14 +377,14 @@ for idx = 1:length(SIDS)
                 total = 1e6*(awins(:,keeps));
                 base = 1e6*(awins(:,label(keeps)==0));
                 test = 1e6*(awins(:,label(keeps)==1));
-                [zT,magT,latT,~,~,~] = zscoreCCEP(total,test,t);
-                [zB,magB,latB,~,~,~] = zscoreCCEP(total,base,t);
+                [zT,magT,latT,~,~,~] = zscoreCCEP(total,test,t,tMin,tMax);
+                [zB,magB,latB,~,~,~] = zscoreCCEP(total,base,t,tMin,tMax);
                 CCEPbyNumStim{chan}{typei} = {zT magT latT zB magB latB};
                 
                 % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
                 total = 1e6*(awins(:,keeps));
 
-                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t);
+                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
                 ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
 
                 %%
@@ -567,12 +570,18 @@ for idx = 1:length(SIDS)
                 colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
                 
                 %%
-                a1 = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                tMin = 0.01;
+                tMax = 0.050;
+                a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
                 
+                % DJC - 3-25-2016. Save a1, label(keeps), in order to do
+                % multiway anova for channels of interest. Will start with
+                % just BETA 
+                
                 % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
-                a = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 dataForAnova{chan}{typei} = {a label keeps};
                 
                 [anova,table,stats] = anova1(a1', label(keeps), 'off');
@@ -584,14 +593,14 @@ for idx = 1:length(SIDS)
                     total = 1e6*(awins(:,keeps));
                     base = 1e6*(awins(:,label(keeps)==0));
                     test = 1e6*(awins(:,label(keeps)==i));
-                    [zT,magT,latT] = zscoreCCEP(total,test,t);
-                    [zB,magB,latB] = zscoreCCEP(total,base,t);
+                    [zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
+                    [zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
                     CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
                 end
                 
                 % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
                 total = 1e6*(awins(:,keeps));
-                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t);
+                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
                 ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
                 %% trying stavros method
                 %                 %%
@@ -775,6 +784,6 @@ for idx = 1:length(SIDS)
         
     end
     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
-    
+    close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
     %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsigShuffle.mat']), 'shuffleChans');
 end

@@ -131,7 +131,7 @@ for idx = 1:length(SIDS)
     for chan = chans
         
         %% load in ecog data for that channel
-        fprintf('loading in ecog data:\n');
+        fprintf('loading in ecog data for %s:\n',sid);
         fprintf('channel %d:\n',chan);
         tic;
         grp = floor((chan-1)/16);
@@ -297,7 +297,7 @@ for idx = 1:length(SIDS)
 % original notch below 
 %                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
 % 2-26-2016 - my attempt for ecb43e 
-                eco = toRow(notch(eco, [60 120 180], efs, 2, 'causal'));
+                eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
         %
         %
         %% process triggers
@@ -419,12 +419,15 @@ for idx = 1:length(SIDS)
                 colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
                 
                 %% attempt at anova, multiple comparisons
-                a1 = 1e6*max(abs((awins(t>0.010 & t < 0.030,keeps))));
+                % modified DJC 4/24/2016 -
+                tMin = 0.01;
+                tMax = 0.050;
+                a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
                                 
                 % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
-                a = 1e6*max(abs((awins(t>0.01 & t < 0.030,keeps))));
+                a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 dataForAnova{chan}{typei} = {a label keeps};
                 
                 [anova,table,stats] = anova1(a1', label(keeps), 'off');
@@ -437,8 +440,8 @@ for idx = 1:length(SIDS)
                     total = 1e6*(awins(:,keeps));
                     base = 1e6*(awins(:,label(keeps)==0));
                     test = 1e6*(awins(:,label(keeps)==i));
-                    [zT,magT,latT] = zscoreCCEP(total,test,t);
-                    [zB,magB,latB] = zscoreCCEP(total,base,t);
+                    [zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
+                    [zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
                     CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
                 end
                 
@@ -446,7 +449,7 @@ for idx = 1:length(SIDS)
                 % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
                 total = 1e6*(awins(:,keeps));
 
-                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t);
+                [~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
                 ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
                 
                 %% - DJC 2-23-2016 - looking at erp_perm_test
@@ -723,5 +726,6 @@ for idx = 1:length(SIDS)
         
     end
     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
-    
+    close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
+
 end
