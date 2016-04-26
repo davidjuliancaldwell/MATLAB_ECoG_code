@@ -29,7 +29,7 @@ s_o_a = [0:0.0001:1];
 
 s_i_a = 1./(1./s_o_a - 1/f_lens);
 
-f_eye = 1./(1./(1-s_i_a) + 1/0.02);
+f_eye = 1./(1./(1-(s_i_a+s_o_a)) + 1/0.02);
 
 figure
 plot(s_o_a,f_eye,'linewidth',2)
