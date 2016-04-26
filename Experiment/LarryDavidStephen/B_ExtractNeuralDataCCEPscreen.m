@@ -1,86 +1,92 @@
 %% Extract neural data for screening CCEPs.
 % modified from the Kurt script 1-10-2016 by DJC
-% modified 4-20-2016 by David to help Larry and Stephen 
+% modified 4-20-2016 by David to help Larry and Stephen
 
 %% Constants
 close all;clear all;clc
 % Z_ConstantsKurtConnectivity;
 
+
+% % looping through it! - DJC 
+% for i = 2:9
+
 % changed 3-7-2016 by DJC for CCEP amath project
 Z_Constants
 
-addpath c:/users/david/desktop/research/raolab/matlab/code/experiment/BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
+addpath ../BetaTriggeredStim/scripts/ %DJC edit 8/14/2015
+SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 %%
 sid = input('enter subject ID ','s');
 
 %9ab7ab
+% sid = SIDS{i};
 switch(sid)
-    case '9ab7ab'
-        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
-        block = 'BetaPhase-3';
-        stimChans = [59 60];
-        chans = [1:64]; % want to look at all channels, DJC 8-28-2015
-        
-        % chans = [51 52 53 58 57]; % DJC 8-31-2015, look at channels that were deemed potentially interesting before by Miah/Jared to see if I can see anything
-        % chans(ismember(chans, stims)) = []; want to look at stim channels too!
-        %%
-        %'ecb43e'
+
     case 'd5cd55'
         % sid = SIDS{2};
-        tp = 'D:\Subjects\d5cd55\data\D8\d5cd55_BetaTriggeredStim';
+        % sid = SIDS{2};
+        tp = strcat(SUB_DIR,'\d5cd55\data\D8\d5cd55_BetaTriggeredStim');
         block = 'Block-49';
-        stimChans = [54 62];
+        stims = [54 62];
         %         chans = [53 61 63];
         chans = [1:64];
         
     case 'c91479'
         % sid = SIDS{3};
-        tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
+        tp = strcat(SUB_DIR,'\c91479\data\d7\c91479_BetaTriggeredStim');
         block = 'BetaPhase-14';
+        stims = [55 56];
         stimChans = [55 56];
         %         chans = [64 63 48];
         chans = [1:64];
         
     case '7dbdec'
         % sid = SIDS{4};
-        tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+        tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
         block = 'BetaPhase-17';
+        stims = [11 12];
         stimChans = [11 12];
         %         chans = [4 5 14];
         chans = [1:64];
         
     case '9ab7ab'
         %             sid = SIDS{5};
-        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        %             sid = SIDS{5};
+        tp = strcat(SUB_DIR,'\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
         block = 'BetaPhase-3';
+        stims = [59 60];
         stimChans = [59 60];
         %         chans = [51 52 53 58 57];
         chans = [1:64];
         
         % chans = 29;
     case '702d24'
-        tp = 'D:\Subjects\702d24\data\d7\702d24_BetaStim';
+        tp = strcat(SUB_DIR,'\702d24\data\d7\702d2Plo4_BetaStim');
         block = 'BetaPhase-4';
+        stims = [13 14];
         stimChans = [13 14];
         %         chans = [4 5 21];
         chans = [1:64];
         %             chans = [36:64];
         
     case 'ecb43e'
-        tp = 'D:\Subjects\ecb43e\data\d7\BetaStim';
+        tp = strcat(SUB_DIR,'\ecb43e\data\d7\BetaStim');
         block = 'BetaPhase-3';
+        stims = [56 64];
         stimChans = [56 64];
         chans = [1:64];
         %         chans = [47 55]; want to look at all channels
     case '0b5a2e' % added DJC 7-23-2015
-        tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
+        tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
         block = 'BetaPhase-2';
+        stims = [22 30];
         stimChans = [22 30];
         chans = [1:64];
     case '0b5a2ePlayback' % added DJC 7-23-2015
-        tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
+        tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
         block = 'BetaPhase-4';
+        stims = [22 30];
         stimChans = [22 30];
         chans = [1:64];
         
@@ -159,7 +165,7 @@ tank.selectBlock(block);
 
 % META_DIR = 'D:\Output\AMATH582\meta';
 
-% DJC 4-20-2016 - this changes the meta directory and output directory 
+% DJC 4-20-2016 - this changes the meta directory and output directory
 Z_ConstantsLarryDavidStephen
 
 
@@ -170,12 +176,12 @@ Z_ConstantsLarryDavidStephen
 
 for chan = chans
     %% load in ecog data for that channel
-    fprintf('loading in ecog data:\n');
+    fprintf('loading in %s ecog data:\n',sid);
     tic;
     grp = floor((chan-1)/16);
     ev = sprintf('ECO%d', grp+1);
     achan = chan - grp*16;
-    fprintf('channel %s',chan)
+    fprintf('channel %d \n',chan)
     
     %         [eco, efs] = tdt_loadStream(tp, block, ev, achan);
     [eco, info] = tank.readWaveEvent(ev, achan);
@@ -190,10 +196,10 @@ for chan = chans
     pts = stims(3,:)==0;
     ptis = round(stims(2,pts)/fac);
     
-
+    
     % change presamps and post samps to be what Kurt wanted to look at
-    presamps = round(0.1 * efs); % pre time in sec
-    postsamps = round(0.3 * efs); % post time in sec
+    presamps = round(0.05 * efs); % pre time in sec
+    postsamps = round(0.15 * efs); % post time in sec
     
     t = (-presamps:postsamps)/efs;
     wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
@@ -221,20 +227,22 @@ for chan = chans
     
     types = unique(bursts(5,pstims(4,:)));
     
-    % DJC - 4-20-2016 - KEEP ALL STIMULI 
+    % DJC - 4-20-2016 - KEEP ALL STIMULI
     
-%     kwins = awins(:,keeper);
-kwins = awins;
-    
+    %     kwins = awins(:,keeper);
+    kwins = awins;
+    clear awins
     % added DJC 3/9/2016 to save individual responses, want signals x
     % observations x channels
     ECoGData(:,:,chan) = kwins;
- 
+    clear kwins
 end
 
-ECoGDataAverage = mean(ECoGData,2);
+ECoGDataAverage = squeeze(mean(ECoGData,2));
 
-% save(fullfile(META_DIR, [sid '_StimulationAndCCEPs.mat']), 't','ECoGData','ECoGDataAverage');
+save(fullfile(META_DIR, [sid '_StimulationAndCCEPs.mat']), 't','ECoGData','ECoGDataAverage','-v7.3');
 
+close all; clearvars -except i
+% end 
 % save(fullfile(META_DIR, [sid '_StatsCCEPhuntNOTNULL.mat']), 'zCell', 't','muCell','muMat','stdErrCell');
 
