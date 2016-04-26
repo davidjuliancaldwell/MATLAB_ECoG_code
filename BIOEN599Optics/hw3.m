@@ -7,15 +7,19 @@ f_lens = 100/1000;
 
 s_o_a = [0:0.0001:1];
 
-s_i_a = 1./(1./s_o_a - 1/f_lens);
+% s_i_a = 1./(1./s_o_a - 1/f_lens);
+
+s_i_a = (s_o_a.*f_lens)./(s_o_a-f_lens);
 
 figure
-plot(s_o_a,(s_i_a + s_o_a),'linewidth',2)
+plot(s_o_a,(s_i_a),'linewidth',2)
+ylim([-1 1])
+xlim([0 1])
 xlabel('s_o_A')
 ylabel('s_o_A + s_i_A')
 set(gca,'fontsize',14)
 title('Intermediate Image position vs. Magnifying Glass Position')
-ylim([-1 1])
+% ylim([-1 1])
 vline(0.1,'r:','focal length of lens')
 vline(0.2,'r:')
 
@@ -25,11 +29,15 @@ hline(0,'g')
 % plot focal length of lens in eye 
 
 
-s_o_a = [0:0.0001:1];
+% s_o_a = [0:0.0001:1];
 
-s_i_a = 1./(1./s_o_a - 1/f_lens);
+% s_i_a = 1./(1./s_o_a - 1/f_lens);
 
-f_eye = 1./(1./(1-(s_i_a+s_o_a)) + 1/0.02);
+% f_eye = 1./(1./(1-(s_i_a)) + 1/0.02);
+
+s_o_a = 1-s_i_a;
+s_i_a = 0.02;
+f_eye = (s_o_a.*s_i_a)/(s_o_a + s_i_a);
 
 figure
 plot(s_o_a,f_eye,'linewidth',2)
