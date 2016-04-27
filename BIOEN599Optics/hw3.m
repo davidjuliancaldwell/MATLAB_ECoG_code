@@ -2,7 +2,7 @@
 
 %% a 
 % Plot intermediate real/virtual image position as function of magnifying glas position 
-
+close all;clearvars;clc
 f_lens = 100/1000;
 
 s_o_a = [0:0.0001:1];
@@ -11,37 +11,45 @@ s_o_a = [0:0.0001:1];
 
 s_i_a = (s_o_a.*f_lens)./(s_o_a-f_lens);
 
+s_comb = s_i_a + s_o_a; 
 figure
+subplot(2,1,1)
+plot(s_o_a,(s_comb),'linewidth',2)
+ylim([-1 1])
+xlim([0 1])
+xlabel('s_o_A (m)')
+ylabel('s_o_A + s_i_A (m)')
+set(gca,'fontsize',14)
+title({'Intermediate Image position','Taking Into Account Lens Position' 'vs. Magnifying Glass Position'})
+vline(0.1,'r:','object at focal length of lens')
+hline(0,'g')
+
+
+subplot(2,1,2)
 plot(s_o_a,(s_i_a),'linewidth',2)
 ylim([-1 1])
 xlim([0 1])
-xlabel('s_o_A')
-ylabel('s_o_A + s_i_A')
+xlabel('s_o_A (m)')
+ylabel('s_i_A (m)')
 set(gca,'fontsize',14)
-title('Intermediate Image position vs. Magnifying Glass Position')
-% ylim([-1 1])
-vline(0.1,'r:','focal length of lens')
-vline(0.2,'r:')
+title({'Intermediate Image position','Disregarding lens position' 'vs. Magnifying Glass Position'})
+vline(0.1,'r:','object at focal length of lens')
 
 hline(0,'g')
 
 %% c
 % plot focal length of lens in eye 
+s_o_a = [0:0.0001:1];
+s_i_a = (s_o_a.*f_lens)./(s_o_a-f_lens);
+s_comb = s_i_a + s_o_a; 
 
-
-% s_o_a = [0:0.0001:1];
-
-% s_i_a = 1./(1./s_o_a - 1/f_lens);
-
-% f_eye = 1./(1./(1-(s_i_a)) + 1/0.02);
-
-s_o_a = 1-s_i_a;
-s_i_a = 0.02;
-f_eye = (s_o_a.*s_i_a)/(s_o_a + s_i_a);
+s_o_new = 1-s_comb;
+s_i_b = 0.02;
+f_eye = (s_o_new.*s_i_b)./(s_o_new + s_i_b);
 
 figure
 plot(s_o_a,f_eye,'linewidth',2)
-xlabel('s_o_A')
+xlabel('s_o_A (m)')
 ylabel('f_{eye}')
 set(gca,'fontsize',14)
 title('Focal Length of Eye lens to focus')
@@ -50,7 +58,41 @@ title('Focal Length of Eye lens to focus')
 % vline(0.2,'r:')
 
 % hline(0,'g')
-ylim([0.018 0.025])
+ylim([0.01 0.04])
 hline(0.0185,'r','Physiologic limit')
-hline(0.02,'r','Physiologic limit')
+hline(0.02,'r')
+
+vline(0.1,'g','object at focal length of lens')
+vline(0.75,'b','near point of eye')
+
+%% 
+figure
+plot(s_o_a,(s_comb),'linewidth',2)
+ylim([-1 1])
+xlim([0 1])
+xlabel('s_o_A (m)')
+ylabel('s_o_A + s_i_A (m)')
+set(gca,'fontsize',14)
+title({'Intermediate Image position'})
+vline(0.1,'r:','object at focal length of lens')
+hline(0.75,'g', 'this is the near point of the eye')
+
+%% magnification
+
+% unaided = -0.25;
+
+% aided =  -0.02./s_o_new;
+
+magnif = -(s_o_new)./0.25;
+
+figure
+plot(s_o_a, magnif);
+vline(0.1)
+xlabel('s_o_A (m)')
+ylabel('Magnification')
+title ('Magnification vs. magnifying glass position')
+set(gca,'fontsize',14)
+ylim([-3 3])
+
+
 
