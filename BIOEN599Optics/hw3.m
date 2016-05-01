@@ -83,16 +83,32 @@ hline(0.75,'g', 'this is the near point of the eye')
 
 % aided =  -0.02./s_o_new;
 
-magnif = -(s_o_new)./0.25;
+magnif = (s_o_new);
 
 figure
-plot(s_o_a, magnif);
-vline(0.1)
+subplot(2,1,1)
+plot(s_o_a, magnif,'linewidth',2);
+% vline(0.1)
 xlabel('s_o_A (m)')
 ylabel('Magnification')
-title ('Magnification vs. magnifying glass position')
+title ({'Magnification vs. magnifying glass position','before divergence'})
 set(gca,'fontsize',14)
-ylim([-3 3])
+% ylim([-3 3])
+ylim([0 6])
+xlim([0 0.1])
+
+subplot(2,1,2)
+magnif = -(s_o_new);
+plot(s_o_a, magnif,'linewidth',2);
+% vline(0.1)
+xlabel('s_o_A (m)')
+ylabel('Magnification')
+title ({'Magnification vs. magnifying glass position','after divergence'})
+set(gca,'fontsize',14)
+% ylim([-3 3])
+ylim([-1 0])
+xlim([0.1 1])
+
 
 
 
