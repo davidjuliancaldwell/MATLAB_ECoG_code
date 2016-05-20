@@ -22,6 +22,13 @@ sid = input('enter subject ID ','s');
 %9ab7ab
 % sid = SIDS{i};
 switch(sid)
+    
+            case '8adc5c'
+            % sid = SIDS{1};
+            tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
+            block = 'Block-67';
+            stims = [31 32];
+            chans = [1:64];
 
     case 'd5cd55'
         % sid = SIDS{2};
@@ -242,7 +249,7 @@ ECoGDataAverage = squeeze(mean(ECoGData,2));
 
 save(fullfile(META_DIR, [sid '_StimulationAndCCEPs.mat']), 't','ECoGData','ECoGDataAverage','-v7.3');
 
-close all; clearvars -except i
+% close all; clearvars -except i
 % end 
 % save(fullfile(META_DIR, [sid '_StatsCCEPhuntNOTNULL.mat']), 'zCell', 't','muCell','muMat','stdErrCell');
 

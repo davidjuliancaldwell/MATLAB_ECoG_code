@@ -1,15 +1,18 @@
 %% Constants
+close all; clear all;clc
+
 Z_Constants;
 addpath ./scripts/ %DJC edit 7/17/2015
+SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 %% Load in the trigger data
 %DJC 7/20/2015 - changed tp to fit David paths
 
 % select the subject from list
-sid = SIDS{2};
+sid = SIDS{1};
 
 if (strcmp(sid, '8adc5c'))
-    tp = 'D:\Subjects\8adc5c\data\D6\8adc5c_BetaTriggeredStim';
+    tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
     block = 'Block-67';
     
     % SMon-2 is the stim command
@@ -440,7 +443,8 @@ end
 
 %% save the result to intermediate file for future use
 % added mod
-save(fullfile(META_DIR, [sid '_tables_modDJC_2_22_2016.mat']), 'bursts', 'fs', 'stims');
+% save(fullfile(META_DIR, [sid '_tables_modDJC_2_22_2016.mat']), 'bursts', 'fs', 'stims');
+save(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
 
 %% testing
 %

@@ -5,7 +5,7 @@ function [z,mag,latencyMS,zI,magI,latencyIms] = zscoreCCEP(overallSignal,signalI
 
     % this is for AVERAGE values here
     
-    meanPre = median(overallSignal(t<0),2);
+    meanPre = median(overallSignal(t<-0.005),2);
     stdPre = std(overallSignal(t<-0.005),[],2);
     signalIntAbs = abs(signalInt);
     signalIntAbsMean = median(signalIntAbs,2);
@@ -17,7 +17,7 @@ function [z,mag,latencyMS,zI,magI,latencyIms] = zscoreCCEP(overallSignal,signalI
     z = (mag-meanPre)/stdPre;
     
     % this is for doing INDIVIDUAL 
-    meanPre = median(overallSignal(t<0),2);
+    meanPre = median(overallSignal(t<-0.005),2);
     stdPre = std(overallSignal(t<-0.005),[],2);
     signalIntAbs = abs(signalInt);
     [magI,latencyI] = max(signalIntAbs((t>tMin & t<tMax),:));
