@@ -317,6 +317,30 @@ elseif (strcmp(sid, '0b5a2ePlayback'))
     raw = tank.readWaveEvent('Blck', 2)';
     
     toc;
+elseif (strcmp(sid, '0a80cf'))
+    
+    tank = TTank;
+    tank.openTank(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+    tank.selectBlock('BetaPhase-4');
+    
+    tic;
+    [smon, info] = tank.readWaveEvent('SMon', 2);
+    smon = smon';
+    
+    fs = info.SamplingRateHz;
+    
+    stim = tank.readWaveEvent('SMon', 4)';
+    toc;
+    
+    tic;
+    mode = tank.readWaveEvent('Wave', 2)';
+    ttype = tank.readWaveEvent('Wave', 1)';
+    
+    beta = tank.readWaveEvent('Blck', 1)';
+    
+    raw = tank.readWaveEvent('Blck', 2)';
+    
+    toc;
     
     
     
