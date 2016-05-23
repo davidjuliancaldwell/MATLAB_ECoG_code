@@ -9,7 +9,12 @@ OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
 
 subjid = input('What is the subject ID?  \n','s');
 
-load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','78283a_RestingState','RestingState-2.mat'))
+switch subjid
+    case '78283a'
+        load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','78283a_RestingState','RestingState-2.mat'))
+    case '0a80cf'
+        load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','0a80cf','RestingState','RestingState-2.mat'))
+end 
 
 %% load in data 
 
