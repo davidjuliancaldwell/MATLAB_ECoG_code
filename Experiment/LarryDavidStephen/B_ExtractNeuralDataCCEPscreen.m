@@ -7,7 +7,7 @@ close all;clear all;clc
 % Z_ConstantsKurtConnectivity;
 
 
-% % looping through it! - DJC 
+% % looping through it! - DJC
 % for i = 2:9
 
 % changed 3-7-2016 by DJC for CCEP amath project
@@ -23,13 +23,13 @@ sid = input('enter subject ID ','s');
 % sid = SIDS{i};
 switch(sid)
     
-            case '8adc5c'
-            % sid = SIDS{1};
-            tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
-            block = 'Block-67';
-            stims = [31 32];
-            chans = [1:64];
-
+    case '8adc5c'
+        % sid = SIDS{1};
+        tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
+        block = 'Block-67';
+        stims = [31 32];
+        chans = [1:64];
+        
     case 'd5cd55'
         % sid = SIDS{2};
         % sid = SIDS{2};
@@ -95,6 +95,13 @@ switch(sid)
         block = 'BetaPhase-4';
         stims = [22 30];
         stimChans = [22 30];
+        chans = [1:64];
+        
+    case '0a80cf' % added DJC 5-24-2016
+        tp = strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim');
+        block = 'BetaPhase-4';
+        stims = [27 28];
+        stimChans = [27 28];
         chans = [1:64];
         
 end
@@ -178,9 +185,6 @@ Z_ConstantsLarryDavidStephen
 
 %% process each ecog channel individually
 
-
-% figure
-
 for chan = chans
     %% load in ecog data for that channel
     fprintf('loading in %s ecog data:\n',sid);
@@ -201,8 +205,14 @@ for chan = chans
     %% Process Triggers 9-3-2015
     
     pts = stims(3,:)==0;
-    ptis = round(stims(2,pts)/fac);
     
+    % 0a80cf only had conditioning
+    
+    if strcmp(sid,'0a80cf');
+        pts = stims(3,:)==1;
+    end
+    
+    ptis = round(stims(2,pts)/fac);
     
     % change presamps and post samps to be what Kurt wanted to look at
     presamps = round(0.05 * efs); % pre time in sec
@@ -215,7 +225,10 @@ for chan = chans
     awins = wins-repmat(mean(wins(t<0,:),1), [size(wins, 1), 1]);
     
     pstims = stims(:,pts);
-    types = unique(bursts(5,pstims(4,:)));
+    
+    if ~strcmp('0a80cf',sid)
+        types = unique(bursts(5,pstims(4,:)));
+    end
     
     % using idea of probes from Extracting neural data, <250 ms after the end
     % of the beta burst, AND NOT EQUAL TO NULL
@@ -224,6 +237,9 @@ for chan = chans
         
         % this is for 0b5a2e
         probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))~=types(2);
+    elseif strcmp(sid,'0a80cf')
+        probes = pstims;
+        
     else
         % this is for 9ab7ab (and others)
         probes = pstims(5,:) < .250*fs;
@@ -232,7 +248,9 @@ for chan = chans
     %     keeper = ((pstims(5,:)>(0.25*fs))&(pstims(7,:)>(0.25*fs)));
     keeper = probes;
     
-    types = unique(bursts(5,pstims(4,:)));
+    if ~strcmp('0a80cf',sid)
+        types = unique(bursts(5,pstims(4,:)));
+    end
     
     % DJC - 4-20-2016 - KEEP ALL STIMULI
     
@@ -250,6 +268,13 @@ ECoGDataAverage = squeeze(mean(ECoGData,2));
 save(fullfile(META_DIR, [sid '_StimulationAndCCEPs.mat']), 't','ECoGData','ECoGDataAverage','-v7.3');
 
 % close all; clearvars -except i
-% end 
+% end
 % save(fullfile(META_DIR, [sid '_StatsCCEPhuntNOTNULL.mat']), 'zCell', 't','muCell','muMat','stdErrCell');
-
+%%
+figure
+for i=1:64
+    subplot(8,8,i)
+    plot(t,ECoGDataAverage(:,i))
+    title(['channel ', num2str(i)])
+    ylim([-100e-6 100e-6])
+end

@@ -2,13 +2,17 @@
 close all;clear all;clc
 Z_Constants;
 addpath ./scripts/ %DJC edit 7/17/2015
+SUB_DIR = fullfile(myGetenv('subject_dir'));
+
 
 %% Load in the trigger data
 %DJC 7/20/2015 - changed tp to fit David paths
 % modified 12/15/2015 to try and work with 0b5a2e
 
+% 5/24/2016 - DJC add 0a80cf
+
 % select the subject from list
-sid = SIDS{9};
+sid = SIDS{10};
 
 if (strcmp(sid, '8adc5c'))
             tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
@@ -220,7 +224,7 @@ elseif (strcmp(sid, '702d24'))
 elseif (strcmp(sid, 'ecb43e'))
     
     tank = TTank;
-    tank.openTank(strcat('SUB_DIR,'\ecb43e\data\d7\BetaStim'');
+    tank.openTank(strcat(SUB_DIR,'\ecb43e\data\d7\BetaStim'));
     tank.selectBlock('BetaPhase-3');
     
     tic;
@@ -296,7 +300,7 @@ elseif (strcmp(sid, '0b5a2e'))
 elseif (strcmp(sid, '0b5a2ePlayback'))
     
     tank = TTank;
-    tank.openTank(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+    tank.openTank(strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim'));
     tank.selectBlock('BetaPhase-4');
     
     tic;
@@ -318,9 +322,11 @@ elseif (strcmp(sid, '0b5a2ePlayback'))
     
     toc;
 elseif (strcmp(sid, '0a80cf'))
-    
+    tp = strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim');
+                block = 'BetaPhase-4';
+
     tank = TTank;
-    tank.openTank(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+    tank.openTank(strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim'));
     tank.selectBlock('BetaPhase-4');
     
     tic;
@@ -468,7 +474,7 @@ end
 
 %% save the result to intermediate file for future use
 % added mod
-save(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
+% save(fullfile(META_DIR, [sid '_tables_modDJC_beta3.mat']), 'bursts', 'fs', 'stims');
 
 %% testing
 %
