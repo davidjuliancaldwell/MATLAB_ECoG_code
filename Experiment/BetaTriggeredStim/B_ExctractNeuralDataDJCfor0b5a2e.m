@@ -11,7 +11,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % FOR 0b5a2e
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(10);
+SIDS = SIDS(8);
 %%
 for idx = 1:length(SIDS)
     %%
@@ -67,7 +67,7 @@ for idx = 1:length(SIDS)
             %             chans = [23 31 21 14 15 32 40];
             % DJC 2-5-2016 - prototype just on channel 23
             chans = [1:64];
-            chans = [23];
+            chans = [14 23 31];
 %                         chans = [23];
 %             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
         case '0b5a2ePlayback' % added DJC 7-23-2015
@@ -545,8 +545,13 @@ for idx = 1:length(SIDS)
                 %     % if (all)
                 %     probes = pstims(5,:) < .250*fs;
                 %     % if (falling)
-                probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))==types(typei);
-                %     if (rising)
+                
+                
+% time window for probes, originally < 0.250*fs, test
+                % further out 
+                
+                
+                probes = pstims(5,:) > 1*fs & bursts(5,pstims(4,:))==types(typei);                %     if (rising)
                 %         probes = pstims(5,:) < .250*fs * bursts(5,pstims(4,:))==1;
                 
                 if (sum(probes) < 100)
