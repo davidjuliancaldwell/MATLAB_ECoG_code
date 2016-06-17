@@ -31,6 +31,17 @@ for idx = 2:length(SIDS)-3
             chans = [53 61 63];
             chans = [1:64];
             
+            
+            goods = sort([44 45 46 52 53 55 60 61 63]);
+            betaChan = 53;
+            
+            % have to set t_min and t_max for each subject
+            %t_min = 0.004833;
+            % t_min of 0.005 would find the really early ones
+            t_min = 0.008;
+            t_max = 0.05;
+            
+            
         case 'c91479'
             % sid = SIDS{3};
             tp = strcat(SUB_DIR,'\c91479\data\d7\c91479_BetaTriggeredStim');
@@ -39,6 +50,11 @@ for idx = 2:length(SIDS)-3
             chans = [64 63 48];
             chans = [1:64];
             
+            betaChan = 64;
+            goods = sort([ 39 40 47 48 63 64]);
+            t_min = 0.008;
+            t_max = 0.035;
+            
         case '7dbdec'
             % sid = SIDS{4};
             tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
@@ -46,6 +62,11 @@ for idx = 2:length(SIDS)-3
             stims = [11 12];
             chans = [4 5 14];
             chans = [1:64];
+            
+            goods = sort([4 5 10 13]);
+            betaChan = 4;
+            t_min = 0.005;
+            t_max = 0.05;
             
         case '9ab7ab'
             %             sid = SIDS{5};
@@ -56,6 +77,13 @@ for idx = 2:length(SIDS)-3
             chans = [1:64];
             
             % chans = 29;
+            
+            % chans = 29;
+            betaChan = 51;
+            
+            goods = sort([42 43 49 50 51 52 53 57 58]);
+            t_min = 0.005;
+            t_max = 0.0425;
         case '702d24'
             tp = strcat(SUB_DIR,'\702d24\data\d7\702d24_BetaStim');
             block = 'BetaPhase-4';
@@ -64,6 +92,11 @@ for idx = 2:length(SIDS)-3
             chans = [1:64];
             %            chans = [36:64];
             
+            goods = [ 5 ];
+            bads = [23 27 28 29 30 32];
+            t_min = 0.008;
+            t_max = 0.0425;
+            
         case 'ecb43e' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\ecb43e\data\d7\BetaStim');
             block = 'BetaPhase-3';
@@ -71,16 +104,34 @@ for idx = 2:length(SIDS)-3
             chans = [47 55];
             chans = [1:64];
             
+            betaChan = 55;
+            goods = sort([55 63 54 47 48]);
+            t_min = 0.008;
+            t_max = 0.05;
+            
         case '0b5a2e' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             block = 'BetaPhase-2';
             stims = [22 30];
             chans = [23 31];
+            
+            betaChan = 31;
+            goods = sort([12 13 14 15 16 20 21 23 31 32 39 40]);
+            % goods = [14 21 23 31];
+            bads = [20 24 28];
+            t_min = 0.005;
+            t_max = 0.05;
         case '0b5a2ePlayback' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             block = 'BetaPhase-4';
             stims = [22 30];
             chans = [23 31];
+            
+            betaChan = 31;
+            goods = sort([12 13 14 15 16 21 23 31 32 39 40]);
+            bads = [20 24 28];
+            t_min = 0.005;
+            t_max = 0.05;
         otherwise
             error('unknown SID entered');
     end
@@ -429,8 +480,14 @@ for idx = 2:length(SIDS)-3
                 
                 %% attempt at anova, multiple comparisons
                 % modified DJC 4/24/2016 -
-                tMin = 0.01;
-                tMax = 0.050;
+                % DJC 6_17_2017 try 0.030
+                
+                % try setting t_min and t_max for each subject
+                %                 tMin = 0.01;
+                %                 tMax = 0.030;
+                tMin = t_min;
+                tMax = t_max;
+                
                 a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
@@ -462,7 +519,8 @@ for idx = 2:length(SIDS)-3
                 % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC
                 total = 1e6*(awins(:,keeps));
                 %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
-                [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
+                [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,total,t,tMin,tMax,plotIt);
+                ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
                 
                 %% - DJC 2-23-2016 - looking at erp_perm_test
                 

@@ -11,7 +11,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % FOR 0b5a2e
 % need to be fixed to be nonspecific to subject
 % SIDS = SIDS(2:end);
-SIDS = SIDS(8);
+SIDS = SIDS(9);
 %%
 for idx = 1:length(SIDS)
     %%
@@ -25,24 +25,43 @@ for idx = 1:length(SIDS)
             block = 'Block-67';
             stims = [31 32];
             chans = [8 7 48];
+            
         case 'd5cd55'
             % sid = SIDS{2};
-             tp = strcat(SUB_DIR,'\d5cd55\data\D8\d5cd55_BetaTriggeredStim');
+            tp = strcat(SUB_DIR,'\d5cd55\data\D8\d5cd55_BetaTriggeredStim');
             block = 'Block-49';
             stims = [54 62];
             chans = [53 61 63];
+            
+            goods = sort([44 45 46 52 53 55 60 61 63]);
+            betaChan = 53;
+            
+            % have to set t_min and t_max for each subject
+            %t_min = 0.004833;
+            % t_min of 0.005 would find the really early ones
+            t_min = 0.008;
+            t_max = 0.05;
+            
         case 'c91479'
             % sid = SIDS{3};
             tp = strcat(SUB_DIR,'\c91479\data\d7\c91479_BetaTriggeredStim');
             block = 'BetaPhase-14';
             stims = [55 56];
             chans = [64 63 48];
+            betaChan = 64;
+            goods = sort([ 39 40 47 48 63 64]);
+            t_min = 0.008;
+            t_max = 0.035;
         case '7dbdec'
             % sid = SIDS{4};
             tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
             block = 'BetaPhase-17';
             stims = [11 12];
             chans = [4 5 14];
+            goods = sort([4 5 10 13]);
+            betaChan = 4;
+            t_min = 0.005;
+            t_max = 0.05;
         case '9ab7ab'
             %             sid = SIDS{5};
             tp = strcat(SUB_DIR,'\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
@@ -50,16 +69,30 @@ for idx = 1:length(SIDS)
             stims = [59 60];
             chans = [51 52 53 58 57];
             % chans = 29;
+            betaChan = 51;
+            
+            goods = sort([42 43 49 50 51 52 53 57 58]);
+            t_min = 0.005;
+            t_max = 0.0425;
         case '702d24'
             tp = strcat(SUB_DIR,'\702d24\data\d7\702d24_BetaStim');
             block = 'BetaPhase-4';
             stims = [13 14];
             chans = [4 5 21];
+            goods = [ 5 ];
+            bads = [23 27 28 29 30 32];
+            t_min = 0.008;
+            t_max = 0.0425;
+            
         case 'ecb43e' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\ecb43e\data\d7\BetaStim');
             block = 'BetaPhase-3';
             stims = [56 64];
             chans = [47 55];
+            betaChan = 55;
+            goods = sort([55 63 54 47 48]);
+            t_min = 0.008;
+            t_max = 0.05;
         case '0b5a2e' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             block = 'BetaPhase-2';
@@ -68,27 +101,38 @@ for idx = 1:length(SIDS)
             % DJC 2-5-2016 - prototype just on channel 23
             chans = [1:64];
             %chans = [14 23 31];
-%                         chans = [23];
-%             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
+            %                         chans = [23];
+            %             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
+            betaChan = 31;
+            goods = sort([12 13 14 15 16 20 21 23 31 32 39 40]);
+            % goods = [14 21 23 31];
+            bads = [20 24 28];
+            t_min = 0.005;
+            t_max = 0.05;
         case '0b5a2ePlayback' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             block = 'BetaPhase-4';
             stims = [22 30];
             %             chans = [23 31 21 14 15 32 40];
             %             chans = [23 31];
-%             chans = 23;
-           chans = [1:64];
-%             chans = 40;
+            %             chans = 23;
+            chans = [1:64];
+            %             chans = 40;
+            betaChan = 31;
+            goods = sort([12 13 14 15 16 21 23 31 32 39 40]);
+            bads = [20 24 28];
+            t_min = 0.005;
+            t_max = 0.05;
         case '0a80cf' % added DJC 5-24-2016
-              tp = strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim');
-              block = 'BetaPhase-4';
-     
+            tp = strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim');
+            block = 'BetaPhase-4';
+            
             stims = [27 28];
             %             chans = [23 31 21 14 15 32 40];
             %             chans = [23 31];
-%             chans = 23;
-           chans = [1:64];
-%             chans = 40;
+            %             chans = 23;
+            chans = [1:64];
+            %             chans = 40;
         otherwise
             error('unknown SID entered');
     end
@@ -161,7 +205,7 @@ for idx = 1:length(SIDS)
     shuffleChans = {};
     CCEPbyNumStim = {};
     
-    % 4/4/2016 - added data for anova 
+    % 4/4/2016 - added data for anova
     dataForAnova = {};
     
     % 4/7/2016 - Zscored data for anova
@@ -172,7 +216,7 @@ for idx = 1:length(SIDS)
         %% load in ecog data for that channel
         fprintf('loading in ecog data for:\n',sid);
         fprintf('channel %d:\n',chan);
-
+        
         tic;
         grp = floor((chan-1)/16);
         ev = sprintf('ECO%d', grp+1);
@@ -241,13 +285,13 @@ for idx = 1:length(SIDS)
         %             plot(foo);
         %             vline(ct);
         %
-        %% INTERPOLATION PART! 
-%         for sti = 1:length(sts)
-%             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-%             
-%             %             interpolation approach
-%             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-%         end
+        %% INTERPOLATION PART!
+        %         for sti = 1:length(sts)
+        %             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+        %
+        %             %             interpolation approach
+        %             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+        %         end
         % %         tried doing 1-200 rather than 1-40 - DJC 1-7-2016
         %                         eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
         %                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
@@ -366,15 +410,19 @@ for idx = 1:length(SIDS)
                 % significant
                 
                 % modified DJC 4/24/2016 -
-                tMin = 0.01;
-                tMax = 0.050;
+                % try setting t_min and t_max for each subject 6_17-2016
+                %  tMin = 0.01;
+                %  tMax = 0.030;
+                tMin = t_min;
+                tMax = t_max;
+                
                 a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
                 
                 % DJC - 3-25-2016. Save a1, label(keeps), in order to do
                 % multiway anova for channels of interest. Will start with
-                % just BETA 
+                % just BETA
                 
                 % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
                 a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
@@ -383,7 +431,7 @@ for idx = 1:length(SIDS)
                 [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'off');
                 [c,m,h,gnames] = multcompare(statsNull,'display','off');
                 sigChans{chan}{typei} = {m c a1Median a1 label keeps};
-                plotIt = false; 
+                plotIt = false;
                 %% zscore dat
                 for i = 1:length(ulabels)-1
                     total = 1e6*(awins(:,keeps));
@@ -393,17 +441,17 @@ for idx = 1:length(SIDS)
                     [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
                     %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
                     [zB,magB,latB] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
-
-                                        
+                    
+                    
                     CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
                 end
                 
-                % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
+                % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC
                 total = 1e6*(awins(:,keeps));
                 %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
                 [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
-
-
+                
+                
                 %%
                 %                 %% - DJC 2-23-2016 - looking at erp_perm_test
                 %
@@ -452,100 +500,100 @@ for idx = 1:length(SIDS)
                 %                 CCEPbyNumStimNull{i} = CCEPmag;
                 
                 %%
-%                 if anova < 0.05
-%                     figure
-%                     % this sets the figure to be the whole screen
-%                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
-%                     subplot(3,1,1);
-%                     
-%                     % try subtracting the mean, other idea is to build two
-%                     % distributions from zscore
-%                     % 2-4-2016 - DJC post conversation with Miah
-%                     
-%                     
-%                     % original
-%                     prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
-%                     xlim(1e3*[-0.025 max(t)]);
-%                     
-%                     %                     xlim(1e3*[min(t) max(t)]);
-%                     yl = ylim;
-%                     yl(1) = min(-10, max(yl(1),-140));
-%                     yl(2) = max(10, min(yl(2),100));
-%                     ylim(yl);
-%                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-%                     vline(0);
-%                     xlabel('time (ms)');
-%                     ylabel('ECoG (uV)');
-%                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-%                     title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
-%                     leg = {'Pre','Post'};
-%                     
-%                     leg{end+1} = 'Stim Window';
-%                     %     leg{end+1} = 'EP_P';
-%                     legend(leg, 'location', 'Southeast')
-%                     % try subtracting mean of baselines, DJC 2-4-2016, post
-%                     % convo with miah
-%                     subplot(3,1,2)
-%                     
-%                     prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
-%                     
-%                     % try zscore?
-%                     
-%                     
-%                     %     ylim([-130 50]);
-%                     
-%                     % changed DJC 1-7-2016 to look at -8 to 80
-%                     xlim(1e3*[-0.025 max(t)]);
-% %                     xlim(1e3*[min(t) max(t)]);
-%                     %                 xlim([-5 300]);
-%                     
-%                     %     vline([6 20 40], 'k');
-%                     %     highlight(gca, [25 33], [], [.6 .6 .6])
-%                     %             highlight(gca, [0 4], [], [.3 .3 .3]);
-%                     %             vline(0.030*1e3);
-%                     %             vline(0.080*1e3);
-%                     yl = ylim;
-%                     yl(1) = min(-10, max(yl(1),-140));
-%                     yl(2) = max(10, min(yl(2),100));
-%                     ylim(yl);
-%                     % DJC - ylim for zscores
-%                     %                                 ylim([-2 2])
-%                     
-%                     % DJC set highlight to 1 1 1 to block it out
-%                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-%                     
-%                     vline(0);
-%                     %                 vline(80);
-%                     
-%                     
-%                     xlabel('time (ms)');
-%                     ylabel('ECoG (uV)');
-%                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-%                     title('Median Subtracted')
-%                     %                     leg = {'Pre','Post'};
-%                     %
-%                     %                     leg{end+1} = 'Stim Window';
-%                     %                     %     leg{end+1} = 'EP_P';
-%                     %                     legend(leg, 'location', 'Southeast')
-%                     
-%                     
-%                     %% added DJC 2-11-2016 to try and do quick stats
-%                     
-%                     subplot(3,1,3)
-%                     %                 figure
-%                     prettybar(a1, label(keeps), colors, gcf);
-%                     set(gca, 'xtick', []);
-%                     ylabel('\DeltaEP_N (uV)');
-%                     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', tableNull{2,5}, tableNull{2,6}));
-%                     %                                     figure
-%                                                         figure
-%                                                         [pNull,tblNull,statsNull] = kruskalwallis(a1',label(keeps));
-                    
-%                     
-%                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-%                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
-% %                     
-%                 end
+                %                 if anova < 0.05
+                %                     figure
+                %                     % this sets the figure to be the whole screen
+                %                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
+                %                     subplot(3,1,1);
+                %
+                %                     % try subtracting the mean, other idea is to build two
+                %                     % distributions from zscore
+                %                     % 2-4-2016 - DJC post conversation with Miah
+                %
+                %
+                %                     % original
+                %                     prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
+                %                     xlim(1e3*[-0.025 max(t)]);
+                %
+                %                     %                     xlim(1e3*[min(t) max(t)]);
+                %                     yl = ylim;
+                %                     yl(1) = min(-10, max(yl(1),-140));
+                %                     yl(2) = max(10, min(yl(2),100));
+                %                     ylim(yl);
+                %                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
+                %                     vline(0);
+                %                     xlabel('time (ms)');
+                %                     ylabel('ECoG (uV)');
+                %                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                %                     title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
+                %                     leg = {'Pre','Post'};
+                %
+                %                     leg{end+1} = 'Stim Window';
+                %                     %     leg{end+1} = 'EP_P';
+                %                     legend(leg, 'location', 'Southeast')
+                %                     % try subtracting mean of baselines, DJC 2-4-2016, post
+                %                     % convo with miah
+                %                     subplot(3,1,2)
+                %
+                %                     prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
+                %
+                %                     % try zscore?
+                %
+                %
+                %                     %     ylim([-130 50]);
+                %
+                %                     % changed DJC 1-7-2016 to look at -8 to 80
+                %                     xlim(1e3*[-0.025 max(t)]);
+                % %                     xlim(1e3*[min(t) max(t)]);
+                %                     %                 xlim([-5 300]);
+                %
+                %                     %     vline([6 20 40], 'k');
+                %                     %     highlight(gca, [25 33], [], [.6 .6 .6])
+                %                     %             highlight(gca, [0 4], [], [.3 .3 .3]);
+                %                     %             vline(0.030*1e3);
+                %                     %             vline(0.080*1e3);
+                %                     yl = ylim;
+                %                     yl(1) = min(-10, max(yl(1),-140));
+                %                     yl(2) = max(10, min(yl(2),100));
+                %                     ylim(yl);
+                %                     % DJC - ylim for zscores
+                %                     %                                 ylim([-2 2])
+                %
+                %                     % DJC set highlight to 1 1 1 to block it out
+                %                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
+                %
+                %                     vline(0);
+                %                     %                 vline(80);
+                %
+                %
+                %                     xlabel('time (ms)');
+                %                     ylabel('ECoG (uV)');
+                %                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                %                     title('Median Subtracted')
+                %                     %                     leg = {'Pre','Post'};
+                %                     %
+                %                     %                     leg{end+1} = 'Stim Window';
+                %                     %                     %     leg{end+1} = 'EP_P';
+                %                     %                     legend(leg, 'location', 'Southeast')
+                %
+                %
+                %                     %% added DJC 2-11-2016 to try and do quick stats
+                %
+                %                     subplot(3,1,3)
+                %                     %                 figure
+                %                     prettybar(a1, label(keeps), colors, gcf);
+                %                     set(gca, 'xtick', []);
+                %                     ylabel('\DeltaEP_N (uV)');
+                %                     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', tableNull{2,5}, tableNull{2,6}));
+                %                     %                                     figure
+                %                                                         figure
+                %                                                         [pNull,tblNull,statsNull] = kruskalwallis(a1',label(keeps));
+                
+                %
+                %                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                %                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                % %
+                %                 end
                 %                 shuffleChansNull{chan} = {CI_loNull CI_hiNull sgcNull CCEPbyNumStimNull};
             elseif (types(typei) ~= nullType)
                 %     % if (all)
@@ -553,8 +601,8 @@ for idx = 1:length(SIDS)
                 %     % if (falling)
                 
                 
-% time window for probes, originally < 0.250*fs, test
-                % further out 
+                % time window for probes, originally < 0.250*fs, test
+                % further out
                 
                 
                 probes = pstims(5,:) < 0.250*fs & bursts(5,pstims(4,:))==types(typei);                %     if (rising)
@@ -592,15 +640,19 @@ for idx = 1:length(SIDS)
                 colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
                 
                 %%
-                tMin = 0.01;
-                tMax = 0.050;
+                % try setting t_min and t_max for each subject 6_17-2016
+                %  tMin = 0.01;
+                %  tMax = 0.030;
+                tMin = t_min;
+                tMax = t_max;
+                
                 a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
                 a1Median = median(a1);
                 a1 = a1 - median(a1(label(keeps)==0));
                 
                 % DJC - 3-25-2016. Save a1, label(keeps), in order to do
                 % multiway anova for channels of interest. Will start with
-                % just BETA 
+                % just BETA
                 
                 % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
                 a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
@@ -609,8 +661,8 @@ for idx = 1:length(SIDS)
                 [anova,table,stats] = anova1(a1', label(keeps), 'off');
                 [c,m,h,gnames] = multcompare(stats,'display','off');
                 sigChans{chan}{typei} = {m c a1Median a1 label keeps};
-% using 6_16_2016 zscore peak finder modifications
-                plotIt = false; 
+                % using 6_16_2016 zscore peak finder modifications
+                plotIt = false;
                 %% zscore dat
                 for i = 1:length(ulabels)-1
                     total = 1e6*(awins(:,keeps));
@@ -620,16 +672,16 @@ for idx = 1:length(SIDS)
                     [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
                     %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
                     [zB,magB,latB] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
-
-                                        
+                    
+                    
                     CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
                 end
                 
-                % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC 
+                % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC
                 total = 1e6*(awins(:,keeps));
                 %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
-                [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
-
+                [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,total,t,tMin,tMax,plotIt);
+                
                 ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
                 %% trying stavros method
                 %                 %%
@@ -673,109 +725,109 @@ for idx = 1:length(SIDS)
                 %                     CCEPbyNumStim{i} = CCEPmed;
                 %                 end
                 %%
-%                 if anova < 0.05
-%                     figure
-%                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
-%                     subplot(3,1,1);
-%                     
-%                     % original
-%                     prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
-%                     %
-%                     %                 % try subtracting mean of baselines, DJC 2-4-2016, post
-%                     %                 % convo with miah
-%                     xlim(1e3*[-0.025 max(t)]);
-%                     
-%                     %                     xlim(1e3*[min(t) max(t)]);
-%                     yl = ylim;
-%                     yl(1) = min(-10, max(yl(1),-140));
-%                     yl(2) = max(10, min(yl(2),100));
-%                     ylim(yl);
-%                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-%                     vline(0);
-%                     xlabel('time (ms)');
-%                     ylabel('ECoG (uV)');
-%                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-%                     title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
-%                     leg = {'Pre'};
-%                     for d = 1:length(labelGroupStarts)
-%                         if d == length(labelGroupStarts)
-%                             leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
-%                         else
-%                             leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
-%                         end
-%                     end
-%                     leg{end+1} = 'Stim Window';
-%                     %     leg{end+1} = 'EP_P';
-%                     legend(leg, 'location', 'Southeast')
-%                     
-%                     %
-%                     % try zscore?
-%                     %                                 prettyline(1e3*t((1e3*t)>10), zscore(1e6*awins((1e3*t)>10, keeps)), label(keeps), colors);
-%                     %     ylim([-130 50]);
-%                     
-%                     % second mean subtracted
-%                     
-%                     subplot(3,1,2)
-%                     prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
-%                     
-%                     
-%                     % changed DJC 1-7-2016
-%                     xlim(1e3*[-0.025 max(t)]);
-%                     
-%                     %                     xlim(1e3*[min(t) max(t)]);
-%                     %                 xlim([-5 300]);
-%                     %     vline([6 20 40], 'k');
-%                     %     highlight(gca, [25 33], [], [.6 .6 .6])
-%                     %             highlight(gca, [0 4], [], [.3 .3 .3]);
-%                     %             vline(0.030*1e3);
-%                     %             vline(0.080*1e3);
-%                     yl = ylim;
-%                     yl(1) = min(-10, max(yl(1),-140));
-%                     yl(2) = max(10, min(yl(2),100));
-%                     ylim(yl);
-%                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-%                     vline(0);
-%                     %                 vline(80);
-%                     
-%                     % DJC - 2-11-2016 - set y limits for z-score
-%                     %                 ylim([-2 2])
-%                     
-%                     xlabel('time (ms)');
-%                     ylabel('ECoG (uV)');
-%                     title('Median Subtracted')
-%                     
-%                                     title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-%                                         title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
-%                                         leg = {'Pre'};
-%                                         for d = 1:length(labelGroupStarts)
-%                                             if d == length(labelGroupStarts)
-%                                                 leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
-%                                             else
-%                                                 leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
-%                                             end
-%                                         end
-%                                         leg{end+1} = 'Stim Window';
-%                                         %     leg{end+1} = 'EP_P';
-%                                         legend(leg, 'location', 'Southeast')
-%                     
-%                     
-%                     %% added DJC 2-11-2016 to try and do quick stats
-%                     % start with negative surface deflection 10 -> 30
-%                     
-%                     
-%                     %                 figure
-%                     subplot(3,1,3)
-%                     prettybar(a1, label(keeps), colors, gcf);
-%                     set(gca, 'xtick', []);
-%                     ylabel('\DeltaEP_N (uV)');
-%                     
-%                     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-%                                                         figure
-%                                                         [pCond,tblCond,statsCond] = kruskalwallis(a1',label(keeps));
-% %                     
-% %                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-% %                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
-%                  end
+                %                 if anova < 0.05
+                %                     figure
+                %                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
+                %                     subplot(3,1,1);
+                %
+                %                     % original
+                %                     prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
+                %                     %
+                %                     %                 % try subtracting mean of baselines, DJC 2-4-2016, post
+                %                     %                 % convo with miah
+                %                     xlim(1e3*[-0.025 max(t)]);
+                %
+                %                     %                     xlim(1e3*[min(t) max(t)]);
+                %                     yl = ylim;
+                %                     yl(1) = min(-10, max(yl(1),-140));
+                %                     yl(2) = max(10, min(yl(2),100));
+                %                     ylim(yl);
+                %                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
+                %                     vline(0);
+                %                     xlabel('time (ms)');
+                %                     ylabel('ECoG (uV)');
+                %                     %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                %                     title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
+                %                     leg = {'Pre'};
+                %                     for d = 1:length(labelGroupStarts)
+                %                         if d == length(labelGroupStarts)
+                %                             leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
+                %                         else
+                %                             leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
+                %                         end
+                %                     end
+                %                     leg{end+1} = 'Stim Window';
+                %                     %     leg{end+1} = 'EP_P';
+                %                     legend(leg, 'location', 'Southeast')
+                %
+                %                     %
+                %                     % try zscore?
+                %                     %                                 prettyline(1e3*t((1e3*t)>10), zscore(1e6*awins((1e3*t)>10, keeps)), label(keeps), colors);
+                %                     %     ylim([-130 50]);
+                %
+                %                     % second mean subtracted
+                %
+                %                     subplot(3,1,2)
+                %                     prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
+                %
+                %
+                %                     % changed DJC 1-7-2016
+                %                     xlim(1e3*[-0.025 max(t)]);
+                %
+                %                     %                     xlim(1e3*[min(t) max(t)]);
+                %                     %                 xlim([-5 300]);
+                %                     %     vline([6 20 40], 'k');
+                %                     %     highlight(gca, [25 33], [], [.6 .6 .6])
+                %                     %             highlight(gca, [0 4], [], [.3 .3 .3]);
+                %                     %             vline(0.030*1e3);
+                %                     %             vline(0.080*1e3);
+                %                     yl = ylim;
+                %                     yl(1) = min(-10, max(yl(1),-140));
+                %                     yl(2) = max(10, min(yl(2),100));
+                %                     ylim(yl);
+                %                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
+                %                     vline(0);
+                %                     %                 vline(80);
+                %
+                %                     % DJC - 2-11-2016 - set y limits for z-score
+                %                     %                 ylim([-2 2])
+                %
+                %                     xlabel('time (ms)');
+                %                     ylabel('ECoG (uV)');
+                %                     title('Median Subtracted')
+                %
+                %                                     title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                %                                         title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
+                %                                         leg = {'Pre'};
+                %                                         for d = 1:length(labelGroupStarts)
+                %                                             if d == length(labelGroupStarts)
+                %                                                 leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
+                %                                             else
+                %                                                 leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
+                %                                             end
+                %                                         end
+                %                                         leg{end+1} = 'Stim Window';
+                %                                         %     leg{end+1} = 'EP_P';
+                %                                         legend(leg, 'location', 'Southeast')
+                %
+                %
+                %                     %% added DJC 2-11-2016 to try and do quick stats
+                %                     % start with negative surface deflection 10 -> 30
+                %
+                %
+                %                     %                 figure
+                %                     subplot(3,1,3)
+                %                     prettybar(a1, label(keeps), colors, gcf);
+                %                     set(gca, 'xtick', []);
+                %                     ylabel('\DeltaEP_N (uV)');
+                %
+                %                     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
+                %                                                         figure
+                %                                                         [pCond,tblCond,statsCond] = kruskalwallis(a1',label(keeps));
+                % %
+                % %                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                % %                     SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                %                  end
                 
             end
             
