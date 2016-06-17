@@ -4,7 +4,7 @@ Z_Constants;
 addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(6);
+SIDS = SIDS(8);
 
 for idx = 1:length(SIDS) 
     subjid = SIDS{idx};
@@ -27,8 +27,18 @@ for idx = 1:length(SIDS)
         case '702d24'
             stims = [13 14];
             beta = 5;
+        case 'ecb43e'
+            stims = [56 64];
+            beta = 55;
+        case '0b5a2e'
+            stims = [22 30];
+            beta = 31;
+        case '0b5a2ePlayback'
+            stims = [22 30];
+            beta = 31;
         otherwise
-            error('unknown SID entered');            
+            error('unknown SID entered');
+          
     end
     
     load(fullfile(getSubjDir(subjid), 'trodes.mat'));
@@ -40,8 +50,17 @@ for idx = 1:length(SIDS)
     w(beta) = 1;
     
     figure
-    PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 20, 'america', 1:size(Grid, 1), true);
-%     SaveFig(OUTPUT_DIR, ['coverage-' subjid], 'png', '-r300');
+    
+    % original plot
+    %PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
+
+    % to just plot white labels 
+    map = [1 1 0; 0 0 0; 1 0 1];
+PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 10, map,[],[]);
+colormap('flag')
+
+
+    %     SaveFig(OUTPUT_DIR, ['coverage-' subjid], 'png', '-r300');
 end
 
 % stims = [55 56];

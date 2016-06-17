@@ -201,7 +201,81 @@ for chan = chans
     
     fac = fs/efs;
     
+    
+   
     toc;
+    
+    %% 6-16-2016 - Do the notch on ecb43e
+    if strcmp(sid,'ecb43e')
+            %% preprocess eco
+        %             presamps = round(0.050 * efs); % pre time in sec
+        presamps = round(0.025 * efs); % pre time in sec
+        
+        % miah had 0.120
+        postsamps = round(0.120 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
+        
+        sts = round(stims(2,:) / fac);
+        edd = zeros(size(sts));
+        
+        
+        temp = squeeze(getEpochSignal(eco', sts-presamps, sts+postsamps+1));
+        foo = mean(temp,2);
+        lastsample = round(0.040 * efs);
+        foo(lastsample:end) = foo(lastsample-1);
+        
+        last = find(abs(zscore(foo))>1,1,'last');
+        last2 = find(abs(diff(foo))>30e-6,1,'last')+1;
+        
+        zc = false;
+        
+        if (isempty(last2))
+            if (isempty(last))
+                error ('something seems wrong in the triggered average');
+            else
+                ct = last;
+            end
+        else
+            if (isempty(last))
+                ct = last2;
+            else
+                ct = max(last, last2);
+            end
+        end
+        
+        while (~zc && ct <= length(foo))
+            zc = sign(foo(ct-1)) ~= sign(foo(ct));
+            ct = ct + 1;
+        end
+        
+        if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
+            ct = max(last, last2);
+        end
+        
+%         % DJC - 8-31-2015 - i believe this is messing with the resizing
+%         % in the figures
+%         %             subplot(8,8,chan);
+%         %             plot(foo);
+%         %             vline(ct);
+%         %
+        for sti = 1:length(sts)
+            win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
+            
+            %             interpolation approach
+            eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+        end
+        % ORIGINAL ORDER WAS bandpass, notch
+        % try reversing it DJC, 2/11/2016
+        
+%                 eco = toRow(bandpass(eco, 1, 40, efs, 4, 'causal'));
+% original notch below 
+%                 eco = toRow(notch(eco, 60, efs, 2, 'causal'));
+
+% JUST TRY NOTCH AT 60 120 180 240 
+% 2-26-2016 - my attempt for ecb43e 
+                eco = toRow(notch(eco, [60 120 180], efs, 2, 'causal'));
+        %
+        %
+    end
     %% Process Triggers 9-3-2015
     
     pts = stims(3,:)==0;
@@ -265,7 +339,7 @@ end
 
 ECoGDataAverage = squeeze(mean(ECoGData,2));
 
-save(fullfile(META_DIR, [sid '_StimulationAndCCEPs.mat']), 't','ECoGData','ECoGDataAverage','-v7.3');
+save(fullfile(META_DIR, [sid '_StimulationAndCCEPs_filterV2.mat']), 't','ECoGData','ECoGDataAverage','-v7.3');
 
 % close all; clearvars -except i
 % end
@@ -276,5 +350,7 @@ for i=1:64
     subplot(8,8,i)
     plot(t,ECoGDataAverage(:,i))
     title(['channel ', num2str(i)])
+    xlim([0 0.05])
     ylim([-100e-6 100e-6])
+   % subtitle([sid]);
 end

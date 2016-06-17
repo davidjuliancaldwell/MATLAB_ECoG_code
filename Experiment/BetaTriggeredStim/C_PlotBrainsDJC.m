@@ -7,7 +7,7 @@ Z_Constants;
 addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(6);
+SIDS = SIDS(8);
 
 for idx = 1:length(SIDS)
     subjid = SIDS{idx};
