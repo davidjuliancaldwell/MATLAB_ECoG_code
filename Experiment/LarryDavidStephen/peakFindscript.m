@@ -132,7 +132,7 @@ for i = 2:length(SIDS)-2
     
     
     % decide whether or not to plot it
-    plotIt = true;
+    plotIt = false;
     
     % which channels to use?
     % goods = channels that I think I seeCCEPs for

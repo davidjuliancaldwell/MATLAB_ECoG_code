@@ -7,8 +7,14 @@ t_new = t(t>tMin & t<tMax);
 
 preSig = overallSignal(t<-0.005,:);
 meanSig = mean(preSig,2);
-meanPre = mean(meanSig,1);
-stdPre = std(meanSig,[],1);
+meanPre = mean(meanSig);
+stdPre = std(meanSig);
+
+if plotIt == true
+figure
+subplot(2,1,1)
+plot(t(t<-0.005),meanSig);
+end 
 
 %meanPreW = mean(overallSignal(t<-0.005),2);
 %stdPreW = std(overallSignal(t<-0.005),[],2);
@@ -32,7 +38,9 @@ else
 end
 
 if plotIt == true
-    figure
+   % figure
+   gcf
+   subplot(2,1,2)
     plot(t_new,signalIntAbsMean((t>tMin & t<tMax)))
     hold on
     plot(locs,pks,'bo')
