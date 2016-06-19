@@ -5,8 +5,14 @@ function [z_ave,mag_ave,latency_ave,w_ave,p_ave,zI,magI,latencyI,wI,pI] = zscore
 
 t_new = t(t>tMin & t<tMax);
 
-meanPre = mean(overallSignal(t<-0.005),2);
-stdPre = std(overallSignal(t<-0.005),[],2);
+preSig = overallSignal(t<-0.005,:);
+meanSig = mean(preSig,2);
+meanPre = mean(meanSig,1);
+stdPre = std(meanSig,[],1);
+
+%meanPreW = mean(overallSignal(t<-0.005),2);
+%stdPreW = std(overallSignal(t<-0.005),[],2);
+
 signalIntAbsMean = abs(mean(signalInt,2));
 %[pks,locs,w,p]  = findpeaks(signalIntAbsMean((t>tMin & t<tMax)),t_new,'Annotate','extents','WidthReference','halfprom','MinPeakDistance',0.003,'sortstr','descend','minpeakheight',15e-6,'Npeaks',3);
 [pks,locs,w,p]  = findpeaks(signalIntAbsMean((t>tMin & t<tMax)),t_new,'Annotate','extents','WidthReference','halfprom','MinPeakDistance',0.003,'sortstr','descend','Npeaks',3);
