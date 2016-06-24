@@ -12,12 +12,12 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % 5/24/2016 - DJC add 0a80cf
 
 % select the subject from list
-sid = SIDS{10};
+sid = SIDS{11};
 
 if (strcmp(sid, '8adc5c'))
-            tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
-            block = 'Block-67';
-            stims = [31 32];
+    tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
+    block = 'Block-67';
+    stims = [31 32];
     % SMon-2 is the stim command
     % SMon-4 is the realized voltage
     tic;
@@ -44,9 +44,9 @@ if (strcmp(sid, '8adc5c'))
     ttype(1:1.1e7) = 0;
     
 elseif (strcmp(sid, 'd5cd55'))
-             tp = strcat(SUB_DIR,'\d5cd55\data\D8\d5cd55_BetaTriggeredStim');
-            block = 'Block-49';
-            stims = [54 62];
+    tp = strcat(SUB_DIR,'\d5cd55\data\D8\d5cd55_BetaTriggeredStim');
+    block = 'Block-49';
+    stims = [54 62];
     
     % SMon-1 is the system enable
     % SMon-2 is the stim command
@@ -90,9 +90,9 @@ elseif (strcmp(sid, 'd5cd55'))
     %     smon(1:4.5e6) = [];
     
 elseif (strcmp(sid, 'c91479'))
-            tp = strcat(SUB_DIR,'\c91479\data\d7\c91479_BetaTriggeredStim');
-            block = 'BetaPhase-14';
-            stims = [55 56];
+    tp = strcat(SUB_DIR,'\c91479\data\d7\c91479_BetaTriggeredStim');
+    block = 'BetaPhase-14';
+    stims = [55 56];
     
     % SMon-1 is the system enable
     % SMon-2 is the stim command
@@ -133,9 +133,9 @@ elseif (strcmp(sid, 'c91479'))
     stim(1:2e7) = 0;
     raw(1:2e7) = 0;
 elseif (strcmp(sid, '7dbdec'))
-            tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
-            block = 'BetaPhase-17';
-                  stims = [11 12];
+    tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
+    block = 'BetaPhase-17';
+    stims = [11 12];
     % SMon-1 is the system enable
     % SMon-2 is the stim command
     % SMon-3 is the stim count
@@ -156,8 +156,8 @@ elseif (strcmp(sid, '7dbdec'))
     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);
     toc;
 elseif (strcmp(sid, '9ab7ab'))
-            tp = strcat(SUB_DIR,'\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
-            block = 'BetaPhase-3';
+    tp = strcat(SUB_DIR,'\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
+    block = 'BetaPhase-3';
     % SMon-1 is the system enable
     % SMon-2 is the stim command
     % SMon-3 is the stim count
@@ -323,8 +323,8 @@ elseif (strcmp(sid, '0b5a2ePlayback'))
     toc;
 elseif (strcmp(sid, '0a80cf'))
     tp = strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim');
-                block = 'BetaPhase-4';
-
+    block = 'BetaPhase-4';
+    
     tank = TTank;
     tank.openTank(strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim'));
     tank.selectBlock('BetaPhase-4');
@@ -348,7 +348,56 @@ elseif (strcmp(sid, '0a80cf'))
     
     toc;
     
+elseif (strcmp(sid, '3f2113'))
+
+    tank = TTank;
+    tankSelect = strcat(SUB_DIR,'\',sid,'\data\data\d6\BetaStim\BetaStim');
+    tank.openTank(tankSelect)
+    tank.selectBlock('BetaPhase-5');
     
+    tic;
+    [smon, info] = tank.readWaveEvent('SMon', 2);
+    smon = smon';
+    
+    fs = info.SamplingRateHz;
+    
+    stim = tank.readWaveEvent('SMon', 4)';
+    toc;
+    
+    tic;
+    mode = tank.readWaveEvent('Wave', 2)';
+    ttype = tank.readWaveEvent('Wave', 1)';
+    
+    beta = tank.readWaveEvent('Blck', 1)';
+    
+    raw = tank.readWaveEvent('Blck', 2)';
+    
+    toc;
+    
+    elseif (strcmp(sid, '3f2113Playback'))
+
+    tank = TTank;
+    tankSelect = strcat(SUB_DIR,'\',sid,'\data\data\d6\BetaStim\BetaStim');
+    tank.selectBlock('BetaPhase-6');
+    
+    tic;
+    [smon, info] = tank.readWaveEvent('SMon', 2);
+    smon = smon';
+    
+    fs = info.SamplingRateHz;
+    
+    stim = tank.readWaveEvent('SMon', 4)';
+    toc;
+    
+    tic;
+    mode = tank.readWaveEvent('Wave', 2)';
+    ttype = tank.readWaveEvent('Wave', 1)';
+    
+    beta = tank.readWaveEvent('Blck', 1)';
+    
+    raw = tank.readWaveEvent('Blck', 2)';
+    
+    toc;
     
 else
     error('unknown sid entered');
@@ -474,7 +523,7 @@ end
 
 %% save the result to intermediate file for future use
 % added mod
-% save(fullfile(META_DIR, [sid '_tables_modDJC_beta3.mat']), 'bursts', 'fs', 'stims');
+save(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
 
 %% testing
 %
@@ -503,9 +552,9 @@ postSamp = round(0.100 * fs);
 
 utype = unique(ttype); %ttype is the trigger type, reports different unique types
 
-% DJC 1-11-2016 to account for 
+% DJC 1-11-2016 to account for
 if strcmp(sid,'0b5a2ePlayback')
-
+    
     utype = [0 1 2];
     
 end
@@ -575,7 +624,7 @@ end
 
 
 subtitle(sprintf('%s',sid))
-% 
+%
 % SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
 % SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
 

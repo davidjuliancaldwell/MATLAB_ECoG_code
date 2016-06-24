@@ -14,6 +14,7 @@ load('latenciesPeaksData_6_19_2016.mat')
 
 
 figure;
+mag_total_ave = mag_total_ave * 1e6;
 h1 = gscatter(betaDist_total,mag_total_ave,ccepSID');
 hold on
 for i = [1 2 3 4 6 7]
