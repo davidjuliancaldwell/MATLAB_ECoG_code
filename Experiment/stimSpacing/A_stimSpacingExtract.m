@@ -29,7 +29,7 @@ if (strcmp(sid, '3f2113'))
     tank.openTank(tankSelect);
     
     % select the block
-    tank.selectBlock('stimSpacing-14');
+    tank.selectBlock('stimSpacing-3');
     %  mark stim channels if desired
     stim_chans = input('Input the stim channels as an array e.g. [22 30]');
     % stims = [29 28];
@@ -376,4 +376,5 @@ ylabel('Amplitude (\muV)')
 title(['Average for subselected stims for channel ', num2str(i)])
 
 %%
-save(fullfile(OUTPUT_DIR, ['stim_constantV',num2str(stim_chans(1)),'_',num2str(stim_chans(2))]), 'data_info','dataEpoched','dataEpochedHigh','dataEpochedLow','dataEpochedMid','fs_data','fs_sing','fs_stim','Sing','Sing_info','stim','stim_chans','stim_info','t');
+%save(fullfile(OUTPUT_DIR, ['stim_constantV',num2str(stim_chans(1)),'_',num2str(stim_chans(2))]), 'data_info','dataEpoched','dataEpochedHigh','dataEpochedLow','dataEpochedMid','fs_data','fs_sing','fs_stim','Sing','Sing_info','stim','stim_chans','stim_info','t');
+save(fullfile(OUTPUT_DIR, ['stim_',num2str(stim_chans(1)),'_',num2str(stim_chans(2))]), 'data_info','dataEpoched','dataEpochedHigh','dataEpochedLow','dataEpochedMid','fs_data','fs_sing','fs_stim','Sing','Sing_info','stim','stim_chans','stim_info','t');
