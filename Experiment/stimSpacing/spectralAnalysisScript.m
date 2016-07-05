@@ -1,6 +1,8 @@
 %% 7/4/2016 - spectral analysis script DJC
 
 %close all;
+
+% example channel for stim_28_29 
 idx = 21;
 
 dataNoStim = dataEpochedHigh(t>5,:,:);
@@ -13,15 +15,19 @@ plot(dataStacked);
 %[u,s,v] = svd(dataStacked);
 
 
-b = permute(dataNoStim,[1,3,2]);
-c = reshape(b,[size(b,1)*size(b,2),size(b,3)]);
+data_permuted  = permute(dataNoStim,[1,3,2]);
+data_stacked = reshape(data_permuted,[size(data_permuted,1)*size(data_permuted,2),size(data_permuted,3)]);
 figure
-plot(c(:,21))
+plot(data_stacked(:,21))
 goods = ones(72,1);
 bads = [28,29,72:80];
 goods(bads) = 0;
 goods = logical(goods);
-dataStackedGood = c(:,goods);
+dataStackedGood = data_stacked(:,goods);
+notch_stacked = input('notch the data? "yes" or "no"','s');
+if strcmp(notch_stacked,'yes')
+    dataStackedGood = notch(dataStackedGood,[60 120 180 240],fs_data);
+end
 %[u,s,v] = svd(dataStackedGood);
 
 %%
@@ -42,13 +48,18 @@ set(gca,'fontsize',14)
 
 % look at the modes
 figure
+x = [1:size(dataStackedGood,2)];
 plot(x,u(:,1:3),'Linewidth',[2])
-title('3 modes'), legend('show')
+title('mode spatial locations'), legend('show')
+legend({'mode 1','mode 2','mode 3'});
+
 
 % look at temporal part - columns of v
 figure
-plot(1e3*t,v(:,1:3),'Linewidth',[2])
+
+plot(v(:,1:3),'Linewidth',[2])
 title('Temporal portion of the 3 modes'), legend('show')
+legend({'mode 1','mode 2','mode 3'});
 
 
 %% dmd
