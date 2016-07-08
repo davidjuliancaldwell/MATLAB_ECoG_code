@@ -29,7 +29,7 @@ if (strcmp(sid, '3f2113'))
     tank.openTank(tankSelect);
     
     % select the block
-    tank.selectBlock('stimSpacing-3');
+    tank.selectBlock('stimSpacing-22');
     %  mark stim channels if desired
     stim_chans = input('Input the stim channels as an array e.g. [22 30]');
     % stims = [29 28];
@@ -51,24 +51,24 @@ if (strcmp(sid, '3f2113'))
 end
 
 %% plot stim
-
-figure
-hold on
-for i = 1:size(stim,2)
-    
-    t = (0:length(stim)-1)/fs_stim;
-    subplot(2,2,i)
-    plot(t*1e3,stim(:,i))
-    title(sprintf('Channel %d',i))
-    
-    
-end
-
-
-xlabel('Time (ms)')
-ylabel('Amplitude (V)')
-
-subtitle('Stimulation Channels')
+% 
+% figure
+% hold on
+% for i = 1:size(stim,2)
+%     
+%     t = (0:length(stim)-1)/fs_stim;
+%     subplot(2,2,i)
+%     plot(t*1e3,stim(:,i))
+%     title(sprintf('Channel %d',i))
+%     
+%     
+% end
+% 
+% 
+% xlabel('Time (ms)')
+% ylabel('Amplitude (V)')
+% 
+% subtitle('Stimulation Channels')
 
 %% Sing looks like the wave to be delivered, with amplitude in uA
 
@@ -107,13 +107,13 @@ bursts(2,:) = find(dmode==1);
 bursts(3,:) = find(dmode==-1);
 
 stims = squeeze(getEpochSignal(Sing1,(bursts(2,:)-1),(bursts(3,:))+1));
-t = (0:size(stims,1)-1)/fs_sing;
-t = t*1e3;
-figure
-plot(t,stims)
-xlabel('Time (ms');
-ylabel('Current to be delivered (mA)')
-title('Current to be delivered for all trials')
+% t = (0:size(stims,1)-1)/fs_sing;
+% t = t*1e3;
+% figure
+% plot(t,stims)
+% xlabel('Time (ms');
+% ylabel('Current to be delivered (mA)')
+% title('Current to be delivered for all trials')
 
 % delay loks to be 0.2867 ms from below.
 
@@ -123,13 +123,13 @@ stim1 = stim(:,1);
 stim1Epoched = squeeze(getEpochSignal(stim1,(bursts(2,:)-1),(bursts(3,:))+1));
 t = (0:size(stim1Epoched,1)-1)/fs_stim;
 t = t*1e3;
-figure
-plot(t,stim1Epoched)
-xlabel('Time (ms');
-ylabel('Voltage (V)');
-title('Finding the delay between current output and stim delivery')
-
-% hold on
+% figure
+% plot(t,stim1Epoched)
+% xlabel('Time (ms');
+% ylabel('Voltage (V)');
+% title('Finding the delay between current output and stim delivery')
+% 
+% % hold on
 %
 % plot(t,stims)
 
@@ -138,17 +138,17 @@ title('Finding the delay between current output and stim delivery')
 delay = round(0.2867*fs_stim/1e3);
 
 % plot the appropriately delayed signal
-figure
-stimTimesBegin = bursts(2,:)-1+delay;
-stimTimesEnd = bursts(3,:)-1+delay;
-stim1Epoched = squeeze(getEpochSignal(stim1,stimTimesBegin,stimTimesEnd));
-t = (0:size(stim1Epoched,1)-1)/fs_stim;
-t = t*1e3;
-figure
-plot(t,stim1Epoched)
-xlabel('Time (ms');
-ylabel('Voltage (V)');
-title('Stim voltage monitoring with delay added in')
+% figure
+% stimTimesBegin = bursts(2,:)-1+delay;
+% stimTimesEnd = bursts(3,:)-1+delay;
+% stim1Epoched = squeeze(getEpochSignal(stim1,stimTimesBegin,stimTimesEnd));
+% t = (0:size(stim1Epoched,1)-1)/fs_stim;
+% t = t*1e3;
+% figure
+% plot(t,stim1Epoched)
+% xlabel('Time (ms');
+% ylabel('Voltage (V)');
+% title('Stim voltage monitoring with delay added in')
 
 
 
@@ -156,8 +156,10 @@ title('Stim voltage monitoring with delay added in')
 
 % try and account for delay for the stim times
 stimTimes = bursts(2,:)-1+delay;
-presamps = round(0.1 * fs_data); % pre time in sec
-postsamps = round(0.30 * fs_data); % post time in sec, % modified DJC to look at up to 300 ms after
+
+% DJC 7-7-2016, changed presamps and post samps to 1 second
+presamps = round(1 * fs_data); % pre time in sec
+postsamps = round(1 * fs_data); % post time in sec, % modified DJC to look at up to 300 ms after
 
 
 % sampling rate conversion between stim and data
@@ -244,137 +246,146 @@ t = (-presamps:postsamps)*1e3/fs_data;
 % chunk out data
 
 % to separate out low and high
-k=1:10;
+
+%k=1:8;
+%j = 1:8;
+
+k = 1:10;
 j = 1:10;
 
-figure
+% figure
 for i = 1:64
-    hold on
-    subplot(8,8,i)
-    plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
-    
-    ylim([-150 150])
-    xlim([-100 300])
-    title(sprintf('Channel %d',i))
-    %     pause(1)
+%     hold on
+%     subplot(8,8,i)
+%     plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
+%     
+%     ylim([-150 150])
+%     xlim([-100 300])
+%     title(sprintf('Channel %d',i))
+%     %     pause(1)
     
     dataEpochedLow(:,i,k) = dataEpoched(:,i,j);
     
 end
-subtitle('Average traces for all stimulations - means not subtracted - stims 1:10')
-xlabel('Time (ms)')
-ylabel('Voltage (uV)')
-
-figure
+% subtitle('Average traces for all stimulations - means not subtracted - stims 1:10')
+% xlabel('Time (ms)')
+% ylabel('Voltage (uV)')
+% 
+% figure
 for i = 65:80
-    hold on
-    subplot(8,8,i-64)
-    plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
-    
-    ylim([-150 150])
-    xlim([-100 300])
-    title(sprintf('Channel %d',i))
-    %     pause(1)
+%     hold on
+%     subplot(8,8,i-64)
+%     plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
+%     
+%     ylim([-150 150])
+%     xlim([-100 300])
+%     title(sprintf('Channel %d',i))
+%     %     pause(1)
     dataEpochedLow(:,i,k) = dataEpoched(:,i,j);
     
     
 end
-subtitle('Average traces for all stimulations - means not subtracted - stims 1:10')
-xlabel('Time (ms)')
-ylabel('Voltage (uV)')
+% subtitle('Average traces for all stimulations - means not subtracted - stims 1:10')
+% xlabel('Time (ms)')
+% ylabel('Voltage (uV)')
 
+k= 1:10;
+%j = 9:18;
 j = 11:20;
 
-figure
+% figure
 for i = 1:64
-    hold on
-    subplot(8,8,i)
-    plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
-    
-    ylim([-150 150])
-    xlim([-100 300])
-    title(sprintf('Channel %d',i))
-    %     pause(1)
+%     hold on
+%     subplot(8,8,i)
+%     plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
+%     
+%     ylim([-150 150])
+%     xlim([-100 300])
+%     title(sprintf('Channel %d',i))
+%     %     pause(1)
     dataEpochedMid(:,i,k) = dataEpoched(:,i,j);
     
     
 end
-subtitle('Average traces for all stimulations - means not subtracted stims - stims 11:20')
-xlabel('Time (ms)')
-ylabel('Amplitude (\muV)')
-
-figure
+% subtitle('Average traces for all stimulations - means not subtracted stims - stims 11:20')
+% xlabel('Time (ms)')
+% ylabel('Amplitude (\muV)')
+% 
+% figure
 for i = 65:80
-    hold on
-    subplot(8,8,i-64)
-    plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
-    
-    ylim([-150 150])
-    xlim([-100 300])
-    title(sprintf('Channel %d',i))
-    %     pause(1)
+%     hold on
+%     subplot(8,8,i-64)
+%     plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
+%     
+%     ylim([-150 150])
+%     xlim([-100 300])
+%     title(sprintf('Channel %d',i))
+%     %     pause(1)
     dataEpochedMid(:,i,k) = dataEpoched(:,i,j);
     
     
 end
-subtitle('Average traces for all stimulations - means not subtracted - stims 11:20 ')
-xlabel('Time (ms)')
-ylabel('Amplitude (\muV)')
+% subtitle('Average traces for all stimulations - means not subtracted - stims 11:20 ')
+% xlabel('Time (ms)')
+% ylabel('Amplitude (\muV)')
 
+%k=1:10;
 j = 21:30;
+%j = 21:39;
 
-figure
+% figure
 for i = 1:64
-    hold on
-    subplot(8,8,i)
-    plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
-    
-    ylim([-150 150])
-    xlim([-100 300])
-    title(sprintf('Channel %d',i))
-    %     pause(1)
+%     hold on
+%     subplot(8,8,i)
+%     plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
+%     
+%     ylim([-150 150])
+%     xlim([-100 300])
+%     title(sprintf('Channel %d',i))
+%     %     pause(1)
     dataEpochedHigh(:,i,k) = dataEpoched(:,i,j);
     
     
 end
-subtitle('Average traces for all stimulations - means not subtracted - stims 21:30 ' )
-xlabel('Time (ms)')
-ylabel('Amplitude (\muV)')
-
-figure
+% subtitle('Average traces for all stimulations - means not subtracted - stims 21:30 ' )
+% xlabel('Time (ms)')
+% ylabel('Amplitude (\muV)')
+% 
+% figure
 for i = 65:80
-    hold on
-    subplot(8,8,i-64)
-    plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
-    
-    ylim([-150 150])
-    xlim([-100 300])
-    title(sprintf('Channel %d',i))
-    %     pause(1)
+%     hold on
+%     subplot(8,8,i-64)
+%     plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
+%     
+%     ylim([-150 150])
+%     xlim([-100 300])
+%     title(sprintf('Channel %d',i))
+%     %     pause(1)
     dataEpochedHigh(:,i,k) = dataEpoched(:,i,j);
     
     
 end
-subtitle('Average traces for all stimulations - means not subtracted - stims 21:30')
-xlabel('Time (ms)')
-ylabel('Amplitude (\muV)')
+% subtitle('Average traces for all stimulations - means not subtracted - stims 21:30')
+% xlabel('Time (ms)')
+% ylabel('Amplitude (\muV)')
 
 
 %% 6-23-2016 - plot channel of interest
-
-% pick channel
-i = 21;
-% pick range of stims
-j = 1:10;
-%j = 11:20;
-%j = 21:30;
-
-figure
-plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
-xlabel('time (ms)')
-ylabel('Amplitude (\muV)')
-title(['Average for subselected stims for channel ', num2str(i)])
+% 
+% % pick channel
+% i = 21;
+% % pick range of stims
+% j = 1:10;
+% %j = 11:20;
+% %j = 21:30;
+% 
+% figure
+% plot(t,1e6*mean(dataEpoched(:,i,j),3),'m','LineWidth',1)
+% xlabel('time (ms)')
+% ylabel('Amplitude (\muV)')
+% title(['Average for subselected stims for channel ', num2str(i)])
 
 %%
 %save(fullfile(OUTPUT_DIR, ['stim_constantV',num2str(stim_chans(1)),'_',num2str(stim_chans(2))]), 'data_info','dataEpoched','dataEpochedHigh','dataEpochedLow','dataEpochedMid','fs_data','fs_sing','fs_stim','Sing','Sing_info','stim','stim_chans','stim_info','t');
-save(fullfile(OUTPUT_DIR, ['stim_',num2str(stim_chans(1)),'_',num2str(stim_chans(2))]), 'data_info','dataEpoched','dataEpochedHigh','dataEpochedLow','dataEpochedMid','fs_data','fs_sing','fs_stim','Sing','Sing_info','stim','stim_chans','stim_info','t');
+%save(fullfile(OUTPUT_DIR, ['stim_',num2str(stim_chans(1)),'_',num2str(stim_chans(2))]), 'data_info','dataEpoched','dataEpochedHigh','dataEpochedLow','dataEpochedMid','fs_data','fs_sing','fs_stim','Sing','Sing_info','stim','stim_chans','stim_info','t');
+save(fullfile(OUTPUT_DIR, ['stim_widePulse',num2str(stim_chans(1)),'_',num2str(stim_chans(2))]), 'data_info','dataEpoched','dataEpochedHigh','dataEpochedLow','dataEpochedMid','fs_data','fs_sing','fs_stim','Sing','Sing_info','stim','stim_chans','stim_info','t');
