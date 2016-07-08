@@ -1,7 +1,7 @@
 %% 6/24/2016 - Script to process human ECoG stim spacing data
 
 % assumes data is loaded in
-close all;clc;
+%close all;clc;
 
 cceps = input('want to look at CCEPs? "yes" or "no"','s');
 %%
@@ -44,6 +44,8 @@ for idx = 17:32
     if strcmp(cceps,'yes')
         ylim([-100e-6 100e-6])
         xlim([0 60])
+    else
+        xlim([0 10])
     end
 end
 
@@ -117,4 +119,19 @@ end
 legend({'Low','Mid','High'})
 xlabel('time (ms)')
 ylabel('voltage')
-%%
+%% plot them all!
+figure
+cceps = input('want to look at CCEPs? "yes" or "no"','s');
+
+for idx = 1:64
+    subplot(8,8,idx)
+    plot(t',mean(dataEpochedHigh(:,idx,:),3),'linewidth',2);
+      title(['Chan ',num2str(idx)])
+    if strcmp(cceps,'yes')
+        ylim([-150e-6 150e-6])
+        xlim([0 60])
+    end
+end
+    xlabel('time (ms)')
+ylabel('voltage')
+legend({'high'})
