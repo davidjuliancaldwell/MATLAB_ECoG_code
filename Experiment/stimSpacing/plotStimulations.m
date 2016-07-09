@@ -126,12 +126,71 @@ cceps = input('want to look at CCEPs? "yes" or "no"','s');
 for idx = 1:64
     subplot(8,8,idx)
     plot(t',mean(dataEpochedHigh(:,idx,:),3),'linewidth',2);
-      title(['Chan ',num2str(idx)])
+    title(['Chan ',num2str(idx)])
     if strcmp(cceps,'yes')
         ylim([-150e-6 150e-6])
         xlim([0 60])
     end
 end
-    xlabel('time (ms)')
+xlabel('time (ms)')
 ylabel('voltage')
 legend({'high'})
+
+%% try smplot
+
+figure
+cceps = input('want to look at CCEPs? "yes" or "no"','s');
+stims = input('what are the stim channels? e.g. [28 29]');
+chansCCEPs = input('what are the CCEP channels? e.g. [10 30 40]');
+
+CT = cbrewer('qual','Set1',3);
+
+
+for idx = 1:64
+    smplot(8,8,idx,'axis','on')
+    %smplot(8,8,idx)
+    axis tight
+    %axis off
+    
+    p = plot(t',mean(dataEpochedHigh(:,idx,:),3),'linewidth',2);
+    
+    if strcmp(cceps,'yes')
+        ylim([-150e-6 150e-6])
+        xlim([0 60])
+    end
+    
+    % box stim channels, color them
+    if ismember(idx,stims)
+        ax = gca;
+        ax.Box = 'on';
+        ax.XColor = CT(:,1);
+        ax.YColor = CT(:,1);
+        ax.LineWidth = 2;
+        p.Color = CT(:,1);
+        title(['Chan ',num2str(idx)],'color',CT(:,1))
+        
+    elseif ismember(idx,chansCCEPs)
+        ax = gca;
+        ax.Box = 'on';
+        ax.XColor = CT(:,3);
+        ax.YColor = CT(:,3);
+        ax.LineWidth = 2;
+        p.Color = CT(:,3);
+        title(['Chan ',num2str(idx)],'color',CT(:,3))
+        
+    else
+        ax = gca;
+        ax.Box = 'on';
+        ax.XColor = CT(:,2);
+        ax.YColor = CT(:,2);
+        %ax.LineWidth = 2;
+        p.Color = CT(:,2);
+        %                title(['Chan ',num2str(idx)],'color',CT(:,1))
+        axis off
+        
+    end
+end
+xlabel('time (ms)')
+ylabel('voltage')
+legend({'high'})
+

@@ -8,7 +8,7 @@
 % whole matrix/data set later
 
 % channel of interest 
-idx = 21;
+idx = 58;
 
 % filter it 
 filter_it = input('notch filter? input "yes" or "no"','s');
@@ -211,7 +211,7 @@ plot(data_stacked(:,idx))
 goods = ones(80,1);
 
 % pick the ones to ignore
-bads = [28,29,72:80];
+bads = [12,52,72:80];
 goods(bads) = 0;
 
 % make a logical matrix
@@ -231,35 +231,10 @@ end
 
 %% This is doing a SVD of our data matrix
 % looks at the first 3 modes in space, time
-[u,s,v] = svd(dataStackedGood','econ');
 
-figure
-plot(diag(s),'ko','Linewidth',[2])
-% to get percentage in mode
-subplot(2,1,1) % plot normal
-plot(diag(s)/sum(diag(s)),'ko','Linewidth',[2])
-title('singular values, fractions')
-set(gca,'fontsize',14)
-
-subplot(2,1,2) % plot semilog
-semilogy(diag(s)/sum(diag(s)),'ko','Linewidth',[2])
-title('singular values, fractions, semilog plot')
-set(gca,'fontsize',14)
-
-% look at the modes in space
-figure
-x = [1:size(dataStackedGood,2)];
-plot(x,u(:,1:3),'Linewidth',[2])
-title('mode spatial locations'), legend('show')
-legend({'mode 1','mode 2','mode 3'});
-
-
-% look at temporal part - columns of v
-figure
-
-plot(v(:,1:3),'Linewidth',[2])
-title('Temporal portion of the 3 modes'), legend('show')
-legend({'mode 1','mode 2','mode 3'});
+% input stim channels
+stims = [28 29];
+[u,s,v] = SVDanalysis(dataStackedGood,stims);
 
 % BELOW THIS IS CURRENTLY NOT FUN
 %% dmd - this is trying to do DMD - I don't think there's much useful from here until we talk to them
