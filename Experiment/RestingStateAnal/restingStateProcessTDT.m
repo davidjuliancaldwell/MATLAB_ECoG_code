@@ -21,13 +21,13 @@ switch subjid
       %  load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','3f2113_RestingState','RestingState-1_preBCI.mat'))
         
         % post BCI
-       load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','3f2113_RestingState','RestingState-2_postBCI.mat'))
+       %load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','3f2113_RestingState','RestingState-2_postBCI.mat'))
         
         % pre
         %load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','3f2113_RestingState','RestingState-1.mat'))
         
         % post
-       % load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','3f2113_RestingState','RestingState-4.mat'))
+       load(fullfile(OUTPUT_DIR,'TDTtoMATfiles','3f2113_RestingState','RestingState-4.mat'))
         
 end
 
@@ -35,6 +35,9 @@ end
 
 fs = Wave.info.SamplingRateHz;
 ECoGData = Wave.data;
+
+% vector of leftover Nans
+nansLeft = zeros(size(ECoGData,1),1);
 
 %% get rid of outliers
 for i = 1:size(ECoGData,2)
@@ -48,11 +51,18 @@ for i = 1:size(ECoGData,2)
     
     bd([1:(min(gd)-1) (max(gd)+1):end])=0;
     ECoGDataNoOutliers(bd)=interp1(gd,tempData(gd),find(bd));
-    ECoGData(:,i) = ECoGDataNoOutliers;
+    NaNlocs = (isnan(ECoGDataNoOutliers));
+    nansLeft(NaNlocs) = 1;
+    %ECoGDataNaNRemove =  ECoGDataNoOutliers(~isnan(ECoGDataNoOutliers));
+    ECoGDataClean(:,i) = ECoGDataNoOutliers;
     
-    clear subdata ECoGDataNoOutliers tempData bd gd
+    
+    clear subdata ECoGDataNoOutliers tempData bd gd ECoGDataNaNRemove
+
+
 end
 
+ECoGData = ECoGDataclean(~nansLeft,:);
 
 % %%
 % figure(1)

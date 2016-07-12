@@ -8,18 +8,18 @@
 % whole matrix/data set later
 
 % channel of interest 
-idx = 58;
+idx = 21;
 
 % filter it 
 filter_it = input('notch filter? input "yes" or "no"','s');
 
 
 % pre time window
-pre_begin = -500;
+pre_begin = -450;
 pre_end = 0;
 % post time window
-post_begin = 5;
-post_end = 505;
+post_begin = 45;
+post_end = (450+45);
 
 
 % extract pre
