@@ -3,14 +3,21 @@
 
 %% This is to plot the time series and do the FFT of Pre and Post
 
+% add in sid - 7-13-2016
+sid = '3f2113';
+
+% define stimulation channels 
+stimChan1 = stim_chans(1);
+stimChan2= stim_chans(2);
+
 % example channel for stims 28_29, 21.
 % set IDX to be whatever we want to look at channel wise. Can extend to
 % whole matrix/data set later
 
-% channel of interest 
-idx = 21;
+% channel of interest
+idx = input('whats your channel of interest?');
 
-% filter it 
+% filter it
 filter_it = input('notch filter? input "yes" or "no"','s');
 
 
@@ -18,8 +25,8 @@ filter_it = input('notch filter? input "yes" or "no"','s');
 pre_begin = -450;
 pre_end = 0;
 % post time window
-post_begin = 45;
-post_end = (450+45);
+post_begin = 5;
+post_end = (450+post_begin);
 
 
 % extract pre
@@ -81,10 +88,10 @@ end
 
 
 
-%% do them one at a time vs their own pre 
+%% do them one at a time vs their own pre
 
 % change this to be dataEpochedLow, Mid, Or High if desired - set legend
-% accordingly 
+% accordingly
 sigL = squeeze(dataEpochedHigh(:,idx,:));
 
 for i = 1:size(sigL,2)
@@ -95,25 +102,25 @@ for i = 1:size(sigL,2)
     else
         sig_pre = sigL((t<pre_end & t>pre_begin),i);
         sig_postL = (sigL((t>post_begin & t<post_end),i));
-
+        
     end
     
     figure
     [f_pre,P1_pre] = spectralAnalysis(fs_data,t_pre,sig_pre);
     [f_postL,P1_postL] = spectralAnalysis(fs_data,t_post,sig_postL);
-
+    
     legend({'pre','high'})
-    % do some time frequency analysis 
+    % do some time frequency analysis
     figure
     timeFrequencyAnalWavelet(sig_pre,sig_postL,t_pre,t_post,fs_data)
-
+    
     
     
 end
 
 
 %% do them one at a time, pre, low, middle, high (PRE BASELINE IS THE ONE PLOTTED)
-% they would all have to be the same length 
+% they would all have to be the same length
 
 sigH = squeeze(dataEpochedHigh(:,idx,:));
 sigM = squeeze(dataEpochedMid(:,idx,:));
@@ -145,7 +152,7 @@ end
 
 %% Plot all 10 stim pulses for the given trial
 % change this to be dataEpochedLow, Mid, Or High if desired - set legend
-% accordingly 
+% accordingly
 sigL = squeeze(dataEpochedHigh(:,idx,:));
 labels = cell(1, size(sigL,2));
 figure
@@ -163,11 +170,11 @@ for i = 1:size(sigL,2)
     
     plot((f),(P1),'Color', [0.0 gcolor 1.0],'linewidth',2)
     hold on
-%     
-%     [f,P1] = spectralAnalysisComp(fs_data,sig_pre);
-%     plot((f),(P1),'linewidth',[2])
-labels{i}=['high ', num2str(i)];
-gcolor=gcolor-colorIncrement;
+    %
+    %     [f,P1] = spectralAnalysisComp(fs_data,sig_pre);
+    %     plot((f),(P1),'linewidth',[2])
+    labels{i}=['high ', num2str(i)];
+    gcolor=gcolor-colorIncrement;
 end
 title('Single-Sided Amplitude Spectrum of X(t) all pulses in trial')
 xlabel('f (Hz)')
@@ -177,66 +184,36 @@ ylim([0 2e-5])
 set(gca,'fontsize',14)
 legend(labels)
 
+%% DJC - 7-13-2016 Added in distance
+% requires functions matrixDist.m and channelExtract.m
+% also a fake trodes file for now 
+
+if (strcmp(sid,'3f2113'))
+    load('fakeTrodes.mat');
+    locs = matrixSorted(:,(2:end));
+else
+end
+
+
+[stim1_dist,stim2_dist] = distanceAnalysis(locs,stimChan1,stimChan2);
+
 
 %% This is to stack the data so we can do SVD and DMD
-%close all;
+% start with dataEpochedHigh
 
-% example channel for stim_28_29
-idx = 21;
-
-% this selects all of the High data more than 5 ms after the stim (let's
-% ignore stim for now)
-
-dataNoStim = dataEpochedHigh((t>post_begin & t<post_end),:,:);
-
-% get an example Channel
-dataStacked = dataNoStim(:,idx,:);
-% stack that example channel
-dataStacked = dataStacked(:);
-figure
-plot(dataStacked);
-
-% reshift the data so we can do a vector operation to stack all of it like
-% we did for that one example
-data_permuted  = permute(dataNoStim,[1,3,2]);
-
-% stack the data
-
-data_stacked = reshape(data_permuted,[size(data_permuted,1)*size(data_permuted,2),size(data_permuted,3)]);
-figure
-% compare the below plot to that example stacked channel above to confirm
-plot(data_stacked(:,idx))
-
-% make a vector of all of the channels we have
-goods = ones(80,1);
-
-% pick the ones to ignore
-bads = [12,52,72:80];
-goods(bads) = 0;
-
-% make a logical matrix
-goods = logical(goods);
-
-% select the good channels
-dataStackedGood = data_stacked(:,goods);
-
-% decide if we want to filter it
-notch_stacked = input('notch the data? "yes" or "no"','s');
-if strcmp(notch_stacked,'yes')
-    dataStackedGood = notch(dataStackedGood,[60 120 180 240],fs_data);
-    figure
-    % plot the filtered data for a sanity check
-    plot(dataStackedGood(:,idx));
-end
+goodChans = [1:72];
+dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,goodChans,stimChan1,stimChan2,[],fs_data);
 
 %% This is doing a SVD of our data matrix
 % looks at the first 3 modes in space, time
 
 % input stim channels
-stims = [28 29];
-[u,s,v] = SVDanalysis(dataStackedGood,stims);
+[u,s,v] = SVDanalysis(dataStackedGood,stim_chans);
 
 % BELOW THIS IS CURRENTLY NOT FUN
+
+
+
 %% dmd - this is trying to do DMD - I don't think there's much useful from here until we talk to them
 
 Xraw = dataStackedGood';

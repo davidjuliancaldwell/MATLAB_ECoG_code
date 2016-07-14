@@ -91,3 +91,9 @@ ECoGData = ECoGDataclean(~nansLeft,:);
 % 
 % % get electrode locations
 % locs = trodeLocsFromMontage(sid, Montage, false);
+
+%% plot offsets
+
+a = Wave.data;
+c = repmat([1:size(a,2)]',[1 size(a,1)])';
+plot(a+c);
