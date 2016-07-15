@@ -1,8 +1,22 @@
 %% 7/4/2016 - spectral analysis script DJC
+%This is to plot the time series and do the FFT of Pre and Post
+
+%% load a data file 
+
+% clear workspace
+close all; clear all; clc
 
 
-%% This is to plot the time series and do the FFT of Pre and Post
+% load in the datafile of interest!
+% have to have a value assigned to the file to have it wait to finish
+% loading...mathworks bug
+uiimport('-file');
 
+%SPECIFIC ONLY TO DJC DESKTOP RIGHT NOW
+%load('C:\Users\djcald\Google Drive\GRIDLabDavidShared\StimulationSpacing\1sBefore1safter\stim_12_52.mat')
+
+
+%%
 % add in sid - 7-13-2016
 sid = '3f2113';
 
@@ -10,22 +24,23 @@ sid = '3f2113';
 stimChan1 = stim_chans(1);
 stimChan2= stim_chans(2);
 
-% example channel for stims 28_29, 21.
-% set IDX to be whatever we want to look at channel wise. Can extend to
-% whole matrix/data set later
 
-% channel of interest
-idx = input('whats your channel of interest?');
+% ui box for input 
+prompt = {'whats your channel of interest?','notch filter? input "y" or "n"'};
+dlg_title = 'Input';
+num_lines = 1;
+defaultans = {'60','n'};
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
+idx = str2num(answer{1});
+filter_it = answer{2};
 
-% filter it
-filter_it = input('notch filter? input "yes" or "no"','s');
 
 
 % pre time window
 pre_begin = -450;
 pre_end = 0;
 % post time window
-post_begin = 5;
+post_begin = 8;
 post_end = (450+post_begin);
 
 
@@ -42,7 +57,7 @@ sigPre = mean(dataEpoched(:,idx,:),3);
 
 
 % filter it?
-if strcmp(filter_it,'yes')
+if strcmp(filter_it,'y')
     sig_pre = notch(sigPre(t<pre_end & t>pre_begin),[60 120 180 240],fs_data);
     sig_post = notch(sig(t>post_begin & t<post_end),[60 120 180 240],fs_data);
 else
@@ -63,7 +78,7 @@ figure
 % get middle signal
 sig = mean(dataEpochedMid(:,idx,:),3);
 
-if strcmp(filter_it,'yes')
+if strcmp(filter_it,'y')
     sig_post = notch(sig(t>post_begin & t<post_end),[60 120 180 240],fs_data);
 else
     sig_post = sig(t>post_begin & t<post_end);
@@ -77,7 +92,7 @@ end
 
 sig = mean(dataEpochedHigh(:,idx,:),3);
 
-if strcmp(filter_it,'yes')
+if strcmp(filter_it,'y')
     sig_post = notch(sig(t>post_begin & t<post_end),[60 120 180 240],fs_data);
 else
     sig_post = sig(t>post_begin & t<post_end);
@@ -96,7 +111,7 @@ sigL = squeeze(dataEpochedHigh(:,idx,:));
 
 for i = 1:size(sigL,2)
     
-    if strcmp(filter_it,'yes')
+    if strcmp(filter_it,'y')
         sig_pre = notch(sigL((t<pre_end & t>pre_begin),i),[60 120 180 240],fs_data);
         sig_postL = notch(sigL((t>post_begin & t<post_end),i),[60 120 180 240],fs_data);
     else
@@ -128,7 +143,7 @@ sigL = squeeze(dataEpochedLow(:,idx,:));
 
 for i = 1:size(sigH,2)
     
-    if strcmp(filter_it,'yes')
+    if strcmp(filter_it,'y')
         sig_pre = notch(sigL((t<pre_end & t>pre_begin),i),[60 120 180 240],fs_data);
         sig_postL = notch(sigL((t>post_begin & t<post_end),i),[60 120 180 240],fs_data);
         sig_postM = notch(sigM((t>post_begin & t<post_end),i),[60 120 180 240],fs_data);
@@ -159,7 +174,7 @@ figure
 gcolor=1.0; % this is to control the color of the line
 colorIncrement=0.1;
 for i = 1:size(sigL,2)
-    if strcmp(filter_it,'yes')
+    if strcmp(filter_it,'y')
         sig_pre = notch(sigL((t<pre_end & t>pre_begin),i),[60 120 180 240],fs_data);
         sig_postL = notch(sigL((t>post_begin & t<post_end),i),[60 120 180 240],fs_data);
     else
@@ -201,14 +216,30 @@ end
 %% This is to stack the data so we can do SVD and DMD
 % start with dataEpochedHigh
 
-goodChans = [1:72];
-dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,goodChans,stimChan1,stimChan2,[],fs_data);
+prompt = {'what is the list of channels to stack ? e.g. 1:8,12 '};
+dlg_title = 'StackChans';
+num_lines = 1;
+defaultans = {'1:64'};
+answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
+goodChans = str2num(answerChans{1});
+
+%dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,goodChans,stimChan1,stimChan2,[],fs_data,filter_it);
+dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,goodChans,[],[],[],fs_data,filter_it);
 
 %% This is doing a SVD of our data matrix
 % looks at the first 3 modes in space, time
 
-% input stim channels
-[u,s,v] = SVDanalysis(dataStackedGood,stim_chans);
+prompt = {'what is the list of channels to ignore? e.g. 1:8,12 '};
+dlg_title = 'GoodChannels';
+num_lines = 1;
+defaultans = {''};
+answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
+badChans = str2num(answerChans{1});
+
+% if we want to plot it spatially, we need to use at least the 64 channels
+% in the grid! 
+fullData = true;
+[u,s,v] = SVDanalysis(dataStackedGood,stim_chans,fullData,badChans);
 
 % BELOW THIS IS CURRENTLY NOT FUN
 
