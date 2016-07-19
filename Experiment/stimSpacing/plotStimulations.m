@@ -187,6 +187,7 @@ for idx = 1:64
         p.Color = CT(:,2);
         %                title(['Chan ',num2str(idx)],'color',CT(:,1))
         axis off
+        title(['Chan ',num2str(idx)],'color',CT(:,2))
         
     end
 end

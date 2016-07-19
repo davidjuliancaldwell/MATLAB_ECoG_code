@@ -106,7 +106,7 @@ if strcmp(plotIt,'y')
     figure
     plot(t,singEpoched)
     xlabel('Time (ms)');
-    ylabel('Current to be delivered (mA)')
+    ylabel('Current to be delivered (\muA)')
     title('Current to be delivered for all trials')
 end
 

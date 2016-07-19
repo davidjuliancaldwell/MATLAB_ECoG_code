@@ -1,15 +1,15 @@
 % compute the means
 % load('/Users/imac2/Desktop/spatially separated stim data/stim_4_60.mat')
-% for j=1:64;d460(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
+ for j=1:64;d460(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
 % 
 % load('/Users/imac2/Desktop/spatially separated stim data/stim_12_52.mat')
-% for j=1:64;d1252(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
+for j=1:64;d1252(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
 % 
 % load('/Users/imac2/Desktop/spatially separated stim data/stim_20_44.mat')
-% for j=1:64;d2044(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
+for j=1:64;d2044(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
 % 
 % load('/Users/imac2/Desktop/spatially separated stim data/stim_28_36.mat')
-% for j=1:64;d2836(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
+for j=1:64;d2836(:,j)=mean(dataEpochedHigh(:,j,:),3);end;
 
 % extract peak positive voltages
 for j=1:64;p2836(j)=d2836(628,j);end

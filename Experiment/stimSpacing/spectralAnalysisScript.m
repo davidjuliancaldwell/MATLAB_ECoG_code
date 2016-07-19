@@ -15,7 +15,6 @@ uiimport('-file');
 %SPECIFIC ONLY TO DJC DESKTOP RIGHT NOW
 %load('C:\Users\djcald\Google Drive\GRIDLabDavidShared\StimulationSpacing\1sBefore1safter\stim_12_52.mat')
 
-
 %%
 % add in sid - 7-13-2016
 sid = '3f2113';
@@ -101,6 +100,93 @@ end
 
 [f_post,P1_post] = spectralAnalysis(fs_data,t_post,sig_post);
 
+%% 7-19-2016 - look at zscore to threshold CCEps
+% use function zscoreStimSpacing.m
+
+% this is for internal calls to the peak finder for zscoring 
+plotIt = false;
+
+% ui box for input - pick zscore threshold 
+prompt = {'whats the zscore threshold? e.g. 15'};
+dlg_title = 'zthresh';
+num_lines = 1;
+defaultans = {'15'};
+answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
+zThresh = str2num(answer{1});
+
+
+% get the data
+
+zMat = {};
+magMat = {};
+latencyMat = {};
+
+for idx = 1:size(dataEpochedHigh,2)
+    
+    sig = mean(dataEpochedHigh(:,idx,:),3);
+    
+    if strcmp(filter_it,'y')
+        
+        sig_pre = notch(sig(t<pre_end & t>pre_begin),[60 120 180 240],fs_data);
+        sig_post = notch(sig(t>post_begin & t<post_end),[60 120 180 240],fs_data);
+    else
+        sig_pre = sig(t>pre_begin & t<pre_end );
+        sig_post = sig(t>post_begin & t<post_end);
+    end
+    
+    %[z_ave,mag_ave,latency_ave,w_ave,p_ave,zI,magI,latencyI,wI,pI] = zscoreStimSpacing(dataEpochedHigh,dataEpochedHigh,t,pre_begin,pre_end,...
+    %post_begin,post_end,plotIt);
+    
+    [z_ave,mag_ave,latency_ave,w_ave,p_ave] = zscoreStimSpacing(sig_pre,sig_post,t,pre_begin,pre_end,...
+        post_begin,post_end,plotIt);
+    
+    zMat{idx} = z_ave;
+    magMat{idx} = mag_ave;
+    latencyMat{idx} = latency_ave;
+    
+end
+
+% plot it
+figure
+
+% colorbrewer
+
+% color map
+CT = cbrewer('seq','YlOrRd',9);
+
+% flip it so red is increase, blue is down
+%CT = flipud(CT);
+
+
+zConverted = cell2mat(zMat);
+zShape = reshape(zConverted(1:64),[8 8]);
+imagesc(transpose(reshape(zShape,[8 8])));
+
+axis off
+
+colormap(CT);
+colorbar;
+caxis([0 max(zShape(:))])
+
+title('z-score of CCEP peaks - average signal, relative to pre')
+textStrings = num2str([1:length(zShape(:))]');  %# Create strings from the matrix values
+textStrings = strtrim(cellstr(textStrings));  %# Remove any space padding
+[x,y] = meshgrid(1:8);   %# Create x and y coordinates for the strings
+
+x = x';
+y= y';
+hStrings = text(x(:),y(:),textStrings(:),...      %# Plot the strings
+    'HorizontalAlignment','center');
+colorbar
+colorBar.Label.String = 'Zscore value relative to baseline';
+
+
+% plot significant CCEPs
+
+sigCCEPs = find(zConverted>zThresh);
+
+sig = dataEpochedHigh;
+plotSignificantCCEPsMap(sig,t,stim_chans,sigCCEPs);
 
 
 %% do them one at a time vs their own pre
@@ -242,7 +328,7 @@ dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,chansToStack,[
 %% This is doing a SVD of our data matrix
 % looks at the first 3 modes in space, time
 
-% bad channels 
+% bad channels
 prompt = {'what is the list of channels to IGNORE? e.g. 1:8,12 '};
 dlg_title = 'BadChannels';
 num_lines = 1;
@@ -260,7 +346,7 @@ goodChans = str2num(answerChans{1});
 % if we want to plot it spatially, we need to use at least the 64 channels
 % in the grid!
 
-% etither give it SVDanalysis(.....,[],goodChans); 
+% etither give it SVDanalysis(.....,[],goodChans);
 %or SVDanalysis(.......,badChans,[]);
 
 fullData = true;
@@ -281,6 +367,7 @@ answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
 cycles = answerChans{1};
 
 parametricPlotSVD(v,post_begin,post_end,fs_data,cycles)
+
 
 
 % BELOW THIS IS CURRENTLY NOT FUN
