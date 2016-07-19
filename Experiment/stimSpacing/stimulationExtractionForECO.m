@@ -14,7 +14,12 @@ structureData = uiimport('-file');
 Sing = structureData.Sing;
 Stim = structureData.Stim;
 Stm0 = structureData.Stm0;
-Wave = structureData.Wave;
+Eco1 = structureData.ECO1;
+Eco2 = structureData.ECO2;
+Eco3 = structureData.ECO3;
+Eco4 = structureData.ECO4;
+
+Wave.info = structureData.ECO1.info; 
 
 %%
 % ui box for input for stimulation channels
@@ -45,7 +50,7 @@ stim = Stim.data;
 sing = Sing.data;
 
 % recording data
-data = Wave.data;
+data = [Eco1.data Eco2.data Eco3.data Eco4.data];
 
 
 %% plot stim channels if interested

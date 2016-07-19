@@ -1,16 +1,25 @@
-function [u,s,v] = SVDanalysis(data,stimChans,fullData,ignore)
+function [u,s,v] = SVDanalysis(data,stimChans,fullData,ignore,goodChans)
 
 if(~exist('fullData','var'))
     fullData = true;
 end
 
-% ignore badChans for SVD
-goods = ones(size(data,2),1);
-goods(ignore) = 0;
-goods = logical(goods);
+if(exist('ignore','var'))
+    % ignore badChans for SVD
+    goods = ones(size(data,2),1);
+    goods(ignore) = 0;
+    goods = logical(goods);
+    
+    %fullData(:,~goods) = 0;
+    dataTrim = data(:,goods);
+end
 
-%fullData(:,~goods) = 0;
-dataTrim = data(:,goods);
+if(exist('goodChans','var'))
+    goods = zeros(size(data,2),1);
+    goods(goodChans) = 1;
+    goods = logical(goods);
+    dataTrim = data(:,goods);
+end
 
 
 % transpose data
@@ -84,32 +93,32 @@ if fullData
         %                                              %#   they can be easily seen over
         %                                              %#   the background color
         % set(hStrings,{'Color'},num2cell(textColors,2));  %# Change the text colors
-%         
-%         figure
-%         imagesc(tempModeStrips);
-%         colormap(CT);
-%         colorbar;
-%         title(['Strip Electrodes Electrodes - mode ' num2str(i)]);
+        %
+        %         figure
+        %         imagesc(tempModeStrips);
+        %         colormap(CT);
+        %         colorbar;
+        %         title(['Strip Electrodes Electrodes - mode ' num2str(i)]);
         
         
     end
 end
 
-% look at temporal part - columns of v - indivividually and together 
+% look at temporal part - columns of v - indivividually and together
 figure
 % all together
 
-% get default colormap and use this to plot same as above 
+% get default colormap and use this to plot same as above
 subDiag = diag(s);
 subDiag = subDiag(1:3);
 
-% scale them by singular values for the combined plot, NOT for individual 
+% scale them by singular values for the combined plot, NOT for individual
 subplot(4,1,1)
 plot(v(:,1:3).*repmat(subDiag,[1 size(v,1)])','Linewidth',[2])
 title({'Temporal portion of the 3 modes', 'scaled by singular value'}), legend('show')
 legend({'mode 1','mode 2','mode 3'});
 
-co = get(gca,'ColorOrder'); 
+co = get(gca,'ColorOrder');
 
 subplot(4,1,2)
 plot(v(:,1),'Linewidth',[2],'color',co(1,:));

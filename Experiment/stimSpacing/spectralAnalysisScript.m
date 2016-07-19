@@ -1,7 +1,7 @@
 %% 7/4/2016 - spectral analysis script DJC
 %This is to plot the time series and do the FFT of Pre and Post
 
-%% load a data file 
+%% load a data file
 
 % clear workspace
 close all; clear all; clc
@@ -20,12 +20,12 @@ uiimport('-file');
 % add in sid - 7-13-2016
 sid = '3f2113';
 
-% define stimulation channels 
+% define stimulation channels
 stimChan1 = stim_chans(1);
 stimChan2= stim_chans(2);
 
 
-% ui box for input 
+% ui box for input
 prompt = {'whats your channel of interest?','notch filter? input "y" or "n"'};
 dlg_title = 'Input';
 num_lines = 1;
@@ -40,7 +40,7 @@ filter_it = answer{2};
 pre_begin = -450;
 pre_end = 0;
 % post time window
-post_begin = 8;
+post_begin = 5;
 post_end = (450+post_begin);
 
 
@@ -200,14 +200,27 @@ set(gca,'fontsize',14)
 legend(labels)
 
 %% DJC - 7-13-2016 Added in distance
-% requires functions matrixDist.m and channelExtract.m
-% also a fake trodes file for now 
+
 
 if (strcmp(sid,'3f2113'))
-    load('fakeTrodes.mat');
-    locs = matrixSorted(:,(2:end));
+    load('trodes.mat');
+    locs = Grid;
 else
 end
+
+% - fakeTrodes.mat is deprecated now that Nile has put up the real trodes
+% file!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% requires functions matrixDist.m and channelExtract.m
+% also a fake trodes file for now
+
+% if (strcmp(sid,'3f2113'))
+%     load('fakeTrodes.mat');
+%     locs = matrixSorted(:,(2:end));
+% else
+% end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 [stim1_dist,stim2_dist] = distanceAnalysis(locs,stimChan1,stimChan2);
@@ -221,25 +234,54 @@ dlg_title = 'StackChans';
 num_lines = 1;
 defaultans = {'1:64'};
 answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
-goodChans = str2num(answerChans{1});
+chansToStack = str2num(answerChans{1});
 
 %dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,goodChans,stimChan1,stimChan2,[],fs_data,filter_it);
-dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,goodChans,[],[],[],fs_data,filter_it);
+dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,chansToStack,[],[],[],fs_data,filter_it);
 
 %% This is doing a SVD of our data matrix
 % looks at the first 3 modes in space, time
 
-prompt = {'what is the list of channels to ignore? e.g. 1:8,12 '};
-dlg_title = 'GoodChannels';
+% bad channels 
+prompt = {'what is the list of channels to IGNORE? e.g. 1:8,12 '};
+dlg_title = 'BadChannels';
 num_lines = 1;
 defaultans = {''};
 answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
 badChans = str2num(answerChans{1});
 
+prompt = {'what is the list of channels to USE? e.g. 1:8,12 '};
+dlg_title = 'BadChannels';
+num_lines = 1;
+defaultans = {''};
+answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
+goodChans = str2num(answerChans{1});
+
 % if we want to plot it spatially, we need to use at least the 64 channels
-% in the grid! 
+% in the grid!
+
+% etither give it SVDanalysis(.....,[],goodChans); 
+%or SVDanalysis(.......,badChans,[]);
+
 fullData = true;
-[u,s,v] = SVDanalysis(dataStackedGood,stim_chans,fullData,badChans);
+%[u,s,v] = SVDanalysis(dataStackedGood,stim_chans,fullData,badChans,[]);
+[u,s,v] = SVDanalysis(dataStackedGood,stim_chans,fullData,[],goodChans);
+
+
+
+%% parametric plot
+% use the v values from the SVDanalysis function from above
+
+
+prompt = {'plot first cycle of modes, or all of time? "1st" or "all" '};
+dlg_title = 'BadChannels';
+num_lines = 1;
+defaultans = {'1st'};
+answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
+cycles = answerChans{1};
+
+parametricPlotSVD(v,post_begin,post_end,fs_data,cycles)
+
 
 % BELOW THIS IS CURRENTLY NOT FUN
 

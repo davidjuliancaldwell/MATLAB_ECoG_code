@@ -1,5 +1,6 @@
 %% 7-14-2016 - David Caldwell - script to look at stim spacing
 % requires getEpochSignal.m , subtitle.m , numSubplots.m , vline.m
+% GRAPHICS SHOULD WORK FOR BEFORE MATLAB 2014b
 
 %% initialize output and meta dir
 % clear workspace
@@ -141,7 +142,7 @@ if strcmp(plotIt,'y')
     t = t*1e3;
     figure
     plot(t,stim1Epoched)
-    xlabel('Time (ms)');
+    xlabel('Time (ms');
     ylabel('Voltage (V)');
     title('Stim voltage monitoring with delay added in')
 end
@@ -229,10 +230,10 @@ for i=uniqueLabels
         % put a box around the stimulation channels of interest if need be
         if ismember(j,stimChans)
             ax = gca;
-            ax.Box = 'on';
-            ax.XColor = 'red';
-            ax.YColor = 'red';
-            ax.LineWidth = 2;
+            set(ax,'Box','on');
+            set(ax,'Xcolor','red')
+            set(ax,'Ycolor','red')
+            set(ax,'LineWidth',2)
             title(num2str(j),'color','red');
             
         else
@@ -266,6 +267,17 @@ end
 
 %% plot averages for 3 conditions on the same graph
 
+% this is to plot different colored lines
+
+
+colorOrder = [         0    0.4470    0.7410
+    0.8500    0.3250    0.0980
+    0.9290    0.6940    0.1250
+    0.4940    0.1840    0.5560
+    0.4660    0.6740    0.1880
+    0.3010    0.7450    0.9330
+    0.6350    0.0780    0.1840];
+
 
 k = 1;
 figure;
@@ -275,7 +287,7 @@ for k = 1:length(dataAvgs)
     
     for j = 1:numChans
         s = subplot(p,q,j);
-        plot(t,squeeze(tempData(:,j)),'linewidth',2);
+        plot(t,squeeze(tempData(:,j)),'linewidth',2,'color',colorOrder(k,:));
         hold on;
         xlim([min(t) max(t)]);
         
@@ -288,10 +300,10 @@ for k = 1:length(dataAvgs)
         
         if ismember(j,stimChans)
             ax = gca;
-            ax.Box = 'on';
-            ax.XColor = 'red';
-            ax.YColor = 'red';
-            ax.LineWidth = 2;
+            set(ax,'Box','on');
+            set(ax,'Xcolor','red')
+            set(ax,'Ycolor','red')
+            set(ax,'LineWidth',2)
             title(num2str(j),'color','red')
             
         else
