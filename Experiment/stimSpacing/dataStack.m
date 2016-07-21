@@ -70,6 +70,7 @@ if strcmp(filter_it,'y')
     figure
     % plot the filtered data for a sanity check
     plot(dataStackedGood(:,idx));
+    title(['Example of the stacked data: Ch. ', num2str(idx)]);
 end
 
 

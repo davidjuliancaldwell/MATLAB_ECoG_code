@@ -1,4 +1,4 @@
-function [u,s,v] = SVDanalysis(data,stimChans,fullData,ignore,goodChans)
+function [u,s,v, dataSVD] = SVDanalysis(data,stimChans,fullData,ignore,goodChans)
 
 if(~exist('fullData','var'))
     fullData = true;

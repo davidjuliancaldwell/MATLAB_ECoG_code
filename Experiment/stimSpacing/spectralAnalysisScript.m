@@ -5,7 +5,8 @@
 
 % clear workspace
 close all; clear all; clc
-
+% to add paths to all the subfolders
+addpath(genpath(pwd))
 
 % load in the datafile of interest!
 % have to have a value assigned to the file to have it wait to finish
@@ -14,6 +15,9 @@ uiimport('-file');
 
 %SPECIFIC ONLY TO DJC DESKTOP RIGHT NOW
 %load('C:\Users\djcald\Google Drive\GRIDLabDavidShared\StimulationSpacing\1sBefore1safter\stim_12_52.mat')
+
+%SPECIFIC ONLY TO JAC DESKTOP RIGHT NOW
+%load('C:\Users\jcronin\Data\Subjects\3f2113\data\d6\Matlab\StimulationSpacing\1sBefore1safter\stim_12_52.mat')
 
 %%
 % add in sid - 7-13-2016
@@ -186,7 +190,7 @@ colorBar.Label.String = 'Zscore value relative to baseline';
 sigCCEPs = find(zConverted>zThresh);
 
 sig = dataEpochedHigh;
-plotSignificantCCEPsMap(sig,t,stim_chans,sigCCEPs);
+plotSignificantCCEPsMap(sig,t,stim_chans,sigCCEPs, 'yes');
 
 
 %% do them one at a time vs their own pre
@@ -201,6 +205,7 @@ for i = 1:size(sigL,2)
         sig_pre = notch(sigL((t<pre_end & t>pre_begin),i),[60 120 180 240],fs_data);
         sig_postL = notch(sigL((t>post_begin & t<post_end),i),[60 120 180 240],fs_data);
     else
+        
         sig_pre = sigL((t<pre_end & t>pre_begin),i);
         sig_postL = (sigL((t>post_begin & t<post_end),i));
         
@@ -332,14 +337,17 @@ dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,chansToStack,[
 prompt = {'what is the list of channels to IGNORE? e.g. 1:8,12 '};
 dlg_title = 'BadChannels';
 num_lines = 1;
-defaultans = {''};
+defaultans = {num2str(stim_chans)};
 answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
 badChans = str2num(answerChans{1});
 
 prompt = {'what is the list of channels to USE? e.g. 1:8,12 '};
-dlg_title = 'BadChannels';
+dlg_title = 'GoodChannels';
 num_lines = 1;
-defaultans = {''};
+defaultGood = 1:64; 
+temp = ones(size(defaultGood));
+temp(stim_chans) = 0;
+defaultans = {num2str(defaultGood(logical(temp)))}; % everything but the stim channels
 answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
 goodChans = str2num(answerChans{1});
 
@@ -351,14 +359,12 @@ goodChans = str2num(answerChans{1});
 
 fullData = true;
 %[u,s,v] = SVDanalysis(dataStackedGood,stim_chans,fullData,badChans,[]);
-[u,s,v] = SVDanalysis(dataStackedGood,stim_chans,fullData,[],goodChans);
+[u,s,v, dataSVD] = SVDanalysis(dataStackedGood,stim_chans,fullData,[],goodChans);
 
 
 
-%% parametric plot
+%% parametric plot (mode 1 vs. mode 2 vs. mode 3)
 % use the v values from the SVDanalysis function from above
-
-
 prompt = {'plot first cycle of modes, or all of time? "1st" or "all" '};
 dlg_title = 'BadChannels';
 num_lines = 1;
@@ -369,15 +375,109 @@ cycles = answerChans{1};
 parametricPlotSVD(v,post_begin,post_end,fs_data,cycles)
 
 
+%% Reconstruction with the first few dominant modes (columns of U) 
+% First project the svd'd data onto the modes
+modes=1:3;
+dataR=u(:,modes)*s(modes, modes)*v(:,modes)';
 
-% BELOW THIS IS CURRENTLY NOT FUN
+% Add rows back in for the stim channels, so that we have 64 channels total
+dataR_withStim = zeros(64, size(dataR,2));
+temp = ones(64,1);
+temp(stim_chans) = 0;
+dataR_withStim(logical(temp),:) = dataR;
+
+% Now I see two ways of plotting this projected data:
+% 1) Get back to a matrix with epochs and average (in
+% plotSignificantCCEPsMap function), or
+% 2) just plot the entire data_proj rows which should show some
+% periodicity since the original data was stacked which yields the peaks at
+% every epoch start.
+
+% Method 1:
+% Get back to a matrix with epochs (like dataEpochedHigh)
+% Since we stacked 10 stim pulses of equal size
+L = size(dataR,2)/10;
+
+% Want:  time(which should be L)*channels*epochs
+sig = reshape(dataR_withStim, [64, L, 10]);
+sig = permute(sig, [2 1 3]);
+
+plotSignificantCCEPsMap(sig,t_post,stim_chans,sigCCEPs, 'no');
+
+% Method 2:
+% Don't reshape, want: time*channels
+plotSignificantCCEPsMap(dataR_withStim',(0:size(dataR_withStim,2)-1)/fs_data*1000,stim_chans,sigCCEPs, 'no');
+
+%% Again plot reconstructions onto first first few dominant modes
+% but, rather than averaging all of the epochs, just plot an epoch of
+% interest
+epoch = 1;
+plotSignificantCCEPsMap(sig(:,:,epoch), t_post,stim_chans,sigCCEPs, 'no');
+
+%% Compute projection of each data matrix (response after a single stim pulse)
+% onto the dominant modes
+% Change time to use the stacked or unstacked data
+modes=[1:3];
+channels = [1:62]; % max of 62, since this doens't include the stim channels
+
+% time = 1:size(A_proj,2); % All stims/epochs
+epoch = 2;
+time = (epoch-1)*size(A_proj,2)/10+1:epoch*size(A_proj,2)/10; % Just a single epoch
+
+A_proj = zeros(size(dataSVD, 1), size(dataSVD, 2), 3);
+
+for i=modes
+    A_proj(:,:,i)=u(:,i)*s(i,i)*v(:,i)';
+end
+
+figure
+plot3(A_proj(channels,time,1), A_proj(channels,time,2), A_proj(channels,time,3))
+title('Data projected onto some dominant modes of U');
+xlabel(['Mode ', num2str(modes(1))]);
+ylabel(['Mode ', num2str(modes(2))]);
+zlabel(['Mode ', num2str(modes(3))]);
+
+%% Again, projections of each data matrix, but plot each channel separately on grid
+
+% Add in the stim channels 
+sig = zeros(64, size(dataR,2),3);
+temp = ones(64,1);
+temp(stim_chans) = 0;
+sig(logical(temp),:,:) = A_proj;
+
+% sig in 3D: time*channels*epochs
+sig = permute(sig, [2, 1, 3]);
+
+plotSignificantCCEPsMap(sig, (0:size(dataR_withStim,2)-1)/fs_data*1000, stim_chans,sigCCEPs, 'plot3');
+
+%% Local SVD... NOT DONE!!!!!!!!!!!!!!!!!!!!!!!!!!
+% So what we already did u, v, and s are the global modes
+% Now calculate some 'local' modes
+epoch=1; % choose epoch number
+sig = reshape(dataSVD, [62, L, 10]);
+[uL,sL,vL] = svd(sig(:,:,epoch), 'econ');
+
+% for i=2:4
+%     a(i) = u(:,i).'*uL(:,i); % this is what Nathan wrote, but it's just a
+%     % scalar
+% end
+
+% for a projection...
+for i=2:4
+    a(:,:,i) = u(:,i)*uL(:,i)'; 
+end
+
+figure
+plot3(a(:,:,1), a(:,:,2), a(:,:,3))
 
 
+
+%% BELOW THIS IS CURRENTLY NOT FUN
 
 %% dmd - this is trying to do DMD - I don't think there's much useful from here until we talk to them
-
 Xraw = dataStackedGood';
 dt = 1/fs_data;
+
 
 % added in dt optional argument, dt is our sampling frequency
 % added in number of stacks. Using 5 for right now. The paper talks about

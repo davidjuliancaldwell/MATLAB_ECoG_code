@@ -41,7 +41,8 @@ if (strcmp(sid, '8adc5c'))
     ttype(1:1.1e7) = 0;
     
 elseif (strcmp(sid, 'd5cd55'))
-    tp = 'D:\Subjects\d5cd55\data\D8\d5cd55_BetaTriggeredStim';
+   
+     tp = strcat(SUB_DIR,'\d5cd55\data\D8\d5cd55_BetaTriggeredStim');
     block = 'Block-49';
     
     % SMon-1 is the system enable
@@ -86,7 +87,8 @@ elseif (strcmp(sid, 'd5cd55'))
     %     smon(1:4.5e6) = [];
     
 elseif (strcmp(sid, 'c91479'))
-    tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
+   
+        tp = strcat(SUB_DIR,'\c91479\data\d7\c91479_BetaTriggeredStim');
     block = 'BetaPhase-14';
     
     % SMon-1 is the system enable
@@ -128,7 +130,9 @@ elseif (strcmp(sid, 'c91479'))
     stim(1:2e7) = 0;
     raw(1:2e7) = 0;
 elseif (strcmp(sid, '7dbdec'))
-    tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+    
+            tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
+
     block = 'BetaPhase-17';
     
     % SMon-1 is the system enable
@@ -151,7 +155,7 @@ elseif (strcmp(sid, '7dbdec'))
     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);
     toc;
 elseif (strcmp(sid, '9ab7ab'))
-    tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+                tp = strcat(SUB_DIR,'\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
     block = 'BetaPhase-3';
     
     % SMon-1 is the system enable
@@ -182,7 +186,9 @@ elseif (strcmp(sid, '9ab7ab'))
     toc;
 elseif (strcmp(sid, '702d24'))
     tank = TTank;
-    tank.openTank('D:\Subjects\702d24\data\d7\702d24_BetaStim');
+                    tp = strcat(SUB_DIR,'\702d24\data\d7\702d24_BetaStim');
+
+    tank.openTank(tp);
     tank.selectBlock('BetaPhase-4');
     %     tp = 'd:\research\subjects\702d24\data\d7\702d24_BetaStim';
     %     block = 'BetaPhase-4';
@@ -218,9 +224,10 @@ elseif (strcmp(sid, '702d24'))
     
     % added last subject, DJC - 7-23-2015
 elseif (strcmp(sid, 'ecb43e'))
-    
+                        tp = strcat(SUB_DIR,'\ecb43e\data\d7\BetaStim');
+
     tank = TTank;
-    tank.openTank('D:\Subjects\ecb43e\data\d7\BetaStim');
+    tank.openTank(tp);
     tank.selectBlock('BetaPhase-3');
     
     tic;
@@ -270,9 +277,10 @@ elseif (strcmp(sid, 'ecb43e'))
     %     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);
     %     toc;
 elseif (strcmp(sid, '0b5a2e'))
-    
+                            tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+
     tank = TTank;
-    tank.openTank('D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+    tank.openTank(tp);
     tank.selectBlock('BetaPhase-2');
     
     tic;
@@ -294,9 +302,11 @@ elseif (strcmp(sid, '0b5a2e'))
     
     toc;
 elseif (strcmp(sid, '0b5a2ePlayback'))
-    
+                                tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+
     tank = TTank;
-    tank.openTank('D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+        tank.openTank(tp);
+
     tank.selectBlock('BetaPhase-4');
     
     tic;
