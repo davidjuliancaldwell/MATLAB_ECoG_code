@@ -3,7 +3,7 @@ function [] = parametricPlotSVD(v,post_begin,post_end,fs,cycles)
 
 if strcmp(cycles,'all')
     % look at the whole thing
-    t = 0:size(v,1);
+    t = 0:size(v,1)-1;
     
     mode1 = v(:,1);
     mode2 = v(:,2);

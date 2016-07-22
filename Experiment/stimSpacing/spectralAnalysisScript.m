@@ -11,13 +11,13 @@ addpath(genpath(pwd))
 % load in the datafile of interest!
 % have to have a value assigned to the file to have it wait to finish
 % loading...mathworks bug
-uiimport('-file');
+%uiimport('-file');
 
 %SPECIFIC ONLY TO DJC DESKTOP RIGHT NOW
 %load('C:\Users\djcald\Google Drive\GRIDLabDavidShared\StimulationSpacing\1sBefore1safter\stim_12_52.mat')
 
 %SPECIFIC ONLY TO JAC DESKTOP RIGHT NOW
-%load('C:\Users\jcronin\Data\Subjects\3f2113\data\d6\Matlab\StimulationSpacing\1sBefore1safter\stim_12_52.mat')
+load('C:\Users\jcronin\Data\Subjects\3f2113\data\d6\Matlab\StimulationSpacing\1sBefore1safter\stim_constantV26_31.mat')
 
 %%
 % add in sid - 7-13-2016
@@ -32,7 +32,7 @@ stimChan2= stim_chans(2);
 prompt = {'whats your channel of interest?','notch filter? input "y" or "n"'};
 dlg_title = 'Input';
 num_lines = 1;
-defaultans = {'60','n'};
+defaultans = {'60','y'};
 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
 idx = str2num(answer{1});
 filter_it = answer{2};
@@ -114,7 +114,7 @@ plotIt = false;
 prompt = {'whats the zscore threshold? e.g. 15'};
 dlg_title = 'zthresh';
 num_lines = 1;
-defaultans = {'15'};
+defaultans = {'10'};
 answer = inputdlg(prompt,dlg_title,num_lines,defaultans);
 zThresh = str2num(answer{1});
 
@@ -333,23 +333,41 @@ dataStackedGood = dataStack(dataEpochedHigh,t,post_begin,post_end,chansToStack,[
 %% This is doing a SVD of our data matrix
 % looks at the first 3 modes in space, time
 
-% bad channels
-prompt = {'what is the list of channels to IGNORE? e.g. 1:8,12 '};
-dlg_title = 'BadChannels';
+% sigCCEPs only?
+prompt = {'SVD with only the sigCCEPs? (y or n) '};
+dlg_title = 'sigCCEPs?';
 num_lines = 1;
-defaultans = {num2str(stim_chans)};
+defaultans = {'n'};
 answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
-badChans = str2num(answerChans{1});
+use_sigCCEPs = answerChans{1};
 
-prompt = {'what is the list of channels to USE? e.g. 1:8,12 '};
-dlg_title = 'GoodChannels';
-num_lines = 1;
-defaultGood = 1:64; 
-temp = ones(size(defaultGood));
-temp(stim_chans) = 0;
-defaultans = {num2str(defaultGood(logical(temp)))}; % everything but the stim channels
-answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
-goodChans = str2num(answerChans{1});
+defaultGood = 1:64;
+
+if strcmp(use_sigCCEPs,'y')
+    temp = zeros(size(defaultGood));
+    temp(sigCCEPs(~(sigCCEPs>64))) = 1;
+    goodChans = defaultGood(logical(temp));
+else
+    % bad channels
+    prompt = {'what is the list of channels to IGNORE? e.g. 1:8,12 '};
+    dlg_title = 'BadChannels';
+    num_lines = 1;
+    defaultans = {num2str(stim_chans)};
+    answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
+    badChans = str2num(answerChans{1});
+    
+    prompt = {'what is the list of channels to USE? e.g. 1:8,12 '};
+    dlg_title = 'GoodChannels';
+    num_lines = 1;
+    temp = ones(size(defaultGood));
+    temp(stim_chans) = 0;
+    temp(badChans) = 0;
+    defaultans = {num2str(defaultGood(logical(temp)))}; % everything but the stim channels
+    answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
+    goodChans = defaultGood(logical(temp));
+end
+
+
 
 % if we want to plot it spatially, we need to use at least the 64 channels
 % in the grid!
@@ -359,9 +377,12 @@ goodChans = str2num(answerChans{1});
 
 fullData = true;
 %[u,s,v] = SVDanalysis(dataStackedGood,stim_chans,fullData,badChans,[]);
-[u,s,v, dataSVD] = SVDanalysis(dataStackedGood,stim_chans,fullData,[],goodChans);
+modes = 1:3;
+[u,s,v, dataSVD, goods] = SVDanalysis(dataStackedGood,stim_chans,fullData,[],goodChans, modes);
 
-
+%% If you want to plot some other modes
+modes = [2:4];
+SVDplot(u,s,v, fullData, goods, modes);
 
 %% parametric plot (mode 1 vs. mode 2 vs. mode 3)
 % use the v values from the SVDanalysis function from above
@@ -382,8 +403,8 @@ dataR=u(:,modes)*s(modes, modes)*v(:,modes)';
 
 % Add rows back in for the stim channels, so that we have 64 channels total
 dataR_withStim = zeros(64, size(dataR,2));
-temp = ones(64,1);
-temp(stim_chans) = 0;
+temp = zeros(64,1);
+temp(goodChans) = 1;
 dataR_withStim(logical(temp),:) = dataR;
 
 % Now I see two ways of plotting this projected data:
@@ -418,13 +439,13 @@ plotSignificantCCEPsMap(sig(:,:,epoch), t_post,stim_chans,sigCCEPs, 'no');
 % onto the dominant modes
 % Change time to use the stacked or unstacked data
 modes=[1:3];
-channels = [1:62]; % max of 62, since this doens't include the stim channels
-
+% channels = [1:length(goodChans)]; % max of 62, since this doens't include the stim channels
+channels = 2;
 % time = 1:size(A_proj,2); % All stims/epochs
 epoch = 2;
-time = (epoch-1)*size(A_proj,2)/10+1:epoch*size(A_proj,2)/10; % Just a single epoch
 
 A_proj = zeros(size(dataSVD, 1), size(dataSVD, 2), 3);
+time = (epoch-1)*size(A_proj,2)/10+1:epoch*size(A_proj,2)/10; % Just a single epoch
 
 for i=modes
     A_proj(:,:,i)=u(:,i)*s(i,i)*v(:,i)';
@@ -441,15 +462,14 @@ zlabel(['Mode ', num2str(modes(3))]);
 
 % Add in the stim channels 
 sig = zeros(64, size(dataR,2),3);
-temp = ones(64,1);
-temp(stim_chans) = 0;
+temp = zeros(64,1);
+temp(goodChans) = 1;
 sig(logical(temp),:,:) = A_proj;
 
 % sig in 3D: time*channels*epochs
 sig = permute(sig, [2, 1, 3]);
 
 plotSignificantCCEPsMap(sig, (0:size(dataR_withStim,2)-1)/fs_data*1000, stim_chans,sigCCEPs, 'plot3');
-
 %% Local SVD... NOT DONE!!!!!!!!!!!!!!!!!!!!!!!!!!
 % So what we already did u, v, and s are the global modes
 % Now calculate some 'local' modes
