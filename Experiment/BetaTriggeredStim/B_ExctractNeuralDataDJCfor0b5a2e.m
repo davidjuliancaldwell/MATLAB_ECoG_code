@@ -716,7 +716,7 @@ for idx = 1:length(SIDS)
                                      t_minS = 0.005;
                                 t_maxS = 0.040;
                                 
-                                    extractedSigs = 1e6*((awins(t>t)minS & t<t_maxS,keeps)));
+                                    extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
                                     extractedSigsBase = extractedSigs(:,label(keeps)==0);
                                     extractedSigsTest = extractedSigs(:,label(keeps)==i);
                                     tExtract = t(t>t_minS & t<t_maxS);

@@ -19,6 +19,10 @@ addpath(genpath(pwd))
 %SPECIFIC ONLY TO JAC DESKTOP RIGHT NOW
 load('C:\Users\jcronin\Data\Subjects\3f2113\data\d6\Matlab\StimulationSpacing\1sBefore1safter\stim_constantV26_31.mat')
 
+%SPECIFIC ONLY TO JAC Laptop RIGHT NOW
+% load('/Users/jcronin/Desktop/Data/3f2113/1sBefore1safter/stim_constantV26_31.mat')
+
+
 %%
 % add in sid - 7-13-2016
 sid = '3f2113';
@@ -393,12 +397,13 @@ defaultans = {'1st'};
 answerChans = inputdlg(prompt,dlg_title,num_lines,defaultans);
 cycles = answerChans{1};
 
-parametricPlotSVD(v,post_begin,post_end,fs_data,cycles)
+modes=[2:4];
+parametricPlotSVD(v,post_begin,post_end,fs_data,cycles,modes)
 
 
 %% Reconstruction with the first few dominant modes (columns of U) 
 % First project the svd'd data onto the modes
-modes=1:3;
+modes=2:4;
 dataR=u(:,modes)*s(modes, modes)*v(:,modes)';
 
 % Add rows back in for the stim channels, so that we have 64 channels total
@@ -438,22 +443,35 @@ plotSignificantCCEPsMap(sig(:,:,epoch), t_post,stim_chans,sigCCEPs, 'no');
 %% Compute projection of each data matrix (response after a single stim pulse)
 % onto the dominant modes
 % Change time to use the stacked or unstacked data
-modes=[1:3];
-% channels = [1:length(goodChans)]; % max of 62, since this doens't include the stim channels
-channels = 2;
+modes=[2:4];
+channels = [1:length(goodChans)]; % max of 62, since this doens't include the stim channels
+% channels = 32;
 % time = 1:size(A_proj,2); % All stims/epochs
 epoch = 2;
 
 A_proj = zeros(size(dataSVD, 1), size(dataSVD, 2), 3);
 time = (epoch-1)*size(A_proj,2)/10+1:epoch*size(A_proj,2)/10; % Just a single epoch
 
-for i=modes
-    A_proj(:,:,i)=u(:,i)*s(i,i)*v(:,i)';
+for i=1:length(modes)
+    A_proj(:,:,i)=u(:,modes(i))*s(modes(i),modes(i))*v(:,modes(i))';
 end
 
+
+c = 1:numel(A_proj(channels,time,1));      %# colors
+
 figure
-plot3(A_proj(channels,time,1), A_proj(channels,time,2), A_proj(channels,time,3))
-title('Data projected onto some dominant modes of U');
+r1 = A_proj(channels,time,1);
+r2 = A_proj(channels,time,2);
+r3 = A_proj(channels,time,3);
+
+h = surface([r1(:), r1(:)], [r2(:), r2(:)], [r3(:), r3(:)], ...
+    [c(:), c(:)], 'EdgeColor','flat', 'FaceColor','none');
+colormap( jet(numel(A_proj(channels,time,1))) )
+
+colorBar = colorbar;
+colorBar.Label.String = 'Evolution in time';
+% plot3(A_proj(channels,time,1), A_proj(channels,time,2), A_proj(channels,time,3))
+title('Data reconstructed with individual dominant modes of U');
 xlabel(['Mode ', num2str(modes(1))]);
 ylabel(['Mode ', num2str(modes(2))]);
 zlabel(['Mode ', num2str(modes(3))]);
@@ -489,6 +507,57 @@ end
 
 figure
 plot3(a(:,:,1), a(:,:,2), a(:,:,3))
+
+%% 3 Hz band power
+
+p_ratio = zeros(1,64);
+for i = 1:64
+    
+    sig = mean(dataEpochedHigh(:,i,:),3);
+    
+    if strcmp(filter_it,'y')
+        sig_pre = notch(sig(t<pre_end & t>pre_begin),[60 120 180 240],fs_data);
+        sig_post = notch(sig(t>post_begin & t<post_end),[60 120 180 240],fs_data);
+    else
+        sig_pre = sig(t>pre_begin & t<pre_end );
+        sig_post = sig(t>post_begin & t<post_end);
+    end
+    p_ratio(i) = bandpower(sig_post,fs_data,[0 5])/bandpower(sig_pre,fs_data,[0 5]);
+
+end
+
+% plot it
+figure
+
+% colorbrewer
+
+% color map
+CT = cbrewer('seq','YlOrRd',9);
+
+% flip it so red is increase, blue is down
+%CT = flipud(CT);
+
+p_ratio_resized = reshape(p_ratio,[8 8]);
+imagesc(transpose(reshape(p_ratio_resized,[8 8])));
+
+axis off
+
+colormap(CT);
+colorbar;
+caxis([0 max(zShape(:))])
+
+title('power of 0-5Hz signal, post/pre')
+textStrings = num2str([1:length(zShape(:))]');  %# Create strings from the matrix values
+textStrings = strtrim(cellstr(textStrings));  %# Remove any space padding
+[x,y] = meshgrid(1:8);   %# Create x and y coordinates for the strings
+
+x = x';
+y= y';
+hStrings = text(x(:),y(:),textStrings(:),...      %# Plot the strings
+    'HorizontalAlignment','center');
+colorbar
+colorBar.Label.String = 'power: post/pre';
+
 
 
 
