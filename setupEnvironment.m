@@ -2,7 +2,7 @@
 % your machine.  Make sure to change the values of the environment
 % variables below to reflect your workspace settings.
 
-setenv('matlab_devel_dir', 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code');
-setenv('gridlab_dir', 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code');
-setenv('subject_dir', 'D:\Subjects');
-setenv('OUTPUT_DIR', 'D:\Output');
+setenv('matlab_devel_dir', 'C:\Users\djcald\Code');
+setenv('gridlab_dir', 'C:\Users\djcald\Code');
+setenv('subject_dir', 'C:\Users\djcald\Data\Subjects');
+setenv('OUTPUT_DIR', 'C:\Users\djcald\Data\Output');
