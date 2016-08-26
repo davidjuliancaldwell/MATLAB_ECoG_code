@@ -354,7 +354,7 @@ for idx = 2:length(SIDS)-3
             
             % JUST TRY NOTCH AT 60 120 180 240
             %2-26-2016 - my attempt for ecb43e
-            eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
+%             eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
         end
         
         %% process triggers

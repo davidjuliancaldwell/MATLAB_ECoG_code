@@ -9,7 +9,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 %DJC 7/20/2015 - changed tp to fit David paths
 
 % select the subject from list
-sid = SIDS{1};
+sid = SIDS{3};
 
 if (strcmp(sid, '8adc5c'))
     tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
@@ -454,7 +454,7 @@ end
 %% save the result to intermediate file for future use
 % added mod
 % save(fullfile(META_DIR, [sid '_tables_modDJC_2_22_2016.mat']), 'bursts', 'fs', 'stims');
-save(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+% save(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
 
 %% testing
 %
@@ -482,6 +482,7 @@ figure
 % 
 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
 
+% presamp originally set to 0.020 
 preSamp = round(0.020 * fs);
 postSamp = round(0.100 * fs);
 
@@ -541,8 +542,8 @@ for idx = 1:length(utype)
     
 end
 
-SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'eps', '-r600'); % changed OUTPUT_DIR to allow figure to save
-SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'png', '-r600');
+% SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'eps', '-r600'); % changed OUTPUT_DIR to allow figure to save
+% SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'png', '-r600');
 
 % %%
 % figure
