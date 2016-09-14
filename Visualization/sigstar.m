@@ -1,12 +1,11 @@
 function varargout=sigstar(groups,stats,nosort)
-
-% SIGSTAR Add significance stars to bar charts, boxplots, line charts, etc,
+% sigstar - Add significance stars to bar charts, boxplots, line charts, etc,
 %
-% H = SIGSTAR(GROUPS,STATS,NSORT)
+% H = sigstar(groups,stats,nsort)
 %
 % Purpose
-% Add stars and lines highlighting significant differences between pairs of groups. 
-% The user specifies the groups and associated p-values. The function handles much of 
+% Add stars and lines highlighting significant differences between pairs of groups.
+% The user specifies the groups and associated p-values. The function handles much of
 % the placement and drawing of the highlighting. Stars are drawn according to:
 %   * represents p<=0.05
 %  ** represents p<=1E-2
@@ -14,28 +13,28 @@ function varargout=sigstar(groups,stats,nosort)
 %
 %
 % Inputs
-% GROUPS - a cell array defining the pairs of groups to compare. Groups defined 
-%          either as pairs of scalars indicating locations along the X axis or as 
-%          strings corresponding to X-tick labels. Groups can be a mixture of both 
+% groups - a cell array defining the pairs of groups to compare. Groups defined
+%          either as pairs of scalars indicating locations along the X axis or as
+%          strings corresponding to X-tick labels. Groups can be a mixture of both
 %          definition types.
-% STATS -  a vector of p-values the same length as GROUPS. If empty or missing it's 
-%          assumed to be a vector of 0.05s the same length as GROUPS. Nans are treated
+% stats -  a vector of p-values the same length as groups. If empty or missing it's
+%          assumed to be a vector of 0.05s the same length as groups. Nans are treated
 %          as indicating non-significance.
-% NSORT -  optional, 0 by default. If 1, then significance markers are plotted in 
-%          the order found in GROUPS. If 0, then they're sorted by the length of the 
+% nsort -  optional, 0 by default. If 1, then significance markers are plotted in
+%          the order found in groups. If 0, then they're sorted by the length of the
 %          bar.
 %
 % Outputs
 % H - optionally return handles for significance highlights. Each row is a different
 %     highlight bar. The first column is the line. The second column is the text (stars).
-%     
+%
 %
 % Examples
-% 1. 
+% 1.
 % bar([5,2,1.5])
 % sigstar({[1,2], [1,3]})
 %
-% 2. 
+% 2.
 % bar([5,2,1.5])
 % sigstar({[2,3],[1,2], [1,3]},[nan,0.05,0.05])
 %
@@ -48,8 +47,8 @@ function varargout=sigstar(groups,stats,nosort)
 % ylim([-3,6.5])
 % set(H,'color','r')
 %
-% 4. Note the difference in the order with which we define the groups in the 
-%    following two cases. 
+% 4. Note the difference in the order with which we define the groups in the
+%    following two cases.
 % x=[1,2,3,2,1];
 % subplot(1,2,1)
 % bar(x)
@@ -61,10 +60,10 @@ function varargout=sigstar(groups,stats,nosort)
 % ALSO SEE: demo_sigstar
 %
 % KNOWN ISSUES:
-% 1. Algorithm for identifying whether significance bar will overlap with 
+% 1. Algorithm for identifying whether significance bar will overlap with
 %    existing plot elements may not work in some cases (see line 277)
 % 2. Bars may not look good on exported graphics with small page sizes.
-%    Simply increasing the width and height of the graph with the 
+%    Simply increasing the width and height of the graph with the
 %    PaperPosition property of the current figure should fix things.
 %
 % Rob Campbell - CSHL 2013
@@ -73,20 +72,20 @@ function varargout=sigstar(groups,stats,nosort)
 
 %Input argument error checking
 
-%If the user entered just one group pair and forgot to wrap it in a cell array 
+%If the user entered just one group pair and forgot to wrap it in a cell array
 %then we'll go easy on them and wrap it here rather then generate an error
 if ~iscell(groups) & length(groups)==2
-	groups={groups};
+    groups={groups};
 end
 
-if nargin<2 
-	stats=repmat(0.05,1,length(groups));
+if nargin<2
+    stats=repmat(0.05,1,length(groups));
 end
 if isempty(stats)
-	stats=repmat(0.05,1,length(groups));
+    stats=repmat(0.05,1,length(groups));
 end
 if nargin<3
-	nosort=0;
+    nosort=0;
 end
 
 
@@ -94,15 +93,15 @@ end
 
 %Check the inputs are of the right sort
 if ~iscell(groups)
-	error('GROUPS must be a cell array')
+    error('groups must be a cell array')
 end
 
 if ~isvector(stats)
-	error('STATS must be a vector')
+    error('stats must be a vector')
 end
 
 if length(stats)~=length(groups)
-	error('GROUPS and STATS must be the same length')
+    error('groups and stats must be the same length')
 end
 
 
@@ -110,47 +109,47 @@ end
 
 
 
-%Each member of the cell array GROUPS may be one of three things:
+%Each member of the cell array groups may be one of three things:
 %1. A pair of indices.
 %2. A pair of strings (in cell array) referring to X-Tick labels
 %3. A cell array containing one index and one string
 %
 % For our function to run, we will need to convert all of these into pairs of
-% indices. Here we loop through GROUPS and do this. 
+% indices. Here we loop through groups and do this.
 
-xlocs=nan(length(groups),2); %matrix that will store the indices 
-xtl=get(gca,'XTickLabel');  
+xlocs=nan(length(groups),2); %matrix that will store the indices
+xtl=get(gca,'XTickLabel');
 
 for ii=1:length(groups)
-	grp=groups{ii};
-
-	if isnumeric(grp)
-		xlocs(ii,:)=grp; %Just store the indices if they're the right format already
-
-	elseif iscell(grp) %Handle string pairs or string/index pairs
-
-		if isstr(grp{1})
-			a=strmatch(grp{1},xtl);
-		elseif isnumeric(grp{1})
-			a=grp{1};
-		end
-		if isstr(grp{2})
-			b=strmatch(grp{2},xtl);
-		elseif isnumeric(grp{2})
-			b=grp{2};
-		end
-
-		xlocs(ii,:)=[a,b];
-	end
-
-	%Ensure that the first column is always smaller number than the second
-	xlocs(ii,:)=sort(xlocs(ii,:));
-
+    grp=groups{ii};
+    
+    if isnumeric(grp)
+        xlocs(ii,:)=grp; %Just store the indices if they're the right format already
+        
+    elseif iscell(grp) %Handle string pairs or string/index pairs
+        
+        if isstr(grp{1})
+            a=strmatch(grp{1},xtl);
+        elseif isnumeric(grp{1})
+            a=grp{1};
+        end
+        if isstr(grp{2})
+            b=strmatch(grp{2},xtl);
+        elseif isnumeric(grp{2})
+            b=grp{2};
+        end
+        
+        xlocs(ii,:)=[a,b];
+    end
+    
+    %Ensure that the first column is always smaller number than the second
+    xlocs(ii,:)=sort(xlocs(ii,:));
+    
 end
 
-%If there are any NaNs we have messed up. 
+%If there are any NaNs we have messed up.
 if any(isnan(xlocs(:)))
-	error('Some groups were not found')
+    error('Some groups were not found')
 end
 
 
@@ -159,31 +158,31 @@ end
 
 
 %Optionally sort sig bars from shortest to longest so we plot the shorter ones first
-%in the loop below. Usually this will result in the neatest plot. If we waned to 
-%optimise the order the sig bars are plotted to produce the neatest plot, then this 
+%in the loop below. Usually this will result in the neatest plot. If we waned to
+%optimise the order the sig bars are plotted to produce the neatest plot, then this
 %is where we'd do it. Not really worth the effort, though, as few plots are complicated
-%enough to need this and the user can define the order very easily at the command line. 
+%enough to need this and the user can define the order very easily at the command line.
 if ~nosort
-	[~,ind]=sort(xlocs(:,2)-xlocs(:,1),'ascend');
-	xlocs=xlocs(ind,:);groups=groups(ind);
-	stats=stats(ind);
+    [~,ind]=sort(xlocs(:,2)-xlocs(:,1),'ascend');
+    xlocs=xlocs(ind,:);groups=groups(ind);
+    stats=stats(ind);
 end
 
 
 
 %-----------------------------------------------------
-%Add the sig bar lines and asterisks 
+%Add the sig bar lines and asterisks
 holdstate=ishold;
 hold on
 
 H=ones(length(groups),2); %The handles will be stored here
 
 y=ylim;
-yd=myRange(y)*0.05; %separate sig bars vertically by 5% 
+yd=myRange(y)*0.05; %separate sig bars vertically by 5%
 
 for ii=1:length(groups)
-	thisY=findMinY(xlocs(ii,:))+yd;
-	H(ii,:)=makeBar(xlocs(ii,:),thisY,stats(ii));
+    thisY=findMinY(xlocs(ii,:))+yd;
+    H(ii,:)=makeSignificanceBar(xlocs(ii,:),thisY,stats(ii));
 end
 %-----------------------------------------------------
 
@@ -197,10 +196,10 @@ end
 %for all bars.
 yd=myRange(ylim)*0.01; %Ticks are 1% of the y axis range
 for ii=1:length(groups)
-	y=get(H(ii,1),'YData');
-	y(1)=y(1)-yd;
-	y(4)=y(4)-yd;	
-	set(H(ii,1),'YData',y)
+    y=get(H(ii,1),'YData');
+    y(1)=y(1)-yd;
+    y(4)=y(4)-yd;
+    set(H(ii,1),'YData',y)
 end
 
 
@@ -208,157 +207,109 @@ end
 
 %Be neat and return hold state to whatever it was before we started
 if ~holdstate
-	hold off
+    hold off
 elseif holdstate
-	hold on
+    hold on
 end
 
 
 %Optionally return the handles to the plotted significance bars (first column of H)
 %and asterisks (second column of H).
 if nargout>0
-	varargout{1}=H;
+    varargout{1}=H;
 end
 
+
+end %close sigstar
 
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Internal functions
 
-
-function H=makeBar(x,y,p)
-%makeBar produces the bar and defines how many asterisks we get for a 
+function H=makeSignificanceBar(x,y,p)
+%makeSignificanceBar produces the bar and defines how many asterisks we get for a
 %given p-value
 
+% DJC edit - plot stars or p value -9-9-2016
 
-if p<=1E-3
-	stars='***'; 
-elseif p<=1E-2
-	stars='**';
-elseif p<=0.05
-	stars='*';
-elseif isnan(p)
-	stars='n.s.';
+plotStars = false;
+
+if plotStars
+    if p<=1E-3
+        stars='***';
+    elseif p<=1E-2
+        stars='**';
+    elseif p<=0.05
+        stars='*';
+    elseif isnan(p)
+        stars='n.s.';
+    else
+        stars='';
+    end
 else
-	stars='';
+    stars = sprintf('p = %0.2e',p);
 end
-		
+
 x=repmat(x,2,1);
 y=repmat(y,4,1);
 
-H(1)=plot(x(:),y,'-k','LineWidth',1.5);
+H(1)=plot(x(:),y,'-k','LineWidth',1.5,'Tag','sigstar_bar');
 
 %Increase offset between line and text if we will print "n.s."
-%instead of a star. 
-if ~isnan(p)
-    offset=0.005;
+%instead of a star.
+
+% djc edit - 9-9-2016 to offset if putting p value instead 
+if plotStars
+    if ~isnan(p)
+        offset=0.005;
+    else
+        offset=0.02;
+    end
 else
-    offset=0.02;
+    offset = 0.04;
 end
 
-H(2)=text(mean(x(:)),mean(y)+myRange(ylim)*offset,stars,...
-   	'HorizontalAlignment','Center',...
-   	'BackGroundColor','none');
+starY=mean(y)+myRange(ylim)*offset;
+H(2)=text(mean(x(:)),starY,stars,...
+    'HorizontalAlignment','Center',...
+    'BackGroundColor','none',...
+    'Tag','sigstar_stars');
+
+Y=ylim;
+if Y(2)<starY
+    ylim([Y(1),starY+myRange(Y)*0.05])
+end
 
 
+end %close makeSignificanceBar
 
 
 
 function Y=findMinY(x)
-%Find the minimum y value needed to clear all the plotted data present 
-%over a given range of x values. This allows the significance bar to
-%be plotted in the best location. 
+% The significance bar needs to be plotted a reasonable distance above all the data points
+% found over a particular range of X values. So we need to find these data and calculat the
+% the minimum y value needed to clear all the plotted data present over this given range of
+% x values.
 %
+% This version of the function is a fix from Evan Remington
+oldXLim = get(gca,'XLim');
+oldYLim = get(gca,'YLim');
 
-%First look for patch objects (bars in a bar-chart, most likely)
-if verLessThan('matlab','8.4.0')
-	p=findobj(gca,'Type','bar');
-	xd=get(p,'XData');
-else
-	p=findobj(gca,'Type','bar')
-	xd=p.XData;
-end
+axis(gca,'tight')
+set(gca,'xlim',x) %Matlab automatically re-tightens y-axis
 
+yLim = get(gca,'YLim'); %Now have max y value of all elements within range.
+Y = max(yLim);
 
-if iscell(xd) & verLessThan('matlab','8.4.0')
-	xd=groupedBarFix(xd,'x');
-end
+axis(gca,'normal')
+set(gca,'XLim',oldXLim,'YLim',oldYLim)
 
-xd(xd<x(1))=0;
-xd(xd>x(2))=0;
-
-overlapping=any(xd,1); %These x locations overlap
-
-%Find the corresponding y values 
-if verLessThan('matlab','8.4.0')
-	yd=get(p,'YData');
-else
-	yd=p.YData;
-end
-
-if iscell(yd) & verLessThan('matlab','8.4.0')
-	yd=groupedBarFix(yd,'y');
-end
-
-yd=yd(:,overlapping);
-
-%So we must have a value of at least Y in order to miss all the 
-%plotted bar data:
-Y=max(yd(:));
-
-%Now let's check if any other plot elements (such as significance bars we've 
-%already added) exist over this range of x values.
-%
-% NOTE! This code doesn't identify all cases where there is overlap. 
-%For example, if you have a significance bar going from 3 to 7 along the x
-%axis and you then try to add a new one from 4 to 5, then it won't see the 
-%existing one as overlapping. However, I've yet to find this a problem in
-%practice so I'll leave things be. Can easily be fixed if leads to bugs. 
-
-p=findobj(gca,'Type','Line');
-tmpY=nan(1,length(p));
-
-for ii=1:length(p)
-	xd=get(p(ii),'XData');
+end %close findMinY
 
 
-	xd(xd<x(1))=0;
-	xd(xd>x(2))=0;
-
-	overlapping=xd>0; %These x locations overlap
-
-	if ~any(overlapping)
-		continue
-	end
-
-	clear xd
-	yd=get(p(ii),'YData');
-	yd=yd(overlapping);
-	tmpY(ii)=max(yd);
-
-end
-
-Y=max([Y,tmpY]);
-
-
-%The patch coords of grouped error bars aren't a matrix but a cell array. This needs to be
-%converted to a suitable matrix in order for the code to work. This function does that.  
-function out=groupedBarFix(in,xy)
-	out=ones([size(in{1}),length(in)]);
-	for ii=1:length(in)
-		out(:,:,ii)=in{ii};
-	end
-
-	switch xy
-	case 'x'
-		out=mean(out,3);
-	case 'y'
-		out=max(out,[],3);
-    end
-
-
-%replacement for stats toolbox range function
 function rng=myRange(x)
-  rng = max(x) - min(x);
+%replacement for stats toolbox range function
+rng = max(x) - min(x);
+end %close myRange
 

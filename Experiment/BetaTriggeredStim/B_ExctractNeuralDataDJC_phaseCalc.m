@@ -93,7 +93,7 @@ switch(sid)
         
         goods = [ 5 ];
         bads = [23 27 28 29 30 32];
-        betaChan = 5
+        betaChan = 5;
         t_min = 0.008;
         t_max = 0.0425;
         
@@ -326,8 +326,8 @@ for chan = chans
         zc = sign(foo(ct-1)) ~= sign(foo(ct));
         ct = ct + 1;
     end
-    
-    if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
+    % DJC - changed this to 0.015
+    if (ct > max(last, last2) + 0.015 * efs) % marched along more than 10 msec, probably gone to far
         ct = max(last, last2);
     end
     
@@ -341,8 +341,8 @@ for chan = chans
         win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
-        %           interpolation approach
-        %           eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
+        %interpolation approach
+        eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
@@ -358,8 +358,8 @@ for chan = chans
         %              eco(win(presamps:(ct-1))) = normrnd(aveSig,stdSig,lengthReplace,1);
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % fillgaps
-        eco(win(presamps:(ct-1))) = NaN;
-        eco(win(1:(ct-1))) = fillgaps(eco(win(1:ct-1)));
+        %         eco(win(presamps:(ct-1))) = NaN;
+        %         eco(win(1:(ct-1))) = fillgaps(eco(win(1:ct-1)));
         
         
         
@@ -373,7 +373,7 @@ for chan = chans
     
     % JUST TRY NOTCH AT 60 120 180 240
     %2-26-2016 - my attempt for ecb43e
-    %             eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
+    %                 eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
     
     %% process triggers
     
@@ -400,7 +400,7 @@ for chan = chans
     end
     
     % changing presamps - DJC - 2/24/2016
-    presamps = round(0.025*efs);
+    presamps = round(0.010*efs);
     postsamps = round(0.120*efs);
     
     ptis = round(stims(2,pts)/fac);
@@ -419,6 +419,10 @@ for chan = chans
     %     awins = adjustStims(wins);
     % normalize the windows to each other, using pre data
     awins = wins-repmat(median(wins(t<0,:),1), [size(wins, 1), 1]);
+    
+    % normalize windows using whole window!!! try to deal with DC offset?
+    %     awins = wins-repmat(median(wins,1), [size(wins, 1), 1]);
+    
     %         awins = wins;
     pstims = stims(:,pts);
     
@@ -553,55 +557,54 @@ for chan = chans
             % dont need to reinitialize CCEPbyNumStim, as it goes
             % through the other way first
             % i is 1 in this case
-                        for i = 1:length(ulabels)-1
-
-            t_minS = 0.005;
-            t_maxS = 0.040;
-            
-            i = 1;
-            Nperm = 1000;
-            sp = 95;
-            extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
-            extractedSigsBase = extractedSigs(:,label(keeps)==0);
-            extractedSigsTest = extractedSigs(:,label(keeps)==i);
-            
-            tExtract = t(t>t_minS & t<t_maxS);
-            figure
-            plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
-            hold on
-            plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
-            plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
-            
-            
-            [CI_lo, CI_hi, sgc] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
-            
-            hold on
-            bar(tExtract,100*sgc,'linewidth',[2])
-            % from mathworks to find continuous segment that was at
-            % least 3 ms long?
-            if d == length(labelGroupStarts)
-                    leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
-                else
-                    leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
+            for i = 1:length(ulabels)-1
+                
+                t_minS = 0.005;
+                t_maxS = 0.040;
+                
+                Nperm = 1000;
+                sp = 95;
+                extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
+                extractedSigsBase = extractedSigs(:,label(keeps)==0);
+                extractedSigsTest = extractedSigs(:,label(keeps)==i);
+                tExtract = t(t>t_minS & t<t_maxS);
+                figure
+                plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
+                hold on
+                plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
+                plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
+                
+                
+                [CI_lo, CI_hi, sgc] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
+                
+                hold on
+                bar(tExtract,100*sgc,'linewidth',[2])
+                % from mathworks to find continuous segment that was at
+                % least 3 ms long?
+                
+                %             if d == length(labelGroupStarts)
+                %                     leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
+                %                 else
+                %                     leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
+                %                 end
+                
+                tSearch = diff([false;sgc==1;false]);
+                p = find(tSearch==1);
+                q = find(tSearch==-1);
+                [maxlen,ix] = max(q-p);
+                firstSearch = p(ix);
+                lastSearch = q(ix)-1;
+                
+                CCEPmed = median(extractedSigs(:,klabel==i),2);
+                [minval,inx] = min(CCEPmed);
+                % account for case where inx = 1 to avoid addressing matrix
+                % outside of bounds
+                if inx == 1
+                    inx = inx + 1;
                 end
-            
-            tSearch = diff([false;sgc==1;false]);
-            p = find(tSearch==1);
-            q = find(tSearch==-1);
-            [maxlen,ix] = max(q-p);
-            firstSearch = p(ix);
-            lastSearch = q(ix)-1;
-            
-            CCEPmed = median(extractedSigs(:,klabel==i),2);
-            [minval,inx] = min(CCEPmed);
-            % account for case where inx = 1 to avoid addressing matrix
-            % outside of bounds
-            if inx == 1
-                inx = inx + 1;
+                CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
             end
-            CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
-                        end
-
+            
             %%
             
             %                 if anova < 0.05
