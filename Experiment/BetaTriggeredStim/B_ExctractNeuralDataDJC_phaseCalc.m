@@ -378,33 +378,38 @@ for chan = chans
     %% process triggers
     
     if (strcmp(sid, '8adc5c'))
-        pts = stims(3,:)==0;
+        pts = stims(3,:)==1;
     elseif (strcmp(sid, 'd5cd55'))
         %         pts = stims(3,:)==0 & (stims(2,:) > 4.5e6);
-        pts = stims(3,:)==0 & (stims(2,:) > 4.5e6) & (stims(2, :) > 36536266);
+        pts = stims(3,:)==1 & (stims(2,:) > 4.5e6) & (stims(2, :) > 36536266);
     elseif (strcmp(sid, 'c91479'))
-        pts = stims(3,:)==0;
+        pts = stims(3,:)==1;
     elseif (strcmp(sid, '7dbdec'))
-        pts = stims(3,:)==0;
+        pts = stims(3,:)==1;
     elseif (strcmp(sid, '9ab7ab'))
-        pts = stims(3,:)==0;
+        pts = stims(3,:)==1;
     elseif (strcmp(sid, '702d24'))
-        pts = stims(3,:)==0;
+        ptsPos = stims(3,:)==1 & stims(8,:)==1;
+        ptsNeg = stims(3,:)==1 & stims(8,:)==0;
+
         %modified DJC 7-27-2015
     elseif (strcmp(sid, 'ecb43e'))
-        pts = stims(3,:) == 0;
+        pts = stims(3,:) == 1;
     elseif (strcmp(sid, '0b5a2e'))
-        pts = stims(3,:) == 0;
+        pts = stims(3,:) == 1;
+                ptsPos = stims(3,:)==1 & stims(8,:)==1;
+        ptsNeg = stims(3,:)==1 & stims(8,:)==0;
     else
         error 'unknown sid';
     end
     
     % changing presamps - DJC - 2/24/2016
-    presamps = round(0.010*efs);
-    postsamps = round(0.120*efs);
+    presamps = round(0.030*efs);
+    postsamps = round(0*efs);
     
-    ptis = round(stims(2,pts)/fac);
-    
+    ptisPos = round(stims(2,ptsPos)/fac);
+    ptisNeg = round(stims(2,ptsNeg)/fac);
+
     t = (-presamps:postsamps)/efs;
     
     % 2/24/2016 - change CT so that if you pick different limits for
@@ -415,16 +420,37 @@ for chan = chans
     ct = index + ct - round(0.025*efs);
     
     
-    wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
+    winsPos = squeeze(getEpochSignal(eco', ptisPos-presamps, ptisPos+postsamps+1));
+        winsNeg = squeeze(getEpochSignal(eco', ptisNeg-presamps, ptisNeg+postsamps+1));
+
     %     awins = adjustStims(wins);
     % normalize the windows to each other, using pre data
-    awins = wins-repmat(median(wins(t<0,:),1), [size(wins, 1), 1]);
-    
+    awinsPos = winsPos-repmat(median(winsPos(t<0,:),1), [size(winsPos, 1), 1]);
+    awinsNeg = winsNeg-repmat(median(winsNeg(t<0,:),1), [size(winsNeg, 1), 1]);
+
     % normalize windows using whole window!!! try to deal with DC offset?
     %     awins = wins-repmat(median(wins,1), [size(wins, 1), 1]);
     
     %         awins = wins;
-    pstims = stims(:,pts);
+    pstimsPos = stims(:,ptsPos);
+    pstimsNeg = stims(:,ptsNeg);
+
+        % 11-5-2016 - frequency range
+    f_range = [12 30];
+    t_range_samps = 1./(f_range./fs);
+    startSamp = 123;
+    
+    for i = 1:size(pstimsPos,2)
+        temp = awinsNeg(123:end,i);
+        t_temp = t(123:end);
+    [pha,T,amp,rsquare,fitline] = sinfit(temp,5,t_range_samps);
+    f = 1/(T/fs);
+a = amp.*sin(pha+(2*pi*t_temp*f));
+figure
+plot(t_temp,temp,t_temp,a);
+    end
+    
+
     
     % calculate EP statistics
     stats = quantifyEPs(t, awins);
