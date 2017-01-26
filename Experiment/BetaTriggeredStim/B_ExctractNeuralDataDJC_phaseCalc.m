@@ -14,6 +14,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 %SIDS = SIDS(2);
 
 sid = input('input SID \n','s');
+
 %DJC edited 7/20/2015 to fix tp paths
 switch(sid)
     case '8adc5c'
@@ -40,6 +41,21 @@ switch(sid)
         t_min = 0.008;
         t_max = 0.05;
         
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
+        
+        ttype = 0*beta;
+        
+        
         
     case 'c91479'
         % sid = SIDS{3};
@@ -54,6 +70,28 @@ switch(sid)
         t_min = 0.008;
         t_max = 0.035;
         
+        
+        %%%%%%%%%%%%%%%%%%%%
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
+        
+        mode(64507402:end) = 0;
+        ttype(64507402:end) = 0;
+        beta(64507402:end) = 0;
+        raw(64507402:end) = 0;
+        
+        mode(1:2e7) = 0;
+        ttype(1:2e7) = 0;
+        beta(1:2e7) = 0;
+        raw(1:2e7) = 0;
+        
     case '7dbdec'
         % sid = SIDS{4};
         tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
@@ -66,6 +104,22 @@ switch(sid)
         betaChan = 4;
         t_min = 0.008;
         t_max = 0.04;
+        
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
+        
+        
         
     case '9ab7ab'
         %             sid = SIDS{5};
@@ -83,6 +137,21 @@ switch(sid)
         goods = sort([42 43 49 50 51 52 53 57 58]);
         t_min = 0.005;
         t_max = 0.0425;
+        
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
+        
+        ttype = 0*mode;
+        
     case '702d24'
         tp = strcat(SUB_DIR,'\702d24\data\d7\702d24_BetaStim');
         block = 'BetaPhase-4';
@@ -97,6 +166,19 @@ switch(sid)
         t_min = 0.008;
         t_max = 0.0425;
         
+        
+        
+        %%%%%%%%%%%%%%%%%%
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
+        
     case 'ecb43e' % added DJC 7-23-2015
         tp = strcat(SUB_DIR,'\ecb43e\data\d7\BetaStim');
         block = 'BetaPhase-3';
@@ -108,6 +190,18 @@ switch(sid)
         goods = sort([55 63 54 47 48]);
         t_min = 0.008;
         t_max = 0.05;
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
         
     case '0b5a2e' % added DJC 7-23-2015
         tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
@@ -121,6 +215,19 @@ switch(sid)
         bads = [20 24 28];
         t_min = 0.005;
         t_max = 0.05;
+        
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
     case '0b5a2ePlayback' % added DJC 7-23-2015
         tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
         block = 'BetaPhase-4';
@@ -132,6 +239,18 @@ switch(sid)
         bads = [20 24 28];
         t_min = 0.005;
         t_max = 0.05;
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        
+        
+        tank = TTank;
+        tank.openTank(tp);
+        tank.selectBlock(block);
+        
+        beta = tank.readWaveEvent('Blck', 1)';
+        raw = tank.readWaveEvent('Blck', 2)';
+        mode = tank.readWaveEvent('Wave', 2)';
+        ttype = tank.readWaveEvent('Wave', 1)';
     otherwise
         error('unknown SID entered');
 end
@@ -142,7 +261,6 @@ chans(ismember(chans, stims)) = [];
 % 9-2-2015 DJC added mod DJC
 % below is for original miah style burst tables
 
-load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
 % below is for modified burst tables
 %         load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
 
@@ -151,7 +269,43 @@ load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
 
 %     load(fullfile(META_DIR, [sid '_tables_modDJC_2_22_2016.mat']), 'bursts', 'fs', 'stims');
 
+if strcmp(sid,'0b5a2ePlayback')
+        load(fullfile(META_DIR, ['0b5a2e' '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
+        
+        % this was for discovering the delay, now it's known to be about
+        % 577869
+        %         tic;
+        %         [smon, info] = tank.readWaveEvent('SMon', 2);
+        %         smon = smon';
+        %
+        %         fs = info.SamplingRateHz;
+        %
+        %         stim = tank.readWaveEvent('SMon', 4)';
+        %         toc;
+        %
+        %         tic;
+        %         mode = tank.readWaveEvent('Wave', 2)';
+        %         ttype = tank.readWaveEvent('Wave', 1)';
+        %
+        %         beta = tank.readWaveEvent('Blck', 1)';
+        %
+        %         raw = tank.readWaveEvent('Blck', 2)';
+        %
+        %         toc;
+        
+        delay = 577869;
+elseif strcmp(sid,'0b5a2e')
+        
+        % below is for original miah style burst tables
+        %         load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+        % below is for modified burst tables
+        load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
+elseif strcmp(sid,'ecb43e')
+            load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
 
+else
+    load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+end
 
 
 % drop any stims that happen in the first 500 milliseconds
@@ -160,12 +314,6 @@ stims(:,stims(2,:) < fs/2) = [];
 % drop any probe stimuli without a corresponding pre-burst/post-burst
 bads = stims(3,:) == 0 & (isnan(stims(4,:)) | isnan(stims(6,:)));
 stims(:, bads) = [];
-
-tank = TTank;
-tank.openTank(tp);
-tank.selectBlock(block);
-
-figure
 
 sigChans = {};
 shuffleChans = {};
@@ -200,92 +348,20 @@ for chan = chans
     
     fac = fs/efs;
     
-    % %         %% preprocess eco
-    % %         presamps = round(0.025 * efs); % pre time in sec
-    % %         postsamps = round(0.120 * efs); % post time in sec
-    % %
-    % %         sts = round(stims(2,:) / fac);
-    % %         edd = zeros(size(sts));
-    % %
-    % %
-    % %         temp = squeeze(getEpochSignal(eco', sts-presamps, sts+postsamps+1));
-    % %         foo = mean(temp,2);
-    % %         lastsample = round(0.040 * efs);
-    % %         foo(lastsample:end) = foo(lastsample-1);
-    % %
-    % %         last = find(abs(zscore(foo))>1,1,'last');
-    % %         last2 = find(abs(diff(foo))>30e-6,1,'last')+1;
-    % %
-    % % %         plot(foo);
-    % % %         vline(last)
-    % % %         vline(last2,'k:');
-    % %
-    % %         zc = false;
-    % %         ct = max(last, last2);
-    % %
-    % %         while (~zc && ct <= length(foo))
-    % %             zc = sign(foo(ct-1)) ~= sign(foo(ct));
-    % %             ct = ct + 1;
-    % %         end
-    % %
-    % % %         vline(ct-1,'g');
-    % % %         hline(0);
-    % %
-    % %
-    % %         for sti = 1:length(sts)
-    % %             win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-    % % %             win = sts(sti):(sts(sti)+round(efs * 0.010));
-    % %
-    % % %             % replacement approach
-    % % %             mask = ones(size(win));
-    % % %             mask(presamps:(ct-1)) = 0;
-    % % %             eco(win) = eco(win) .* mask;
-    % %
-    % %             % interpolation approach
-    % %             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-    % %         end
-    % %
-    % % % %         for sti = 1:length(sts)
-    % % % % % %             % find the first zero crossing 4 msec after the stim command
-    % % % % % %             last = floor(efs * 1e-3);
-    % % % % % %             win = sts(sti):(sts(sti)+round(efs * 0.010));
-    % % % % % %             mask = ones(size(win));
-    % % % % % %
-    % % % % % %             ct = last;
-    % % % % % %
-    % % % % % %             mask(1:ct) = 0;
-    % % % % % %             eco(win) = eco(win) .* mask;
-    % % % %
-    % % % % %             % find the zero crossing after the stimulus
-    % % % % %             win = sts(sti):(sts(sti)+round(efs * 0.020));
-    % % % % %
-    % % % % %             nwin = ((eco(win)-mean(eco(win(1:10))))/std(eco(win(1:10))));
-    % % % % %             active = abs(nwin) > 50;
-    % % % % %             last = find(active, 1, 'last');
-    % % % % %
-    % % % % %             if (isempty(last))
-    % % % % %                 error('threshold too high');
-    % % % % %             end
-    % % % % %
-    % % % % %             % find the first zero crossing after the last active sample
-    % % % % %             mask = ones(size(win));
-    % % % % %
-    % % % % %             zc = false;
-    % % % % %             ct = last;
-    % % % % %
-    % % % % %             while (~zc && ct < last+20)
-    % % % % %                 zc = sign(eco(sts(sti)+ct-1)) ~= sign(eco(sts(sti)+ct));
-    % % % % %                 ct = ct + 1;
-    % % % % %             end
-    % % % % %
-    % % % % %             mask(1:ct) = 0;
-    % % % % %             eco(win) = eco(win) .* mask;
-    % % % %         end
-    % %
-    % %
-    % %         eco = bandpass(eco, 1, 200, efs, 4, 'causal');
-    % %         eco = notch(eco, [60], efs, 2, 'causal');
-    % %
+    % DJC - 1-14-2017
+    
+    % plot whole signal if interested
+    
+    %     figure
+    %     hold on
+    %     acausal_filt = bandpass(eco,20,12,efs,4,'acausal');
+    %     causal_filt = bandpass(eco,20,12,efs,4,'causal');
+    %     plot(eco)
+    %     plot(acausal_filt*1000);
+    %     plot(causal_filt*100);
+    %     legend({'raw','acausal','causal'})
+    %
+   
     
     %% preprocess eco
     %             presamps = round(0.050 * efs); % pre time in sec
@@ -327,7 +403,7 @@ for chan = chans
         ct = ct + 1;
     end
     % DJC - changed this to 0.015
-    if (ct > max(last, last2) + 0.015 * efs) % marched along more than 10 msec, probably gone to far
+    if (ct > max(last, last2) + 0.020 * efs) % marched along more than 10 msec, probably gone to far
         ct = max(last, last2);
     end
     
@@ -375,6 +451,22 @@ for chan = chans
     %2-26-2016 - my attempt for ecb43e
     %                 eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
     
+    % 1-14-2017 - look at stim without artifact
+    
+    
+    acausal_filt = bandpass(eco,20,12,efs,4,'acausal');
+    causal_filt = bandpass(eco,20,12,efs,4,'causal');
+    
+    % plot it if interested
+    
+    
+    %     figure
+    %     hold on
+    %
+    %     plot(eco)
+    %     plot(acausal_filt*100);
+    %     plot(causal_filt*10);
+    %     legend({'raw','acausal','causal'})
     %% process triggers
     
     if (strcmp(sid, '8adc5c'))
@@ -383,7 +475,8 @@ for chan = chans
         %         pts = stims(3,:)==0 & (stims(2,:) > 4.5e6);
         pts = stims(3,:)==1 & (stims(2,:) > 4.5e6) & (stims(2, :) > 36536266);
     elseif (strcmp(sid, 'c91479'))
-        pts = stims(3,:)==1;
+        ptsPos = stims(3,:)==1 & stims(8,:)==1;
+        ptsNeg = stims(3,:)==1 & stims(8,:)==0;
     elseif (strcmp(sid, '7dbdec'))
         pts = stims(3,:)==1;
     elseif (strcmp(sid, '9ab7ab'))
@@ -391,25 +484,37 @@ for chan = chans
     elseif (strcmp(sid, '702d24'))
         ptsPos = stims(3,:)==1 & stims(8,:)==1;
         ptsNeg = stims(3,:)==1 & stims(8,:)==0;
-
+        
         %modified DJC 7-27-2015
     elseif (strcmp(sid, 'ecb43e'))
-        pts = stims(3,:) == 1;
+        
+        ptsPos = stims(3,:)==1 & stims(8,:)==0;
+        ptsNeg = stims(3,:)==1 & stims(8,:)==1;
+        pts = stims(3,:)==1 & stims(8,:)==3;
     elseif (strcmp(sid, '0b5a2e'))
-        pts = stims(3,:) == 1;
-                ptsPos = stims(3,:)==1 & stims(8,:)==1;
+        ptsPos = stims(3,:)==1 & stims(8,:)==1;
         ptsNeg = stims(3,:)==1 & stims(8,:)==0;
+        
+    elseif (strcmp(sid, '0b5a2ePlayback'))
+          ptsPos = stims(3,:)==1 & stims(8,:)==1;
+        ptsNeg = stims(3,:)==1 & stims(8,:)==0;
+        
     else
         error 'unknown sid';
     end
     
     % changing presamps - DJC - 2/24/2016
-    presamps = round(0.030*efs);
-    postsamps = round(0*efs);
+    presamps = round(0.05*efs);
+    postsamps = round(0.00*efs);
+    if exist('ptsPos') & exist('ptsNeg')
+        ptisPos = round(stims(2,ptsPos)/fac);
+        ptisNeg = round(stims(2,ptsNeg)/fac);
+    end
+    if exist('pts')
+        ptis = round(stims(2,pts)/fac);
+    end
     
-    ptisPos = round(stims(2,ptsPos)/fac);
-    ptisNeg = round(stims(2,ptsNeg)/fac);
-
+    
     t = (-presamps:postsamps)/efs;
     
     % 2/24/2016 - change CT so that if you pick different limits for
@@ -419,487 +524,424 @@ for chan = chans
     index = find(t==0);
     ct = index + ct - round(0.025*efs);
     
+    % use raw_sig or filtered
+    raw_sig = true;
     
-    winsPos = squeeze(getEpochSignal(eco', ptisPos-presamps, ptisPos+postsamps+1));
+    if (exist('ptsPos') & exist('ptsNeg'))
+        
+        winsPos = squeeze(getEpochSignal(eco', ptisPos-presamps, ptisPos+postsamps+1));
         winsNeg = squeeze(getEpochSignal(eco', ptisNeg-presamps, ptisNeg+postsamps+1));
-
+        
+        % normalize the windows to each other, using pre data
+        awinsPos = winsPos-repmat(median(winsPos(t<0,:),1), [size(winsPos, 1), 1]);
+        awinsNeg = winsNeg-repmat(median(winsNeg(t<0,:),1), [size(winsNeg, 1), 1]);
+        
+        % normalize windows with DC subtract for whole thing
+        awinsPos = winsPos - repmat(median(winsPos,1), [size(winsPos,1),1]);
+        awinsNeg = winsNeg - repmat(median(winsNeg,1), [size(winsNeg,1),1]);
+        
+        
+        % DJC 1-14-2017 - attempt to look at epoched acausal
+        winsPos_caus = squeeze(getEpochSignal(causal_filt', ptisPos-presamps, ptisPos+postsamps+1));
+        winsNeg_caus = squeeze(getEpochSignal(causal_filt', ptisNeg-presamps, ptisNeg+postsamps+1));
+        
+        awinsPos_caus = winsPos_caus;
+        awinsNeg_caus = winsNeg_caus;
+        
+        winsPos_acaus = squeeze(getEpochSignal(acausal_filt', ptisPos-presamps, ptisPos+postsamps+1));
+        winsNeg_acaus = squeeze(getEpochSignal(acausal_filt', ptisNeg-presamps, ptisNeg+postsamps+1));
+        
+        awinsPos_acaus = winsPos_acaus;
+        awinsNeg_acaus = winsNeg_acaus;
+        
+        % do the fit on the mean signal
+        
+        % plot intermediate steps?
+        plotIt = false;
+        
+        % set parameters for fit function
+        f_range = [10 30];
+        smooth_span = 13;
+        
+        % do it on different conditions
+        
+        % raw
+        
+        [phase_at_0_pos,r_square_pos,fitline_pos] = phase_calculation(awinsPos,t,smooth_span,f_range,efs,plotIt);
+        [phase_at_0_neg,r_square_neg,fitline_neg] = phase_calculation(awinsNeg,t,smooth_span,f_range,efs,plotIt);
+        
+        % causal
+        
+        [phase_at_0_pos_caus,r_square_pos_caus,fitline_pos_caus] = phase_calculation(awinsPos_caus,t,smooth_span,f_range,efs,plotIt);
+        [phase_at_0_neg_caus,r_square_neg_caus,fitline_neg_caus] = phase_calculation(awinsNeg_caus,t,smooth_span,f_range,efs,plotIt);
+        
+        
+        % acausal
+        [phase_at_0_pos_acaus,r_square_pos_acaus,fitline_pos_acaus] = phase_calculation(awinsPos_acaus,t,smooth_span,f_range,efs,plotIt);
+        [phase_at_0_neg_acaus,r_square_neg_acaus,fitline_neg_acaus] = phase_calculation(awinsNeg_acaus,t,smooth_span,f_range,efs,plotIt);
+        
+        
+        % make fake vector for non pts
+        
+        phase_at_0= 0;
+        r_square= 0;
+        fitline = 0;
+        
+        phase_at_0_caus= 0;
+        r_square_caus= 0;
+        fitline_caus = 0;
+        
+        phase_at_0_acaus= 0;
+        r_square_acaus = 0;
+        fitline_acaus = 0;
+        
+    end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
+    
+    %         % dont normalize for beta
+    %         awinsPos = winsPos;
+    %         awinsNeg = winsNeg;
+    %
+    %         pstimsPos = stims(:,ptsPos);
+    %         pstimsneg = stims(:,ptsNeg);
+    %
+    %         figure
+    %         plot(1e3*t,awinsPos)
+    %         figure
+    %         plot(1e3*t,awinsNeg)
+    %
+    %         figure
+    %         plot(1e3*t,awinsPos)
+    %         hold on
+    %         ave = mean(awinsPos,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('beta filtered signal around positive conditioning stimuli')
+    %
+    %         figure
+    %         plot(1e3*t,awinsNeg)
+    %         hold on
+    %         ave = mean(awinsNeg,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('beta filtered signal around negative conditioning stimuli')
+    
+    
+    %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %         % try hilbert amp phase approach
+    %
+    %         fband = [12 20];
+    %
+    %         [amp, phase] = hilbAmp(eco', fband, efs);
+    %         wins_amp_pos = squeeze(getEpochSignal(amp,ptisPos-presamps,ptisPos+postsamps+1));
+    %         wins_phase_pos = squeeze(getEpochSignal(phase,ptisPos-presamps,ptisPos+postsamps+1));
+    %
+    %         wins_amp_neg = squeeze(getEpochSignal(amp,ptisNeg-presamps,ptisNeg+postsamps+1));
+    %         wins_phase_neg = squeeze(getEpochSignal(phase,ptisNeg-presamps,ptisNeg+postsamps+1));
+    %
+    %
+    %
+    %
+    %         figure
+    %         plot(1e3*t,wins_amp_pos)
+    %         hold on
+    %         ave = mean(wins_amp_pos,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('Hilbert Amplitude - positive')
+    %
+    %         figure
+    %         plot(1e3*t,wins_phase_pos)
+    %         hold on
+    %         ave = mean(wins_phase_pos,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('Hilbert Phase - positive ')
+    %
+    %         figure
+    %         plot(1e3*t,wins_amp_neg)
+    %         hold on
+    %         ave = mean(wins_amp_neg,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('Hilbert Amplitude - negative ')
+    %
+    %         figure
+    %         plot(1e3*t,wins_phase_neg)
+    %         hold on
+    %         ave = mean(wins_phase_neg,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('Hilbert Phase - negative ')
+    %
+    %     end
+    
+    if exist('pts')
+        
+        wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
+        % subtract pre
+        awins =    wins-repmat(median(wins(t<0,:),1), [size(wins, 1), 1]);
+        % DJC 1-14-2017 - attempt to look at epoched acausal
+        
+        wins_acaus = squeeze(getEpochSignal(acausal_filt', ptis-presamps, ptis+postsamps+1));
+        wins_caus = squeeze(getEpochSignal(causal_filt', ptis-presamps, ptis+postsamps+1));
+        
+        awins_acaus = wins_acaus;
+        awins_caus = wins_caus;
+        
+        
+        % subtract whole thing
+        awins =    wins-repmat(mean(wins,1), [size(wins, 1), 1]);
+        
+        % DJC 1-23-2017 - add in sinfit
+        
+        f_range = [10 30];
+        smooth_span = 13;
+        
+        % do the fit on the mean signal
+        
+        % plot intermediate steps?
+        plotIt = false;
+        
+        % raw
+        
+        [phase_at_0,r_square,fitline] = phase_calculation(awins,t,smooth_span,f_range,efs,plotIt);
+        
+        % causal
+        
+        [phase_at_0_caus,r_square_caus,fitline_caus] = phase_calculation(awins_caus,t,smooth_span,f_range,efs,plotIt);
+        
+        
+        % acausal
+        [phase_at_0_acaus,r_square_acaus,fitline_acaus] = phase_calculation(awins_acaus,t,smooth_span,f_range,efs,plotIt);
+        
+        
+        
+        % make fake vector
+        
+        
+        phase_at_0_pos = 0;
+        r_square_pos= 0;
+        fitline_pos= 0;
+        phase_at_0_neg= 0;
+        r_square_neg= 0;
+        fitline_neg= 0;
+        
+        phase_at_0_pos_caus= 0;
+        r_square_pos_caus= 0;
+        fitline_pos_caus= 0;
+        phase_at_0_neg_caus= 0;
+        r_square_neg_caus= 0;
+        fitline_neg_caus= 0;
+        
+        phase_at_0_pos_acaus= 0;
+        r_square_pos_acaus= 0;
+        fitline_pos_acaus= 0;
+        phase_at_0_neg_acaus= 0;
+        r_square_neg_acaus= 0;
+        fitline_neg_acaus= 0;
+        
+        
+        
+    end
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %
+    %         figure
+    %         plot(1e3*t,awins)
+    %         hold on
+    %         ave = mean(awins,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('beta filtered signal around conditioning stimuli')
+    %
+    %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %         % try hilbert amp phase approach
+    %
+    %         fband = [12 20];
+    %
+    %         [amp, phase] = hilbAmp(eco', fband, efs);
+    %         wins_amp = squeeze(getEpochSignal(amp,ptis-presamps,ptis+postsamps+1));
+    %         wins_phase = squeeze(getEpochSignal(phase,ptis-presamps,ptis+postsamps+1));
+    %
+    %
+    %         pstims = stims(:,pts);
+    %
+    %         figure
+    %         plot(1e3*t,wins_amp)
+    %         hold on
+    %         ave = mean(wins_amp,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('Hilbert Amplitude')
+    %
+    %         figure
+    %         plot(1e3*t,wins_phase)
+    %         hold on
+    %         ave = mean(wins_phase,2);
+    %         plot(1e3*t,ave,'k','LineWidth',4)
+    %         vline(0)
+    %         title('Hilbert Phase')
+    %     end
+    
+    
+    
     %     awins = adjustStims(wins);
-    % normalize the windows to each other, using pre data
-    awinsPos = winsPos-repmat(median(winsPos(t<0,:),1), [size(winsPos, 1), 1]);
-    awinsNeg = winsNeg-repmat(median(winsNeg(t<0,:),1), [size(winsNeg, 1), 1]);
-
+    
+    
     % normalize windows using whole window!!! try to deal with DC offset?
     %     awins = wins-repmat(median(wins,1), [size(wins, 1), 1]);
     
     %         awins = wins;
-    pstimsPos = stims(:,ptsPos);
-    pstimsNeg = stims(:,ptsNeg);
-
-        % 11-5-2016 - frequency range
-    f_range = [12 30];
-    t_range_samps = 1./(f_range./fs);
-    startSamp = 123;
-    
-    for i = 1:size(pstimsPos,2)
-        temp = awinsNeg(123:end,i);
-        t_temp = t(123:end);
-    [pha,T,amp,rsquare,fitline] = sinfit(temp,5,t_range_samps);
-    f = 1/(T/fs);
-a = amp.*sin(pha+(2*pi*t_temp*f));
-figure
-plot(t_temp,temp,t_temp,a);
-    end
-    
-
-    
-    % calculate EP statistics
-    stats = quantifyEPs(t, awins);
     
     
-    % considered a baseline if it's been at least N seconds since the last
-    % burst ended
-    figure
-    plot(t,awins);
+    %%
     
-    baselines = pstims(5,:) > 2 * fs;
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% from a build stim tables - look
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% at raw and beta
     
-    % modified 9-10-2015 - DJC, find pre condition for each type of
-    % test pulse
     
-    pre = pstims(7,:) < 0.250*fs;
     
-    if (sum(baselines) < 100)
-        warning('N baselines = %d.', sum(baselines));
-    end
-    
-    types = unique(bursts(5,pstims(4,:)));
-    
-    %DJC - modify suffix to list conditioning type
-    suffix = arrayfun(@(x) num2str(x), types, 'uniformoutput', false);
+    %     %
+    %     % % visualize the triggers (this is slow)
+    %     % figure
+    %     % plot(smon)
+    %     % hold all;
+    %     % plot(mode, 'linew', 2)
+    %     %
+    %     % pts = stims(3,:)==0;
+    %     % cts = stims(3,:)==1;
+    %     %
+    %     % plot(stims(2,pts), ones(sum(pts),1),'.');
+    %     % plot(stims(2,cts), ones(sum(cts),1),'.');
+    %     %
+    %     % % visualize the distribution of stims per burst
+    %     % figure
+    %     % error('needs to be reworked for multiple conditioning types');
+    %     % hist(bursts(4,:),100)
+    %     %
+    %     % visualize the average trigger signal
+    %     figure
     %
-    suffix = cell(1,4);
-    suffix{1} = 'Negative peak of Beta';
-    suffix{2} = 'Positive peak of Beta';
-    suffix{3} = 'null condition';
-    suffix{4} = 'Random phase of Beta';
-    
-    nullType = 2;
-    
-    for typei = 1:length(types)
-        if (types(typei) ~= nullType)
-            %     % if (all)
-            %     probes = pstims(5,:) < .250*fs;
-            %     % if (falling)
-            
-            %
-            % time window for probes, originally < 0.250*fs, test
-            % further out
-            
-            
-            probes = pstims(5,:) < 0.250*fs & bursts(5,pstims(4,:))==types(typei);
-            %     if (rising)
-            %         probes = pstims(5,:) < .250*fs * bursts(5,pstims(4,:))==1;
-            
-            if (sum(probes) < 100)
-                warning('N probes = %d.', sum(probes));
-            end
-            
-            label = bursts(4,pstims(4,:));
-            label(baselines) = 0;
-            %modify this to change groupings/stratifications - djc 8/31/2015
-            
-            labelGroupStarts = [1 3 5];
-            %                 labelGroupStarts = 1:10;
-            %     labelGroupStarts = 1:5;
-            labelGroupEnds   = [labelGroupStarts(2:end) Inf];
-            
-            for gIdx = 1:length(labelGroupStarts)
-                labeli = label >= labelGroupStarts(gIdx) & label < labelGroupEnds(gIdx);
-                label(labeli) = gIdx;
-            end
-            
-            keeps = probes | baselines;
-            
-            %     lows = awins(awins==repmat(min(awins(180:320,keeps)), size(awins,1), 1));
-            %     figure
-            %     scatter(jitter(label, 0.1), lows)
-            
-            load('line_colormap.mat');
-            kwins = awins(:, keeps);
-            klabel = label(keeps);
-            ulabels = unique(klabel);
-            colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
-            
-            %% attempt at anova, multiple comparisons
-            % modified DJC 4/24/2016 -
-            % DJC 6_17_2017 try 0.030
-            
-            % try setting t_min and t_max for each subject
-            %                 tMin = 0.01;
-            %                 tMax = 0.030;
-            tMin = t_min;
-            tMax = t_max;
-            
-            
-            a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
-            a1Median = median(a1);
-            a1 = a1 - median(a1(label(keeps)==0));
-            
-            % DJC 4/4/2016 - save just a, so don't get rid of baseline yet
-            a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
-            dataForAnova{chan}{typei} = {a label keeps};
-            
-            [anova,table,stats] = anova1(a1', label(keeps), 'on');
-            figure
-            [c,m,h,gnames] = multcompare(stats,'display','on');
-            sigChans{chan}{typei} = {m c a1Median a1 label keeps};
-            
-            % david modified zScore 6_16_2016
-            plotIt = true;
-            %% zscore dat
-            for i = 1:length(ulabels)-1
-                total = 1e6*(awins(:,keeps));
-                base = 1e6*(awins(:,label(keeps)==0));
-                test = 1e6*(awins(:,label(keeps)==i));
-                %[zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
-                [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
-                %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
-                [zB,magB,latB] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
-                
-                
-                CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
-            end
-            
-            % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC
-            total = 1e6*(awins(:,keeps));
-            %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
-            [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,total,t,tMin,tMax,plotIt);
-            ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
-            
-            %% - DJC 8-26-2016 - looking at erp_perm_test
-            
-            % need to do for each type
-            %                 CCEPbyNumStim = {};
-            % dont need to reinitialize CCEPbyNumStim, as it goes
-            % through the other way first
-            % i is 1 in this case
-            for i = 1:length(ulabels)-1
-                
-                t_minS = 0.005;
-                t_maxS = 0.040;
-                
-                Nperm = 1000;
-                sp = 95;
-                extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
-                extractedSigsBase = extractedSigs(:,label(keeps)==0);
-                extractedSigsTest = extractedSigs(:,label(keeps)==i);
-                tExtract = t(t>t_minS & t<t_maxS);
-                figure
-                plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
-                hold on
-                plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
-                plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
-                
-                
-                [CI_lo, CI_hi, sgc] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
-                
-                hold on
-                bar(tExtract,100*sgc,'linewidth',[2])
-                % from mathworks to find continuous segment that was at
-                % least 3 ms long?
-                
-                %             if d == length(labelGroupStarts)
-                %                     leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
-                %                 else
-                %                     leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
-                %                 end
-                
-                tSearch = diff([false;sgc==1;false]);
-                p = find(tSearch==1);
-                q = find(tSearch==-1);
-                [maxlen,ix] = max(q-p);
-                firstSearch = p(ix);
-                lastSearch = q(ix)-1;
-                
-                CCEPmed = median(extractedSigs(:,klabel==i),2);
-                [minval,inx] = min(CCEPmed);
-                % account for case where inx = 1 to avoid addressing matrix
-                % outside of bounds
-                if inx == 1
-                    inx = inx + 1;
-                end
-                CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
-            end
-            
-            %%
-            
-            %                 if anova < 0.05
-            figure
-            set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
-            subplot(3,1,1);
-            
-            % original
-            prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
-            %
-            %                 % try subtracting mean of baselines, DJC 2-4-2016, post
-            %                 % convo with miah
-            %xlim(1e3*[-0.025 max(t)]);
-            
-            %                     lim(1e3*[min(t) max(t)]);
-            yl = ylim;
-            yl(1) = min(-10, max(yl(1),-140));
-            yl(2) = max(10, min(yl(2),100));
-            ylim(yl);
-            highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-            vline(0);
-            xlabel('time (ms)');
-            ylabel('ECoG (uV)');
-            %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-            title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
-            leg = {'Pre'};
-            for d = 1:length(labelGroupStarts)
-                if d == length(labelGroupStarts)
-                    leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
-                else
-                    leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
-                end
-            end
-            leg{end+1} = 'Stim Window';
-            %     leg{end+1} = 'EP_P';
-            legend(leg, 'location', 'Southeast')
-            
-            %
-            % try zscore?
-            %                                 prettyline(1e3*t((1e3*t)>10), zscore(1e6*awins((1e3*t)>10, keeps)), label(keeps), colors);
-            %     ylim([-130 50]);
-            
-            % second mean subtracted
-            
-            subplot(3,1,2)
-            prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
-            
-            
-            % changed DJC 1-7-2016
-            %xlim(1e3*[-0.025 max(t)]);
-            
-            xlim(1e3*[min(t) max(t)]);
-            %                 xlim([-5 300]);
-            %     vline([6 20 40], 'k');
-            %     highlight(gca, [25 33], [], [.6 .6 .6])
-            %             highlight(gca, [0 4], [], [.3 .3 .3]);
-            %             vline(0.030*1e3);
-            %             vline(0.080*1e3);
-            yl = ylim;
-            yl(1) = min(-10, max(yl(1),-140));
-            yl(2) = max(10, min(yl(2),100));
-            ylim(yl);
-            highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-            vline(0);
-            %                 vline(80);
-            
-            % DJC - 2-11-2016 - set y limits for z-score
-            %                 ylim([-2 2])
-            
-            xlabel('time (ms)');
-            ylabel('ECoG (uV)');
-            title('Median Subtracted')
-            
-            %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-            %                     title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
-            %                     leg = {'Pre'};
-            %                     for d = 1:length(labelGroupStarts)
-            %                         if d == length(labelGroupStarts)
-            %                             leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
-            %                         else
-            %                             leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
-            %                         end
-            %                     end
-            %                     leg{end+1} = 'Stim Window';
-            %                     %     leg{end+1} = 'EP_P';
-            %                     legend(leg, 'location', 'Southeast')
-            %
-            
-            %% added DJC 2-11-2016 to try and do quick stats
-            % start with negative surface deflection 10 -> 30
-            
-            
-            %                 figure
-            subplot(3,1,3)
-            prettybar(a1, label(keeps), colors, gcf);
-            set(gca, 'xtick', []);
-            ylabel('\DeltaEP_N (uV)');
-            
-            title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-            figure
-            [pCond,tblCond,statsCond] = kruskalwallis(a1',label(keeps));
-            %
-            %                     %                                         SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-            %                     %                                         SaveFig(OUTPUT_DIR, sprintf(['epSTATS-%s-%dFILT' suffix{typei}], sid, chan), 'png', '-r600');
-            %                     %               close
-            %                                  end
-            %                     %%
-            %                     %                 figure
-            %                     %                 %     subplot(2,2,1:2);
-            %                     %
-            %                     %                 % try subtracting the mean, other idea is to build two
-            %                     %                 % distributions from zscore
-            %                     %                 % 2-4-2016 - DJC post conversation with Miah
-            %                     %
-            %                     %
-            %                     %                 % original
-            %                     %                 %                 prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
-            %                     %
-            %                     %                 % try subtracting mean of baselines, DJC 2-4-2016, post
-            %                     %                 % convo with miah
-            %                     %
-            %                     %                 prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*mean(awins(:,baselines),2)), label(keeps), colors);
-            %                     %
-            %                     %                 % try zscore?
-            %                     %                 %                 prettyline(1e3*t((1e3*t)>10), zscore(1e6*awins((1e3*t)>10, keeps)), label(keeps), colors);
-            %                     %
-            %                     %                 %     ylim([-130 50]);
-            %                     %
-            %                     %                 %     ylim([-130 50]);
-            %                     %
-            %                     %                 % xlim modified by DJC 1-7-2016
-            %                     %
-            %                     %                 %                 xlim(1e3*[min(t) max(t)]);
-            %                     %                 xlim([-5 80]);
-            %                     %
-            %                     %
-            %                     %                 %     vline([6 20 40], 'k');
-            %                     %                 %     highlight(gca, [25 33], [], [.6 .6 .6])
-            %                     %                 %             highlight(gca, [0 4], [], [.3 .3 .3]);
-            %                     %                 %             vline(0.030*1e3);
-            %                     %                 %             vline(0.080*1e3);
-            %                     %                 yl = ylim;
-            %                     %                 yl(1) = min(-10, max(yl(1),-140));
-            %                     %                 yl(2) = max(10, min(yl(2),100));
-            %                     %                 ylim(yl);
-            %                     %
-            %                     %                 % 2-10-2016 zscore ylim
-            %                     %                 %                 ylim([-5 5])
-            %                     %
-            %                     %                 xlim([-5 80]);
-            %                     %                 highlight(gca, [0 t(ct)*1e3], [], [.8 .8 .8]) %this is the part that plots that stim window
-            %                     %                 vline(0);
-            %                     %
-            %                     %                 xlabel('time (ms)');
-            %                     %                 ylabel('ECoG (uV)');
-            %                     %                 %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-            %                     %                 title(sprintf('%s CCEPs for Channel %d, stimuli in %s ',sid,chan,suffix{typei}))
-            %                     %
-            %                     %                 %1-7-2016 - below is for d5cd55
-            %                     %                 %                 title(sprintf('%s CCEPs for Channel %d, stimuli on zero crossing ',sid,chan))
-            %                     %
-            %                     %                 leg = {'Pre'};
-            %                     %                 for d = 1:length(labelGroupStarts)
-            %                     %                     if d == length(labelGroupStarts)
-            %                     %                         leg{end+1} = sprintf('%d<=CT', labelGroupStarts(d));
-            %                     %                     else
-            %                     %                         leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
-            %                     %                     end
-            %                     %                 end
-            %                     %                 leg{end+1} = 'Stim Window';
-            %                     %                 %     leg{end+1} = 'EP_P';
-            %                     %                 legend(leg, 'location', 'Southeast')
-            %                     %
-            %                     %                 %% added DJC 2-11-2016 to try and do quick stats
-            %                     %                 a1 = 1e6*max(awins(t>0.010 & t < 0.040,keeps));
-            %                     %                 a1 = a1 - mean(a1(label(keeps)==0));
-            %                     %
-            %                     %                 figure
-            %                     %                 subplot(2,1,1)
-            %                     %                 prettybar(a1, label(keeps), colors, gcf);
-            %                     %                 set(gca, 'xtick', []);
-            %                     %                 ylabel('\DeltaEP_N (uV)');
-            %                     %                 [~,table] = anova1(dep_n', label(keeps), 'off');
-            %                     %                 title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-            %                     %
-            %                     %
-            %                     %                 pair = {};
-            %                     %                 p = [];
-            %                     %                 ulabels = unique(label);
-            %                     %                 for c = 2:length(ulabels)
-            %                     %                     [~,p(c-1)] = ttest2(dep_n(label(keeps)==0), dep_n(label(keeps)==ulabels(c)));
-            %                     %                     pair{c-1} = {1,c};
-            %                     %                 end
-            %                     %                 ylim([-12 15]);
-            %                     %
-            %                     %                 sigstar(pair, p);
-            %                     %
-            %                     %                 subplot(2,1,2);
-            %                     %                 prettybar(a1, label(keeps), colors, gcf);
-            %                     %                 set(gca, 'xtick', []);
-            %                     %                 ylabel('\DeltaEP_P (uV)');
-            %                     %                 [~,table] = anova1(a1', label(keeps), 'off');
-            %                     %                 title(sprintf('Change in EP_P by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-            %                     %
-            %                     %                 pair = {};
-            %                     %                 p = [];
-            %                     %                 ulabels = unique(label);
-            %                     %                 for c = 2:length(ulabels)
-            %                     %                     [~,p(c-1)] = ttest2(a1(label(keeps)==0), a1(label(keeps)==ulabels(c)));
-            %                     %                     pair{c-1} = {1,c};
-            %                     %                 end
-            %                     %                 ylim([-12 15]);
-            %                     %
-            %                     %                 sigstar(pair, p);
-            %                     %
-            %                     %                 %                                     dep_n = 1e6*min(awins(t>0.005 & t < 0.020, keeps));
-            %                     %                 %                                     dep_n = dep_n - mean(dep_n(label(keeps)==0));
-            %                     %                 %
-            %                     %                 %                                     dep_p = 1e6*max(awins(t>0.025 & t < 0.033, keeps));
-            %                     %                 %                                     dep_p = dep_p - mean(dep_p(label(keeps)==0));
-            %                     %                 %
-            %                     %                 %                                     subplot(2,2,3);
-            %                     %                 %                                     prettybar(dep_n, label(keeps), colors, gcf);
-            %                     %                 %                                     set(gca, 'xtick', []);
-            %                     %                 %                                     ylabel('\DeltaEP_N (uV)');
-            %                     %                 %                                     [~,table] = anova1(dep_n', label(keeps), 'off');
-            %                     %                 %                                     title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-            %                     %                 %
-            %                     %                 %                                     pair = {};
-            %                     %                 %                                     p = [];
-            %                     %                 %                                     ulabels = unique(label);
-            %                     %                 %                                     for c = 2:length(ulabels)
-            %                     %                 %                                         [~,p(c-1)] = ttest2(dep_n(label(keeps)==0), dep_n(label(keeps)==ulabels(c)));
-            %                     %                 %                                         pair{c-1} = {1,c};
-            %                     %                 %                                     end
-            %                     %                 %                                     ylim([-12 15]);
-            %                     %                 %
-            %                     %                 %                                     sigstar(pair, p);
-            %                     %                 %
-            %                     %                 %                                     subplot(2,2,4);
-            %                     %                 %                                     prettybar(dep_p, label(keeps), colors, gcf);
-            %                     %                 %                                     set(gca, 'xtick', []);
-            %                     %                 %                                     ylabel('\DeltaEP_P (uV)');
-            %                     %                 %                                     [~,table] = anova1(dep_p', label(keeps), 'off');
-            %                     %                 %                                     title(sprintf('Change in EP_P by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-            %                     %                 %
-            %                     %                 %                                     pair = {};
-            %                     %                 %                                     p = [];
-            %                     %                 %                                     ulabels = unique(label);
-            %                     %                 %                                     for c = 2:length(ulabels)
-            %                     %                 %                                         [~,p(c-1)] = ttest2(dep_p(label(keeps)==0), dep_p(label(keeps)==ulabels(c)));
-            %                     %                 %                                         pair{c-1} = {1,c};
-            %                     %                 %                                     end
-            %                     %                 %                                     ylim([-12 15]);
-            %                     %                 %
-            %                     %                 %                                     sigstar(pair, p);
-            %
-            %                     %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-            %                     %                 SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
-            %
-            %                     %                 saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)), 'eps', '-r600');
-            %                     %                 saveas(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)),'eps','-r600');
-        end
-        if strcmp('ecb43e',sid)
-            sigChans{64} = [];
-        end
-    end
+    %     % modified by DJC 2-21-2016 to set figure to be the full size of the window
+    %     %
+    %     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
+    %
+    %     % presamp originally set to 0.020
+    %     preSamp = round(0.020 * fs);
+    %     postSamp = round(0.100 * fs);
+    %
+    %     utype = unique(ttype); %ttype is the trigger type, reports different unique types
+    %
+    %     cts = stims(3,:)==1; % Stims that are conditioning stimuli
+    %
+    %     dat = squeeze(getEpochSignal(beta', stims(2, cts)-preSamp, stims(2, cts)+postSamp+1)); %getting segments of beta signals
+    %     rdat = squeeze(getEpochSignal(raw', stims(2, cts)-preSamp, stims(2, cts)+postSamp+1)); %getting segments of raw ECoG signals
+    %
+    %     % first eliminate those where storage was incorrect:
+    %     % bads = sum(rdat==0,1)>10;
+    %
+    %     % dat(:, bads) = [];
+    %     % rdat(:,bads) = [];
+    %
+    %     bdat = rdat - repmat(mean(rdat(1:100,:)), size(rdat, 1), 1);
+    %
+    %     t = (-preSamp:postSamp) / fs;
+    %
+    %     stimtypes = stims(8, cts);
+    %
+    %     for idx = 1:length(utype)
+    %         mtype = utype(idx);
+    %         subplot(length(utype),2,2*(idx-1)+1);
+    %
+    %         mdat = squeeze(dat(:, stimtypes==mtype));
+    %         badmoment = diff(mdat,1,1)==0;
+    %         badmoment = cat(1, false(1, size(badmoment, 2)), badmoment);
+    %         mdat(badmoment) = NaN;
+    %         %     bads = mean(diff(mdat,1,1)==0) > 0.05;
+    %         plot(1e3*t, 1e6*mdat(:,1:10:end)','color', [0.5 0.5 0.5]);
+    %         hold on;
+    %
+    %         plot(1e3*t, 1e6*nanmean(squeeze(mdat),2), 'r', 'linew', 2);
+    %         xlabel('Time (msec)');
+    %         ylabel('Trigger signal (uV)');
+    %         title(sprintf('average \\beta trigger; cond type = %d', mtype));
+    %         xlim([min(1e3*t) max(1e3*t)]);
+    %
+    %         %     ylim([-120 120]);
+    %         vline(0, 'k:');
+    %
+    %         subplot(length(utype),2,2*(idx-1)+2);
+    %         mrdat = squeeze(rdat(:, stimtypes==mtype));
+    %         plot(1e3*t, 1e6*mrdat(:,1:10:end)','color', [0.5 0.5 0.5]);
+    %         hold on;
+    %
+    %         plot(1e3*t, 1e6*mean(squeeze(mrdat),2), 'r', 'linew', 2);
+    %         xlabel('Time (msec)');
+    %         ylabel('Trigger signal (uV)');
+    %         title(sprintf('average raw response; cond type = %d', mtype));
+    %         xlim([min(1e3*t) max(1e3*t)]);
+    %         ylim([-120 120]);
+    %         vline(0, 'k:');
+    %
+    %
+    %     end
+    %
+    %     % SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'eps', '-r600'); % changed OUTPUT_DIR to allow figure to save
+    %     % SaveFig(OUTPUT_DIR, sprintf('trigger-%s', sid), 'png', '-r600');
+    %
+    %     % %%
+    %     % figure
+    %     % for c = 1:1000
+    %     %     plot(t, dat(:,1, c));
+    %     %     pause
+    %     % end
+    %     %
+    %     %
+    %     % %%
+    %     % res = [];
+    %     %
+    %     % for e = 1:4431
+    %     % %     res(e) = any(find(diff(dat(:,1,e)) > 1e-6));
+    %     %     res(e) = rdat(find(t>0,1,'first'),1,e)==0;
+    %     %
+    %     % end
+    %     % %%
+    %     % figure
+    %     % for c = find(res)
+    %     %     plot(t, rdat(:,1,c));
+    %     %     pause
+    %     % end
+    %
+    %     %     %% TEMP
+    %     %     figure
+    %     %     hist = find(mode ~= 0 & smon ~= 0);
+    %     %     X = getEpochSignal(beta', hist-round(fs*0.1), hist+round(fs*.1));
+    %     %     t= round(-fs*.1):round(fs*.1);
+    %     %     t(end) = [];
+    %     %     plot(t/fs, squeeze(X))
+    %     %     vline(0)
+    %     %     vline(-390/fs, 'k:')
+    %     %     hold all
+    %     %     plot(t/fs, mean(squeeze(X)'), 'k', 'linew', 3);
+    %     %
+    %     %
+    %     %
+    %
+  
     
 end
-%     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
+%%
+if strcmp(sid,'0b5a2e')
+   sid = '0b5a2e_mod'
+elseif strcmp(sid,'ecb43e')
+    sid = 'ecb43e_mod'
+end
+save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery.mat']), 'sid','t','r_square','r_square_acaus','r_square_caus','r_square_neg_acaus','r_square_pos',...
+    'r_square_pos_acaus','r_square_pos_caus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
+    'phase_at_0_pos_caus','fitline_pos_caus','phase_at_0_neg_caus','fitline_neg_caus',...
+    'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
+    'phase_at_0','r_square','fitline','phase_at_0_caus','r_square_caus','fitline_caus','phase_at_0_acaus','r_square_acaus','fitline_acaus');
 %     close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
-

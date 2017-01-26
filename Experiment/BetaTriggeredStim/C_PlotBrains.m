@@ -1,12 +1,13 @@
 %% Constants
 % modified by DJC 1-10-2016 
+clear all;close all;clc
 Z_Constants;
 addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(8);
 
-for idx = 1:length(SIDS) 
+%for idx = 1:length(SIDS) 
+    idx = 8;
     subjid = SIDS{idx};
     switch(subjid)
         case '8adc5c'
@@ -43,25 +44,33 @@ for idx = 1:length(SIDS)
     
     load(fullfile(getSubjDir(subjid), 'trodes.mat'));
     
+    clims = [-1 1];
+   % w = zeros(size(Grid, 1), 1);
     
-    w = zeros(size(Grid, 1), 1);
-    
-    w(stims) = -1;
-    w(beta) = 1;
+  %  w(stims) = -1;
+   % w(beta) = 1;
     
     figure
     
-    % original plot
-    %PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
+%     % original plot
+  %  PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, 'recon_colormap', 1:size(Grid, 1), true);
 
-    % to just plot white labels 
-    map = [1 1 0; 0 0 0; 1 0 1];
-PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 10, map,[],[]);
-colormap('flag')
+%     % to just plot white labels 
+    %map = [1 1 0; 0 0 0; 1 0 1];
+% PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), [-1 1], 10, map,[],[]);
+% colormap('flag')
 
+% DJC - 1-17-2017 - plot brain with white numbers
+%map = [1 1 1];
+    map = [1 1 1; 1 1 1; 1 1 1];
 
-    %     SaveFig(OUTPUT_DIR, ['coverage-' subjid], 'png', '-r300');
-end
+    w = zeros(size(Grid, 1), 1);
+    clims = [-1 1];
+PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 15, map, 1:size(Grid, 1), true);
+
+%%
+
+%SaveFig(OUTPUT_DIR, ['coverage-' subjid], 'eps', '-r600');
 
 % stims = [55 56];
 % beta = [64];

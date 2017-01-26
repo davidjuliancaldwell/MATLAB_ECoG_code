@@ -5,7 +5,7 @@ load(fullfile(getSubjDir(subjid),'trodes.mat'))
 
 PlotCortex(subjid,determineHemisphereOfCoverage(subjid))
 % get electrode locations
-locs = Grid;
+locs = AllTrodes;
 % take labeling from plot dots direc
 % plot cortex too
 figure

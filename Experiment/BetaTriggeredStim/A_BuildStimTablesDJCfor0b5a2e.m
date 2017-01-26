@@ -12,7 +12,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % 5/24/2016 - DJC add 0a80cf
 
 % select the subject from list
-sid = SIDS{11};
+sid = SIDS{8};
 
 if (strcmp(sid, '8adc5c'))
     tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');
@@ -523,7 +523,7 @@ end
 
 %% save the result to intermediate file for future use
 % added mod
-save(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
+%save(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
 
 %% testing
 %
