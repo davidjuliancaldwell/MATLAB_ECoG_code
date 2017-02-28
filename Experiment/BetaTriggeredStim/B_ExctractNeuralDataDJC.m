@@ -13,7 +13,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % SIDS = SIDS(2:end);
 %SIDS = SIDS(2);
 
-for idx = 2:length(SIDS)-3
+for idx = 6:length(SIDS)-5
     sid = SIDS{idx};
     %DJC edited 7/20/2015 to fix tp paths
     switch(sid)
@@ -145,7 +145,7 @@ for idx = 2:length(SIDS)-3
     
     load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
     % below is for modified burst tables
-    %         load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
+      %       load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
     
     % below is for EXTRA modified burst table of d5cd55, leaving out the
     % ones that miah and jared said 2-22-2016
@@ -354,7 +354,7 @@ for idx = 2:length(SIDS)-3
             
             % JUST TRY NOTCH AT 60 120 180 240
             %2-26-2016 - my attempt for ecb43e
-%             eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
+            eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
         end
         
         %% process triggers
@@ -800,7 +800,7 @@ for idx = 2:length(SIDS)-3
         end
         
     end
-    save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
+%     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
     close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
     
 end

@@ -16,7 +16,7 @@ addpath ./scripts;
 % chans = [64 63 48];
 
 sid = SIDS{3};
-tp = 'd:\research\subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
 block = 'BetaPhase-16';
 trig = [4];
 bads = 57;

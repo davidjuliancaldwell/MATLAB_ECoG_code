@@ -1,20 +1,24 @@
-function [] = burst_timing(bursts)
+function [] = burst_timing(sid,bursts,doStats)
 % modified DJC to look at number of ones
 
+if (~exist('doStats','var'))
+    doStats = false; 
+end
 efs = 1.2207e4;
 fs = 2.4414e4;
 
 figure
-
-sid = '0b5a2e';
 
 suffix = cell(1,3);
 suffix{1} = 'Negative phase of Beta';
 suffix{2} = 'Positive phase of Beta';
 suffix{3} = 'Null Condition';
 
-for n = 0:2
-    ax(n+1) = subplot(3,1,n+1);
+n_max = unique(bursts(5,:));
+max_subs = length(n_max);
+
+for n = n_max
+    ax(n+1) = subplot(max_subs,1,n+1);
     
     burstsM = bursts(:,bursts(5,:)==n);
     beginnings = [burstsM(2,:) 0];
@@ -47,18 +51,19 @@ ylabel('Total')
 subtitle(sprintf('%s - Histogram of length of bursts',sid))
 
 
-numConds = 3;
-pNew = 0.05/numConds;
-
-[pR,hR,statsR] = ranksum(binnedBurstsNeg,binnedBurstsPos,'alpha',pNew)
-[hK,pK,k2stat] = kstest2(binnedBurstsNeg,binnedBurstsPos,'alpha',pNew)
-
-[pR,hR,statsR] = ranksum(binnedBurstsNeg,binnedBurstsNull,'alpha',pNew)
-[hK,pK,k2stat] = kstest2(binnedBurstsNeg,binnedBurstsNull,'alpha',pNew)
-
-[pR,hR,statsR] = ranksum(binnedBurstsPos,binnedBurstsNull,'alpha',pNew)
-[hK,pK,k2stat] = kstest2(binnedBurstsPos,binnedBurstsNull,'alpha',pNew)
-
+if doStats
+    numConds = 3;
+    pNew = 0.05/numConds;
+    
+    [pR,hR,statsR] = ranksum(binnedBurstsNeg,binnedBurstsPos,'alpha',pNew)
+    [hK,pK,k2stat] = kstest2(binnedBurstsNeg,binnedBurstsPos,'alpha',pNew)
+    
+    [pR,hR,statsR] = ranksum(binnedBurstsNeg,binnedBurstsNull,'alpha',pNew)
+    [hK,pK,k2stat] = kstest2(binnedBurstsNeg,binnedBurstsNull,'alpha',pNew)
+    
+    [pR,hR,statsR] = ranksum(binnedBurstsPos,binnedBurstsNull,'alpha',pNew)
+    [hK,pK,k2stat] = kstest2(binnedBurstsPos,binnedBurstsNull,'alpha',pNew)
+end
 
 
 

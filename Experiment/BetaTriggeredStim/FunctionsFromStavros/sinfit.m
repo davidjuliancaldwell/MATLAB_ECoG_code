@@ -40,7 +40,7 @@ ph_sv = 0;
 T_sv = mean(TRANGE);
 
 f = fitoptions('method','NonlinearLeastSquares','Robust','On',...
-    'Lower',[amp_lu(1) ph_lu(1) T_lu(1)],'Upper',[amp_lu(2) ph_lu(2) T_lu(2)]);
+    'Lower',[amp_lu(1) ph_lu(1) T_lu(1)],'Upper',[amp_lu(2) ph_lu(2) T_lu(2)],'Display','off'); % DJC - turn off display
 
 st = [amp_sv ph_sv T_sv];
 set(f,'Startpoint',st);
