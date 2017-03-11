@@ -104,8 +104,8 @@ for idx = 1:length(SIDS)
             %                         chans = [23];
             %             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
             betaChan = 23;
-            goods = sort([12 13 14 15 16 20 21 23 31 32 39 40]);
-            % goods = [14 21 23 31];
+            %goods = sort([12 13 14 15 16 20 21 23 31 32 39 40]);
+             goods = [14 21 23 31];
             bads = [20 24 28];
             t_min = 0.008;
             t_max = 0.05;
@@ -225,7 +225,7 @@ for idx = 1:length(SIDS)
     % 4/7/2016 - Zscored data for anova
     ZscoredDataForAnova = {};
     chans = betaChan;
-    for chan = chans
+    for chan = goods
         
         %% load in ecog data for that channel
         fprintf('loading in ecog data for:\n',sid);
@@ -347,7 +347,7 @@ for idx = 1:length(SIDS)
         % you zscore normalize bad news bears
         %         postsamps = round(0.120 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
         
-        presamps = round(0.03*efs);
+        presamps = round(0.500*efs);
         postsamps = round(0.120*efs);
         
         ptis = round(stims(2,pts)/fac);
@@ -366,7 +366,7 @@ for idx = 1:length(SIDS)
         wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
         %     awins = adjustStims(wins);
         % normalize the windows to each other, using pre data
-        awins = wins-repmat(mean(wins(t<0,:),1), [size(wins, 1), 1]);
+        awins = wins-repmat(mean(wins(t<-0.005 & t>-0.05,:),1), [size(wins, 1), 1]);
         %         awins = wins;
         
         pstims = stims(:,pts);
@@ -891,6 +891,6 @@ for idx = 1:length(SIDS)
         
     end
 %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
-    close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
+    %close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
     %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsigShuffle.mat']), 'shuffleChans');
 end
