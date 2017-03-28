@@ -382,6 +382,8 @@ for idx = 6:length(SIDS)-5
         end
         
         % changing presamps - DJC - 2/24/2016
+        
+        % 3- 15 - 2017 - was 0.1 before, try 0.025 
         presamps = round(0.1*efs);
         postsamps = round(0.120*efs);
         
@@ -401,6 +403,7 @@ for idx = 6:length(SIDS)-5
         %     awins = adjustStims(wins);
         % normalize the windows to each other, using pre data
         awins = wins-repmat(mean(wins(t<0,:),1), [size(wins, 1), 1]);
+
         %         awins = wins;
         
         pstims = stims(:,pts);
