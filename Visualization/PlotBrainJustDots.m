@@ -3,7 +3,7 @@ function PlotBrainJustDots(subjid,chans)
 % plots brain, and just the channels of interest 
 load(fullfile(getSubjDir(subjid),'trodes.mat'))
 
-PlotCortex(subjid,determineHemisphereOfCoverage(subjid))
+%PlotCortex(subjid,determineHemisphereOfCoverage(subjid))
 % get electrode locations
 locs = AllTrodes;
 % take labeling from plot dots direc
