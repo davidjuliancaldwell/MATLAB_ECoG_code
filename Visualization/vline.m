@@ -99,7 +99,8 @@ else
     if g==0
     hold off
     end
-    set(h,'tag','vline','handlevisibility','off')
+    % DJC - changed handle vis to on 5/12/2017
+    set(h,'tag','vline','handlevisibility','on')
 end % else
 
 if nargout

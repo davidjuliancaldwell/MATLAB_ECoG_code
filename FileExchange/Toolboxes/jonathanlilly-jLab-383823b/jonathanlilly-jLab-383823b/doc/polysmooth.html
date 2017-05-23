@@ -1,0 +1,233 @@
+<html><head><meta http-equiv="Content-Style-Type" content="text/html; charset=UTF-8" />
+<style type="text/css" media="all"> @import "m2html.css";</style>
+<title>jLab Help Files</title></head><body>
+<div><h1>POLYSMOOTH is the <a href="jMap.html">jMap</a> module of <a href="jLab.html">jLab</a>.</h1></div><div class="fragment"><pre class="comment">
+ <a href="polysmooth.html">POLYSMOOTH</a>  Smoothing scattered 2D data with local polynomial fitting.
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a> generates a map from scattered data in two dimensions---
+    either on the plane or on the sphere---using a local least squares fit 
+    to a polynomial. 
+ 
+    A numerically efficient algorithm is used that avoids explicit loops. 
+    Also, the data are pre-sorted so that different mapping parameters can 
+    be tried out at little computational expense.
+ 
+    A reference paper for this function is currently in preparation.  In 
+    the meantime, for more details see the following book:
+ 
+       Fan and Gijbels, 1996.  Local polynomial modelling and its 
+           applications. Chapman and Hall.
+    __________________________________________________________________
+ 
+    Smoothing on the plane
+ 
+    Let's say we have an array Z of data is at locations X,Y, where X,Y, 
+    and Z are all arrays of the same size.  The problem is to obtain a 
+    mapped field ZHAT on some regular grid specified by arrays XO and YO.
+ 
+    Calling <a href="polysmooth.html">POLYSMOOTH</a> is a two-step process: 
+ 
+        [DS,XS,YS,ZS]=<a href="twodsort.html">TWODSORT</a>(X,Y,Z,XO,YO,CUTOFF);
+        ZHAT=<a href="polysmooth.html">POLYSMOOTH</a>(DS,XS,YS,ZS,B,P);
+ 
+    Firstly, <a href="twodsort.html">TWODSORT</a> which returns ZS, a 3D array of data values at each 
+    grid point, sorted by increasing distance DS, and the corresponding 
+    positions XS and YS. Here XO and YO are arrays specifying the bin 
+    center locations of the grid.  See <a href="twodsort.html">TWODSORT</a> for more details.
+   
+    Here CUTOFF determines the maximum distance included in the sorting 
+    and should be chosen to be greater than B.  
+ 
+    Secondly, <a href="polysmooth.html">POLYSMOOTH</a> fits a Pth order polynomial at each gridpoint 
+    within a neighborhood specified by the "bandwidth" B.  
+ 
+    Data and grid point locations are presumed to have the same units as
+    the bandwidth B (e.g., kilometers).
+ 
+    P may be chosen as P=0 (fit to a constant), P=1 (fit to a plane), or
+    else P=2 (fit to a parabolic surface).  
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a> can also be used for data on the sphere, as described next.
+    __________________________________________________________________
+ 
+    Smoothing on the sphere
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a> supports a local polynomial fit on the sphere.  As before 
+    this is a two-step process:
+ 
+        [DS,XS,YS,ZS]=<a href="spheresort.html">SPHERESORT</a>(LAT,LON,Z,LATO,LONO,CUTOFF);
+        ZHAT=<a href="polysmooth.html">POLYSMOOTH</a>(DS,XS,YS,ZS,B,P,'sphere') 
+ 
+    Firstly one calls <a href="spheresort.html">SPHERESORT</a>, which is the analogue of <a href="twodsort.html">TWODSORT</a> for the 
+    sphere.  LATO and LONO are arrays specifying the bin center locations 
+    of the grid.  See <a href="spheresort.html">SPHERESORT</a> for more details.
+ 
+    Secondly, <a href="polysmooth.html">POLYSMOOTH</a> fits a Pth order polynomial at each gridpoint 
+    within a neighborhood specified by the "bandwidth" B.  The bandwidth 
+    here should have units of kilometers. 
+ 
+    Note that <a href="spheresort.html">SPHERESORT</a> and <a href="polysmooth.html">POLYSMOOTH</a> both assume the sphere to be the 
+    radius of the earth, as specified by the function <a href="radearth.html">RADEARTH</a>.
+    __________________________________________________________________
+ 
+    Multiple bandwidths
+ 
+    Note that the bandwidth B may be an array, in which case ZHAT, as well
+    as the other output fields described below, will have LENGTH(B) 'pages'
+    along their third dimensions.
+ 
+    This can result in a significant speed improvement compared with 
+    calling <a href="polysmooth.html">POLYSMOOTH</a> by looping over multiple bandwith values.  The 
+    reason is that <a href="polysmooth.html">POLYSMOOTH</a> performs a computationally expensive initial
+    sort to remove non-finite values from the grid.  In calling POLYSMOOTH
+    with an array-valued B, this sort only need to be performed one time.
+    __________________________________________________________________
+ 
+    Additional options
+    
+    A number of different options are possible, as descibed below.  These  
+    are specified with trailing string arguments, which can be given in any
+    order provided they are after the numeric arguments.
+    __________________________________________________________________
+ 
+    Weighting function
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a> weights the data points in the vicinity of each grid point
+    according to some decaying function of distance.
+ 
+    1) Parabolic weighting
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a>(...,'epa'), the default behavior, uses the Epanechnikov  
+    kernel --- a fancy name for a parabolic weighting function.  This  
+    function vanishes outside a radius of the bandwidth B.  
+ 
+    The Epanechnikov kernel has the numerical advantage that distances from 
+    far away points do not have to be computed, and is therefore preferred.
+ 
+    2) Gaussian weighting:
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a>(...,'gau') uses a Gaussian weighting function instead, again
+    vanishing outside of radius B, and with a standard deviation of B/3. 
+    That is, the points more than 3-sigma from the center are set to zero.
+    __________________________________________________________________
+ 
+    Additional output arguments
+ 
+    [ZHAT,R,N,C]=<a href="polysmooth.html">POLYSMOOTH</a>(...) returns the weighted average distance R of
+    all the data points used at each grid point, the number N of such data
+    points, and the condition number C.  All are the same size as ZHAT.
+ 
+    R is computed using the same weighting function as for the mapping. 
+    Large R values mean that a typical data point contribution was far from
+    the current grid point, indicated that ZHAT is potentially biased.   
+ 
+    For uniform data spacing with the Epanechnikov kernel, the weighted 
+    mean radius R is 0.533*B, while for the Gaussian kernel it is 0.410*B.
+ 
+    Small numbers N of enclosed data points means that little averaging was
+    involved, indicating that the values of ZHAT may be more subject to
+    variance, and/or less representative, than at points where N is large.
+ 
+    Note that R includes the effect of the additional weighting factor, if
+    input as described below, whereaas N does not.
+ 
+    The matrix condition number C is computed by COND.  At points where C
+    is large, the least squares solution may be unstable, and one should 
+    consider reverting to a lower-order solution.  Note that for zeroth-
+    order fit with P=0, the matrix condition number is equal to one. 
+    __________________________________________________________________
+ 
+    Estimated derivatives
+ 
+    As a part of the least squares problem, derivatives of order P and
+    lower are estimated as a part of the Pth-order fit. 
+ 
+    [ZHAT,R,N,C,ZX,ZY]=<a href="polysmooth.html">POLYSMOOTH</a>(...) with P>1 returns the estimated X and 
+    Y, or zonal and meridional, derivatives of Z. 
+ 
+    [ZHAT,R,N,C,ZX,ZY,ZXX,ZXY,ZYY]=<a href="polysmooth.html">POLYSMOOTH</a>(...) with P=2 similarly
+    returns the estimated second partial derivatives of Z.
+ 
+    Derivative fields are set to values of NaNs if they are not explicitly
+    computed, so for example, [ZHAT,R,N,C,ZX,ZY]=<a href="polysmooth.html">POLYSMOOTH</a>(...) with P=0 
+    will lead to ZX and ZY being arrays of NaNs of the same size as ZHAT.
+    __________________________________________________________________
+ 
+    Variable bandwidth
+ 
+    ZHAT=<a href="polysmooth.html">POLYSMOOTH</a>(...,N,P,'variable') uses the parameter N instead of a
+    fixed bandwidth.  The bandwidth now varies over the grid such that N
+    points fall within one bandwidth distance from every grid point.
+    
+    [ZHAT,R,B,C]=<a href="polysmooth.html">POLYSMOOTH</a>(...,N,P,'variable') returns as its third output 
+    argument the bandwidth B at each gridpoint rthat than the total number
+    of data points N.  All other output arguments are unchanged. 
+ 
+    The variable bandwidth algorithm can give good results when the data
+    spacing is highly uneven, particularly when used with a higher-order
+    (P=1 or P=2) fit.  
+ 
+    Derivative fields may also be output in this case, as described above.
+ 
+    When using the variable bandwidth method, be aware that the bandwidth
+    necessary to include N points may turn out to be larger than CUTOFF,
+    the maximum distance value given to <a href="twodsort.html">TWODSORT</a> or <a href="spheresort.html">SPHERESORT</a>.  
+    __________________________________________________________________
+ 
+    Weighted data points
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a> can incorporate an additional weighting factor on the data
+    points. Let W be an array of positive values the same size as the data 
+    array Z.  Each data point is then treated as if it were W data points.
+ 
+    To use weighted data points, call <a href="twodsort.html">TWODSORT</a> or <a href="spheresort.html">SPHERESORT</a> with W added:
+ 
+        [DS,XS,YS,ZS,WS]=<a href="twodsort.html">TWODSORT</a>(X,Y,Z,W,XO,YO,CUTOFF);           
+     or [DS,XS,YS,ZS,WS]=<a href="spheresort.html">SPHERESORT</a>(LAT,LON,Z,W,LATO,LONO,CUTOFF); 
+     
+    followed by    ZHAT=<a href="polysmooth.html">POLYSMOOTH</a>(DS,XS,YS,ZS,WS,B,P);
+             or    ZHAT=<a href="polysmooth.html">POLYSMOOTH</a>(DS,XS,YS,ZS,WS,B,P,'sphere');
+ 
+    for data distributed on the plane or on the sphere, respectively.
+ 
+    For very large datasets, this may be useful in first condensing the 
+    data into a manageable size, or alternatively it may be used to weight
+    observations according to a measure of their presumed quality.
+    __________________________________________________________________
+ 
+    Algorithms 
+ 
+    <a href="polysmooth.html">POLYSMOOTH</a> has several algorithm choices for optimal performance, both  
+    of which give identical answers.
+ 
+    1) Speed optimization
+ 
+    The default algorithm is optimized for speed but uses a great deal of 
+    memory.  It solves the least squares problem for all grid points
+    simultaneously (by directly solving matrix inversions---see <a href="matinv.html">MATINV</a>.)
+ 
+    This can be greater than an order of magnitude faster than the obvious 
+    approach of looping over the grid points.
+  
+    2) Memory optimization
+ 
+    ZHAT=<a href="polysmooth.html">POLYSMOOTH</a>(DS,XS,YS,ZS,B,P,'memory') performs an explicit loop. 
+    This is mostly used for testing, purposes, but may also be useful if
+    the dataset is so large that memory becomes a limiting factor.
+    __________________________________________________________________
+ 
+    '<a href="polysmooth.html">polysmooth</a> --t' runs some tests.
+    '<a href="polysmooth.html">polysmooth</a> --f' generates some sample figures.
+    '<a href="polysmooth.html">polysmooth</a> --f2' with jData installed generates the figure shown
+        above, which may require a relatively powerful computer.
+ 
+    Usage:  [ds,xs,ys,zs]=<a href="twodsort.html">twodsort</a>(x,y,z,xo,yo,cutoff);  
+            zhat=<a href="polysmooth.html">polysmooth</a>(ds,xs,ys,zs,b,p);
+            [zhat,R,N,C]=<a href="polysmooth.html">polysmooth</a>(ds,xs,ys,zs,b,p);
+    --or--
+            [ds,xs,ys,zs]=<a href="spheresort.html">spheresort</a>(lat,lon,z,w,lato,lono,cutoff); 
+            [zhat,R,N,C]=<a href="polysmooth.html">polysmooth</a>(ds,xs,ys,zs,b,p,'sphere');
+    __________________________________________________________________
+    This is part of <a href="jLab.html">JLAB</a> --- type 'help jlab' for more information
+    (C) 2008--2017 J.M. Lilly --- type 'help <a href="jlab_license.html">jlab_license</a>' for details
+</pre></div><h2><a href="jLab.html">contents</a>  |  <a href="jlab_allhelp.html">allhelp</a>  |  <a href="jlab_index.html">index</a></h2></body></html>

@@ -3,7 +3,7 @@ function SaveFig(path,filename,filetype,opt)
 % saved
 % filename - the name of the file to be saved
 % fileType - the type of file to be saved, valid options are png and eps
-
+% DJC - 5-22-2017 - add in SVG
 if(~exist('filetype','var'))
     filetype = 'png';
 end
@@ -38,23 +38,28 @@ set(gcf,'PaperPositionMode','auto'); %generally want to do this anyway
 
 % for fileType = fileTypes
 %     fileType = fileType{:};
-    if (exist('opt','var') && ~isempty(opt))
-        switch (filetype)
-            case 'jpg'
-                print('-djpeg', '-noui','-cmyk', '-painters',[destFile filetype],opt);
-            case 'png'
-                print('-dpng', '-noui', '-painters',[destFile filetype],opt);
-            case 'eps'
-                print('-dpsc2', '-noui', '-painters',[destFile filetype],opt);
-        end
-    else
-        switch (filetype)
-            case 'jpg'
-                print('-djpeg', '-noui','-cmyk', '-painters',[destFile filetype]);
-            case 'png'
-                print('-dpng', '-noui', '-painters',[destFile filetype]);
-            case 'eps'
-                print('-dpsc2', '-noui', '-painters',[destFile filetype]);            
-        end
+if (exist('opt','var') && ~isempty(opt))
+    switch (filetype)
+        case 'jpg'
+            print('-djpeg', '-noui','-cmyk', '-painters',[destFile filetype],opt);
+        case 'png'
+            print('-dpng', '-noui', '-painters',[destFile filetype],opt);
+        case 'eps'
+            print('-dpsc2', '-noui', '-painters',[destFile filetype],opt);
+        case 'svg'
+            print('-dsvg','-noui', '-painters',[destFile filetype],opt);
     end
+else
+    switch (filetype)
+        case 'jpg'
+            print('-djpeg', '-noui','-cmyk', '-painters',[destFile filetype]);
+        case 'png'
+            print('-dpng', '-noui', '-painters',[destFile filetype]);
+        case 'eps'
+            print('-dpsc2', '-noui', '-painters',[destFile filetype]);
+        case 'svg'
+            print('-dsvg','-noui', '-painters',[destFile filetype],opt);
+            
+    end
+end
 % end

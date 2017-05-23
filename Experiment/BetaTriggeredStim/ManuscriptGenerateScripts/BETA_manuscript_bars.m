@@ -299,7 +299,7 @@ for i = 1:length(mM)
     ax = gca;
 
     if j ==2
-        text(i+0.25,min(mM(:,1))-13,sprintf([num2str(floor(i/4)+1)]),'fontsize',14)
+        text(i+0.25,min(mM(:,1))-6,sprintf([num2str(floor(i/4)+1)]),'fontsize',14)
         
     end
     

@@ -212,7 +212,7 @@ for idx = 1:length(SIDS)
     
     
     
-    figure
+    %figure
     %% process each ecog channel individually
     
     sigChans = {};
@@ -706,50 +706,52 @@ for idx = 1:length(SIDS)
                 
                 ZscoredDataForAnova{chan}{typei} = {zI label keeps magI latencyIms};
                 %% trying stavros method
-                                %%
-                                % need to do for each type
-                                CCEPbyNumStim = {};
-                                for i = 1:length(ulabels)-1
-                                    Nperm = 1000;
-                                    sp = 95;
-                                    
-                                     t_minS = 0.005;
-                                t_maxS = 0.040;
-                                
-                                    extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
-                                    extractedSigsBase = extractedSigs(:,label(keeps)==0);
-                                    extractedSigsTest = extractedSigs(:,label(keeps)==i);
-                                    tExtract = t(t>t_minS & t<t_maxS);
-                                    figure
-                                    plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
-                                    hold on
-                                    plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
-                                    plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
-                
-                
-                                    [CI_lo, CI_hi, sgc] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
-                
-                                    hold on
-                                    bar(tExtract,100*sgc,'linewidth',[2])
-                                    % from mathworks to find continuous segment that was at
-                                    % least 3 ms long?
-                
-                                    tSearch = diff([false;sgc==1;false]);
-                                    p = find(tSearch==1);
-                                    q = find(tSearch==-1);
-                                    [maxlen,ix] = max(q-p);
-                                    firstSearch = p(ix);
-                                    lastSearch = q(ix)-1;
-                
-                                    CCEPmed = median(extractedSigs(:,klabel==i),2);
-                                    [minval,inx] = min(CCEPmed);
-                                    % account for case if it's at inx = 1
-                                    if inx == 1
-                                        inx = inx +1;
-                                    end
-                                    CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
-                                    CCEPbyNumStim{i} = CCEPmed;
-                                end
+                shuffleSig = 0;
+                if shuffleSig
+                    % need to do for each type
+                    CCEPbyNumStim = {};
+                    for i = 1:length(ulabels)-1
+                        Nperm = 1000;
+                        sp = 95;
+                        
+                        t_minS = 0.005;
+                        t_maxS = 0.040;
+                        
+                        extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
+                        extractedSigsBase = extractedSigs(:,label(keeps)==0);
+                        extractedSigsTest = extractedSigs(:,label(keeps)==i);
+                        tExtract = t(t>t_minS & t<t_maxS);
+                        figure
+                        plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
+                        hold on
+                        plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
+                        plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
+                        
+                        
+                        [CI_lo, CI_hi, sgc] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
+                        
+                        hold on
+                        bar(tExtract,100*sgc,'linewidth',[2])
+                        % from mathworks to find continuous segment that was at
+                        % least 3 ms long?
+                        
+                        tSearch = diff([false;sgc==1;false]);
+                        p = find(tSearch==1);
+                        q = find(tSearch==-1);
+                        [maxlen,ix] = max(q-p);
+                        firstSearch = p(ix);
+                        lastSearch = q(ix)-1;
+                        
+                        CCEPmed = median(extractedSigs(:,klabel==i),2);
+                        [minval,inx] = min(CCEPmed);
+                        % account for case if it's at inx = 1
+                        if inx == 1
+                            inx = inx +1;
+                        end
+                        CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
+                        CCEPbyNumStim{i} = CCEPmed;
+                    end
+                end
                 %%
                 %                 if anova < 0.05
                 figure

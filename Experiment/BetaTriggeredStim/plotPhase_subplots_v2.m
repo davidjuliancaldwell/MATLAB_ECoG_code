@@ -7,7 +7,7 @@
 %positive
 %%
 close all;clear all;clc
-baseDir = 'C:\Users\djcald\Data\Output\BetaTriggeredStim\PhaseOfDelivery';
+baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseOfDelivery';
 filePath = promptForBCI2000Recording(baseDir);
 load(filePath)
 

@@ -1,0 +1,85 @@
+<html><head><meta http-equiv="Content-Style-Type" content="text/html; charset=UTF-8" />
+<style type="text/css" media="all"> @import "m2html.css";</style>
+<title>jLab Help Files</title></head><body>
+<div><h1>TRAJCHUNK is the <a href="jOceans.html">jOceans</a> module of <a href="jLab.html">jLab</a>.</h1></div><div class="fragment"><pre class="comment">
+ <a href="trajchunk.html">TRAJCHUNK</a>  Converts Lagrangian trajectories into chunks based on the Coriolis period.
+ 
+    <a href="trajchunk.html">TRAJCHUNK</a> is used to split float or drifter data into chuncks such that
+    the length of each chunk is a fixed multiple of the average Coriolis
+    frequency. This is useful in spectral analysis. 
+ 
+    [NUMO,LATO]=<a href="trajchunk.html">TRAJCHUNK</a>(NUM,LAT,P), where NUM and LAT are date number and
+    latitude for Lagangian float or drifter data, re-organizes these into 
+    chunks such that the average Coriolis frequency f_C in each chunk is at 
+    least P times the Rayleigh frequency f_R for that chunk.
+ 
+    Recall that the Rayleigh frequency is f_R=2*pi/(DT*N), in units of 
+    radians per unit time, where DT is the sample interval and N is the
+    number of samples.
+ 
+    The input fields NUM and LAT may either be numerical arrays, or 
+    cell arrays of numerical arrays, e.g. NUM{1}=NUM1, NUM{2}=NUM2, etc.
+ 
+    The output variables NUM and LAT are now cell arrays of numerical
+    arrays, with each cell is truncated such that its length is just long
+    enough such that f_C > P * f_R.  
+ 
+    Trajectories that are not long enough to satisfy this criterion are 
+    discarded, as are short residual segments at the end of trajectories.   
+ 
+    Each input trajectory is thus split into zero, one, or more than one
+    cells in the output variables.     
+ 
+    <a href="trajchunk.html">TRAJCHUNK</a>(...,P,LMIN) additionally specifies a mininum number of points
+    LMIN for each chunk.  
+    __________________________________________________________________
+ 
+    Multiple input arguments
+ 
+    [NUMO,LATO,Y1,Y2,...,YM]=<a href="trajchunk.html">TRAJCHUNK</a>(NUM,LAT,X1,X2,...XM,N) chunks the M
+    input arrays X1, X2,... XM in the same manner, and returns these as Y1,
+    Y2,... YM.  The input variables may either all be numerical arrays of 
+    all the same size, or cell arrays of numerical arrays. 
+ 
+    In the case of cell array input, some of the XM may be numerical arrays
+    of the same length as the cells NUM and LAT.  The corresponding output 
+    variable will then also be a numerical array.  An example of such a
+    field is the identification number used in FLOATS.MAT and DRIFTERS.MAT. 
+ 
+    <a href="trajchunk.html">TRAJCHUNK</a> with no output arguments overwrites the original named output
+    variables. 
+    __________________________________________________________________
+    
+    Keeping short data segments
+ 
+    By default, any data is cells shorter than the specified length are 
+    discarded, as are data segments at the end of the trajectories.  
+ 
+    <a href="trajchunk.html">TRAJCHUNK</a>(...,'keep') keeps these instead.  Short cells are returned in
+    their own chunks, and leftover segments are appended to the end of the 
+    preceding chunk.  
+ 
+    This preserves the number of data points, while favoring a requested 
+    length, if possible, from each trajectory. 
+    __________________________________________________________________
+    
+    Overlap
+ 
+    <a href="trajchunk.html">TRAJCHUNK</a>(...,'overlap',PCT) outputs chunks with a percentage PCT 
+    overlap.  For example, <a href="trajchunk.html">TRAJCHUNK</a>(...,'overlap',50) outputs chunks that 
+    overlap by 50%.  The default behavior gives chunks with no overlap.
+    __________________________________________________________________   
+ 
+    See also <a href="cellchunk.html">CELLCHUNK</a>.
+ 
+    '<a href="trajchunk.html">trajchunk</a> --t' runs a test.
+ 
+    Usage: [num,lat]=<a href="trajchunk.html">trajchunk</a>(num,lat,P);
+           [num,lat,lon,cv]=<a href="trajchunk.html">trajchunk</a>(num,lat,lon,cv,P);
+           [num,lat,lon,cv]=<a href="trajchunk.html">trajchunk</a>(num,lat,lon,cv,P,lmin);
+           [num,lat,lon,cv]=<a href="trajchunk.html">trajchunk</a>(num,lat,lon,cv,P,'overlap',50);
+           <a href="trajchunk.html">trajchunk</a>(num,lat,lon,cv,P);
+    __________________________________________________________________
+    This is part of <a href="jLab.html">JLAB</a> --- type 'help jlab' for more information
+    (C) 2014--2015 J.M. Lilly --- type 'help <a href="jlab_license.html">jlab_license</a>' for details
+</pre></div><h2><a href="jLab.html">contents</a>  |  <a href="jlab_allhelp.html">allhelp</a>  |  <a href="jlab_index.html">index</a></h2></body></html>

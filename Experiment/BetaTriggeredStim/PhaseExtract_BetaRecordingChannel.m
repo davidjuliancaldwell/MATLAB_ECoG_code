@@ -47,14 +47,19 @@ switch(sid)
         tank = TTank;
         tank.openTank(tp);
         tank.selectBlock(block);
+%         
+%         
+%         beta = tank.readWaveEvent('Blck', 1)';
+%         raw = tank.readWaveEvent('Blck', 2)';
+%         mode = tank.readWaveEvent('Wave', 2)';
+%         ttype = tank.readWaveEvent('Wave', 1)';
+
+% djc 5-10-2017 ? 
+         raw = tank.readWaveEvent('Wave', 2)';
+
+         beta = tank.readWaveEvent('Wave', 1)';
         
-        
-        beta = tank.readWaveEvent('Blck', 1)';
-        raw = tank.readWaveEvent('Blck', 2)';
-        mode = tank.readWaveEvent('Wave', 2)';
-        ttype = tank.readWaveEvent('Wave', 1)';
-        
-        ttype = 0*beta;
+         ttype = 0*beta;
         
         
         %     % these three lines will get rid of the large simuli at the beginning
@@ -195,6 +200,9 @@ switch(sid)
         raw = tank.readWaveEvent('Blck', 2)';
         mode = tank.readWaveEvent('Wave', 2)';
         ttype = tank.readWaveEvent('Wave', 1)';
+        
+        [smon, info] = tank.readWaveEvent('SMon', 2);
+
         
         
     case 'ecb43e' % added DJC 7-23-2015
@@ -394,11 +402,12 @@ if (strcmp(sid,'0b5a2ePlayback') | strcmp(sid,'0b5a2e'))
     %
     
 else
-    figure
-    
+    fig1 = figure;
+            fig2 = figure;
+
     % modified by DJC 2-21-2016 to set figure to be the full size of the window
     %
-    set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
+    %set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
     
     % presamp originally set to 0.020
     preSamp = round(0.050 * fs);
@@ -423,7 +432,9 @@ else
     
     stimtypes = stims(8, cts);
     
-    for idx = 1:length(utype)mtype = utype(idx);
+    for idx = 1:length(utype)
+        mtype = utype(idx);
+        figure(fig1)
         subplot(length(utype),2,2*(idx-1)+1);
         
         mdat = squeeze(dat(:, stimtypes==mtype));
@@ -450,40 +461,40 @@ else
         t_range = t_range.*fs;
         smooth_span = 1;
         
-        % do the fit on the mean signal
-                figure
-
-        sig_ave = nanmean(squeeze(mdat),2);
-        [pha_a,T_a,amp_a,rsquare_a,~] = sinfit(1e6*sig_ave,smooth_span,t_range);
-                f = 1/(T_a/fs);
-            a = amp_a.*sin(pha_a+(2*pi*t*f));
-            plot(t,a,t,1e6*sig_ave)
+%         % do the fit on the mean signal
+%                 figure
+% 
+%         sig_ave = nanmean(squeeze(mdat),2);
+%         [pha_a,T_a,amp_a,rsquare_a,~] = sinfit(1e6*sig_ave,smooth_span,t_range);
+%                 f = 1/(T_a/fs);
+%             a = amp_a.*sin(pha_a+(2*pi*t*f));
+%             plot(t,a,t,1e6*sig_ave)
+%         
+%         
+        %figure
+%         
+%         for i = 1:size(mdat,2)
+%             
+%             signal = mdat(:,i);
+%             % find contiguous stretch of nan
+%             
+%             %https://www.mathworks.com/matlabcentral/newsreader/view_thread/257862
+%             F = find(isnan([NaN,signal',NaN]));
+%             D = diff(F)-2;
+%             [M,L] = max(D);
+%             sigInterest = signal(F(L):F(L)+M); % The longest block
+%             tInterest = t(F(L):F(L)+M);
+%             [pha(i),T(i),amp(i),rsquare(i),~] = sinfit(sigInterest,smooth_span,t_range);
+%             
+%             f = 1/(T(i)/fs);
+%             a = amp(i).*sin(pha(i)+(2*pi*tInterest*f));
+%             plot(tInterest,a,tInterest,sigInterest)
+%             pause;
+%         end
+%         
+%         
         
-        
-        figure
-        
-        for i = 1:size(mdat,2)
-            
-            signal = mdat(:,i);
-            % find contiguous stretch of nan
-            
-            %https://www.mathworks.com/matlabcentral/newsreader/view_thread/257862
-            F = find(isnan([NaN,signal',NaN]));
-            D = diff(F)-2;
-            [M,L] = max(D);
-            sigInterest = signal(F(L):F(L)+M); % The longest block
-            tInterest = t(F(L):F(L)+M);
-            [pha(i),T(i),amp(i),rsquare(i),~] = sinfit(sigInterest,smooth_span,t_range);
-            
-            f = 1/(T(i)/fs);
-            a = amp(i).*sin(pha(i)+(2*pi*tInterest*f));
-            plot(tInterest,a,tInterest,sigInterest)
-            pause;
-        end
-        
-        
-        
-        
+        figure(fig1)
         subplot(length(utype),2,2*(idx-1)+2);
         mrdat = squeeze(rdat(:, stimtypes==mtype));
         plot(1e3*t, 1e6*mrdat(:,1:10:end)','color', [0.5 0.5 0.5]);
@@ -497,6 +508,12 @@ else
         ylim([-120 120]);
         vline(0, 'k:');
         
+        figure(fig2)
+        plot(nanmean(mdat,2))
+        hold on
+        plot(mean(mrdat,2));
+        ylim([-10e-5 10e-5])
+%         
         
     end
     
@@ -526,3 +543,4 @@ else
     %     pause
     % end
 end
+
