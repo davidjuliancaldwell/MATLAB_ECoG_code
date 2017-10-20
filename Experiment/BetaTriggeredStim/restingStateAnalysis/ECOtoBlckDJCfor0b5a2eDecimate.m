@@ -9,12 +9,11 @@
 %% Constants
 clear all
 close all
-cd 'C:\Users\David\Desktop\Research\RaoLab\MATLAB\Code\Experiment\BetaTriggeredStim'
 Z_ConstantsRest;
-addpath .\scripts\ %DJC edit 7/17/2015
+subj = getenv('subject_dir');
 
 %% load in the converted Data file of interest - here is POST stim
-sid = SIDS{6}; %sid 8 is 0b5a2e
+sid = SIDS{7}; %sid 8 is 0b5a2e
 chans = 1:64;
 
 % downsampling rate
@@ -22,7 +21,7 @@ n = 12;
 switch(sid)
     case '0b5a2e'
         % sid = SIDS{1};
-        tp = 'D:\Subjects\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim';
+        tp = [subj '\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim'];
         blockPre = 'BetaPhase-12'; % this is the PRE stim for 0b5a2e
         blockPost = 'BetaPhase-5';
         stims = [22 30];
@@ -30,7 +29,7 @@ switch(sid)
         chans = 1:64; % here we want to look at all of the channels to start
     case 'd5cd55'
         % sid = SIDS{2};
-        tp = 'D:\Subjects\d5cd55\data\D8\d5cd55_baseline';
+        tp = [subj '\d5cd55\data\D8\d5cd55_baseline'];
         blockPre = 'Block-47';
         blockPost = 'Block-51';
         stims = [54 62];
@@ -39,7 +38,7 @@ switch(sid)
         
     case 'c91479'
         % sid = SIDS{3};
-        tp = 'D:\Subjects\c91479\data\d7\c91479_BetaTriggeredStim';
+        tp = [subj '\c91479\data\d7\c91479_BetaTriggeredStim'];
         blockPre = 'BetaPhase-9';
         blockPost = 'BetaPhase-15';
         stims = [55 56];
@@ -48,7 +47,7 @@ switch(sid)
         
     case '7dbdec'
         % sid = SIDS{4};
-        tp = 'D:\Subjects\7dbdec\data\d7\7dbdec_BetaTriggeredStim';
+        tp = [subj '\7dbdec\data\d7\7dbdec_BetaTriggeredStim'];
         blockPre = 'BetaPhase-16';
         blockPost = 'BetaPhase-18';
         stims = [11 12];
@@ -57,7 +56,7 @@ switch(sid)
         
     case '9ab7ab'
         %             sid = SIDS{5};
-        tp = 'D:\Subjects\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim';
+        tp = [subj '\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim'];
         blockPre = 'BetaPhase-1';
         blockPost = 'BetaPhase-4';
         stims = [59 60];
@@ -66,7 +65,7 @@ switch(sid)
         
         % chans = 29;
     case '702d24'
-        tp = 'D:\Subjects\702d24\data\d7\702d24_BetaStim';
+        tp = [subj '\702d24\data\d7\702d24_BetaStim'];
         blockPre = 'BetaPhase-3';
         blockPost = 'BetaPhase-5';
         stims = [13 14];
@@ -78,6 +77,7 @@ end
 tank = TTank;
 tank.openTank(tp);
 tank.selectBlock(blockPost);
+%%
 
 for chan = chans
     
@@ -91,6 +91,7 @@ for chan = chans
     
     fs = efs/n;
     
+  
     ecoDown = decimate(eco,12);
     clear eco;
     % on first pass, initialize Blck which will have our data to be a zeros
@@ -104,9 +105,9 @@ for chan = chans
 end
 
 % save it to output directory
-save(fullfile(META_DIR, [sid '_postStimRestDecimated.mat']),'fs','Blck','-v7.3');
+%save(fullfile(META_DIR, [sid '_postStimRestDecimated_v2.mat']),'fs','Blck','-v7.3');
 
-
+%%
 % DO the same for PRE stim state of 8 minutes
 % load in the converted Data file of interest
 clear Blck;
@@ -128,7 +129,13 @@ for chan = chans
     %         [eco, efs] = tdt_loadStream(tp, block, ev, achan);
     [eco, info] = tank.readWaveEvent(ev, achan);
     efs = info.SamplingRateHz;
-    eco = eco(732420:end);
+    
+   if strcmp(sid,'0b5a2e')
+          eco = eco(732420:end); % 9-28-2017 , looks to be for 0b5a2e 
+       eco_1 = eco(1:3782063);
+       eco_2 = eco(3895522:end);
+      eco = [eco_1; eco_2];
+   end
     ecoDown = decimate(eco,n);
     clear eco;
     
@@ -144,7 +151,7 @@ for chan = chans
 end
 
 % save it to output directory
-save(fullfile(META_DIR, [sid '_preStimRestDecimated.mat']),'fs', 'Blck','-v7.3');
+save(fullfile(META_DIR, [sid '_preStimRestDecimated_v2.mat']),'fs', 'Blck','-v7.3');
 
 %% load in post stim
 

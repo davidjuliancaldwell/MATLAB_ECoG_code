@@ -7,8 +7,8 @@ Z_Constants;
 addpath ./scripts;
 
 %% parameters
-SIDS = SIDS(1);
-
+SIDS = SIDS(7);
+%%
 for idx = 1:length(SIDS)
     subjid = SIDS{idx};
     switch(subjid)
@@ -65,9 +65,11 @@ for idx = 1:length(SIDS)
             w(i) = min(sigChans{i}{1}{3});
         end
     end
-    %     w = zeros(size(Grid,1),1);
-    %     w(stims) = -1;
-    %     w(beta) = 1;
+    
+    % DJC -10-18-2017 - do this to do different colors of just dots 
+        w = zeros(size(Grid,1),1);
+        w(stims) = -1;
+        w(beta) = 0;
     
     
     if strcmp(subjid,'c91479')

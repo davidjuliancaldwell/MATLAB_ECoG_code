@@ -3,10 +3,9 @@
 % input of about 15 Hz, set RMS,
 % ECO1.data(:,1) has the raw input signal
 % Wave.data(:,4) has the beta signal
-
+close all;clear all;clc
 load('C:\Users\djcald.CSENETID\GoogleDrive\BetaStim-1_dummySig.mat')
 %%
-figure
 a = ECO1.data(:,1);
 figure
 fs1 = ECO1.info.SamplingRateHz;
@@ -20,7 +19,6 @@ figure
 plot(b)
 c = [0; decimate(b,2)]; % decimate because it's stored at double the rate of Eco
 
-figure
 plot(t1,a)
 hold on
 plot(t1,c)
@@ -42,12 +40,16 @@ plot(c)
 vline([timeStamps])
 xlabel('samples')
 
+%% find peaks 8-9-2017 
+
+[max,ind] = findpeaks(a,fs1,'minpeakdistance',0.04,'minpeakheight',0);
+[max_2,ind_2] = findpeaks(c,fs1,'minpeakdistance',0.04,'minpeakheight',0);
+
 
 %%
 clear all
 load('C:\Users\djcald.CSENETID\GoogleDrive\BetaStim-2_dummySig.mat')
 %%
-figure
 a = ECO1.data(:,1);
 figure
 plot(a)
@@ -77,6 +79,18 @@ title('Operation of Real Time Filtering with Stimulation Blanking')
 fig1.Position = [447.6667 786.3333 1408 420];
 xlim([1.0e5*0.9590 1.0e5*1.0268]);
 ylim([-0.09 0.09]);
+
+%% find peaks 8-9-2017 
+
+[max,ind] = findpeaks(a,fs1,'minpeakdistance',0.04,'minpeakheight',0);
+[max_2,ind_2] = findpeaks(c,fs1,'minpeakdistance',0.04,'minpeakheight',0);
+
+
+inds_raw = ind(ind> 0.025 & ind < 142.5);
+inds_filt = ind_2(ind_2> 0.025 & ind_2 < 142.5);
+
+
+
 %%
 
 % figure

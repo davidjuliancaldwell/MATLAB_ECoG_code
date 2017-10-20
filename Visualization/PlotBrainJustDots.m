@@ -16,4 +16,12 @@ logicalMat(chans) = 1;
 logicIndex = logical(logicalMat);
 h = scatter3(locs(logicIndex,1),locs(logicIndex,2),locs(logicIndex,3),100,[0,0,0],'filled');
 
+% DJC - 10-18-2017 - for perfect pitch slide 
+% chans = [22 30];
+% logicalMat = zeros(size(locs,1),1);
+% logicalMat(chans) = 1;
+% logicIndex = logical(logicalMat);
+% h = scatter3(locs(logicIndex,1),locs(logicIndex,2),locs(logicIndex,3),100,[1,1,0],'filled');
+
+
 end

@@ -42,6 +42,8 @@ addpath ./scripts;
           
     end
     
+    %%
+    subjid = 'c19968'
     load(fullfile(getSubjDir(subjid), 'trodes.mat'));
     
     clims = [-1 1];

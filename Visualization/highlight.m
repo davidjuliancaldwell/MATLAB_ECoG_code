@@ -1,4 +1,4 @@
-function highlight(dataAxes, xSpan, ySpan, hColor)
+function a = highlight(dataAxes, xSpan, ySpan, hColor)
 % function highlight(dataAxes, xSpan, ySpan, hColor)
 %
 % changelog:
@@ -12,6 +12,7 @@ function highlight(dataAxes, xSpan, ySpan, hColor)
 % if empty)
 % hColor (optional) - either a string or rgb color value (defaults to red
 % if empty)
+% DJC - 10-6-2017 - added return of figure handle for highlight
 
     fig = get(dataAxes, 'Parent');
     

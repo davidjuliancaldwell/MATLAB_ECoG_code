@@ -64,7 +64,7 @@ xlabel('Time (ms)')
 subplot(1,2,2)
 
 average = 1e6*mean(kwins(:,klabel==labelChoice),2);
-plot(1e3*t,1e6*kwins(:,klabel==labelChoice),'Linewidth',[1])
+plot(1e3*t,1e6*kwins(:,klabel==labelChoice),'Linewidth',[2])
 hold on
 plot(1e3*t,average,'Linewidth',[6],'color','k')
 xlim(1e3*[-0.005 0.05])
