@@ -32,12 +32,21 @@ totalFig.Position = [   10.4097    3.4722   13.2708   10.4514];
 CT = cbrewer('qual','Accent',8);
 CT = flipud(CT);
 
-for idx=1:64
+p = numSubplots(size(signal,3));
+%min_c = squeeze(min(min(min(signal))));
+%max_c = squeeze(max(max(max(signal))));
+min_c = -3;
+max_c = 3;
+ cmap=flipud(cbrewer('div', 'RdBu', 13));
+ colormap(cmap)
+
+for idx=1:size(signal,3)
+    %smplot(p(1),p(2),idx,'axis','on')
     smplot(8,8,idx,'axis','on')
-    
+
     if average
         if ismember(idx,type1)
-            imagesc(1e3*t,f,signal(:,:,idx));
+            imagesc(1e3*t,f,zeros(size(signal(:,:,idx))));
             axis xy;
             title([num2str(idx)],'Color',CT(3,:))
             
@@ -65,31 +74,32 @@ for idx=1:64
         
     end
     
-    
+    caxis([min_c max_c])
     axis off
     axis tight
     %xlim([-10 200])
     xlim([-200 1000])
-   % vline(0)
+    vline(0,'k')
     xlabel('time (ms)');
     ylabel('frequency (Hz)');
     %subtitle(['Baseline CCEPs by Channel']);
     
-    
+      %  colorbar()
+
 end
-    colorbar()
+   %colorbar()
 
 obj = scalebar;
-obj.XLen = 100;              %X-Length, 10.
+obj.XLen = 500;              %X-Length, 10.
 obj.XUnit = 'ms';            %X-Unit, 'm'.
-obj.YLen = 200;
-obj.YUnit = '\muV';
-
+% obj.YLen = 200;
+% obj.YUnit = '\muV';
+% 
 obj.Position = [20,-130];
 obj.hTextX_Pos = [5,-50]; %move only the LABEL position
 obj.hTextY_Pos =  [-45,-40];
-obj.hLineY(2).LineWidth = 5;
-obj.hLineY(1).LineWidth = 5;
+% obj.hLineY(2).LineWidth = 5;
+% obj.hLineY(1).LineWidth = 5;
 obj.hLineX(2).LineWidth = 5;
 obj.hLineX(1).LineWidth = 5;
 obj.Border = 'LL';          %'LL'(default), 'LR', 'UL', 'UR'

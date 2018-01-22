@@ -1,0 +1,1 @@
+java -cp talairach.jar org.talairach.AtlasServer 1600

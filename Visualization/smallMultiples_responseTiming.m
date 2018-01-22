@@ -1,5 +1,5 @@
 function smallMultiples_responseTiming(signal,t,varargin)
-%% DJC - 9-29-2017 small multiples plotting for response timing 
+%% DJC - 9-29-2017 small multiples plotting for response timing
 % plot small mutliple plots - time x channels x trials
 
 
@@ -7,6 +7,7 @@ function smallMultiples_responseTiming(signal,t,varargin)
 type1 = [];
 type2 = [];
 average = 0;
+newfig = true;
 
 for i=1:2:(length(varargin)-1)
     if ~ischar (varargin{i}),
@@ -21,23 +22,40 @@ for i=1:2:(length(varargin)-1)
             type2 = varargin{i+1};
         case 'average'
             average = varargin{i+1};
+        case 'newfig'
+            newfig = varargin{i+1};
             
     end
 end
 
 %
-totalFig = figure;
-totalFig.Units = 'inches';
-totalFig.Position = [   10.4097    3.4722   13.2708   10.4514];
-CT = cbrewer('qual','Accent',8);
-CT = flipud(CT);
+if newfig
+    totalFig = figure;
+    totalFig.Units = 'inches';
+    totalFig.Position = [   10.4097    3.4722   13.2708   10.4514];
+    CT = cbrewer('qual','Accent',8);
+    CT = flipud(CT);
+else
+    gcf
+    hold on
+    CT = cbrewer('qual','Accent',8);
+    CT = flipud(CT);
+    CT_diff = cbrewer('qual','Accent',8);
+    CT(1,:) = CT_diff(1,:);
+end
 
-for idx=1:64
+
+p = numSubplots(size(signal,2));
+
+nullSig = zeros(length(t),1);
+
+for idx=1:size(signal,2)
+    %smplot(p(1),p(2),idx,'axis','on')
     smplot(8,8,idx,'axis','on')
     
     if average
         if ismember(idx,type1)
-            plot(1e3*t,1e6*signal(:,idx),'Color',CT(3,:),'LineWidth',2)
+            plot(1e3*t,nullSig,'Color',CT(3,:),'LineWidth',2)
             title([num2str(idx)],'Color',CT(3,:))
         elseif ismember(idx,type2)
             plot(1e3*t,1e6*signal(:,idx),'Color',CT(2,:),'LineWidth',2)
@@ -49,7 +67,7 @@ for idx=1:64
         
     elseif ~average
         if ismember(idx,type1)
-            plot(1e3*t,1e6*squeeze(signal(:,idx,:)),'Color',CT(3,:),'LineWidth',2)
+            plot(1e3*t,nullSig,'Color',CT(3,:),'LineWidth',2)
             title([num2str(idx)],'Color',CT(3,:))
         elseif ismember(idx,type2)
             plot(1e3*t,1e6*squeeze(signal(:,idx)),'Color',CT(2,:),'LineWidth',2)
@@ -65,8 +83,8 @@ for idx=1:64
     axis off
     axis tight
     %xlim([-10 200])
-        xlim([-200 1000])
-
+    xlim([-200 1000])
+    
     ylim([-200 200])
     vline(0)
     

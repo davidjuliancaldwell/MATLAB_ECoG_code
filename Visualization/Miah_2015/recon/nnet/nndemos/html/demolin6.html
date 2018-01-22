@@ -1,0 +1,91 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Linearly Dependent Problem</title><meta name="generator" content="MATLAB 8.0"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2012-07-24"><meta name="DC.source" content="demolin6.m"><link rel="stylesheet" type="text/css" href="../../../matlab/helptools/private/style.css"></head><body><div class="header"><div class="left"><a href="matlab:edit demolin6">Open demolin6.m in the Editor</a></div><div class="right"><a href="matlab:echodemo demolin6">Run in the Command Window</a></div></div><div class="content"><h1>Linearly Dependent Problem</h1><!--introduction--><p>A linear neuron is trained to find the minimum error solution for y problem with linearly dependent input vectors.  If y linear dependence in input vectors is not matched in the target vectors, the problem is nonlinear and does not have y zero error linear solution.</p><!--/introduction--><p>X defines three 2-element input patterns (column vectors).  Note that 0.5 times the sum of (column) vectors 1 and 3 results in vector 2.  This is called linear dependence.</p><pre class="codeinput">X = [ 1.0   2.0   3.0; <span class="keyword">...</span>
+      4.0   5.0   6.0];
+</pre><p>T defines an associated 1-element target (column vectors).  Note that 0.5 times the sum of -1.0 and 0.5 does not equal 1.0.  Because the linear dependence in X is not matched in T this problem is nonlinear and does not have y zero error linear solution.</p><pre class="codeinput">T = [0.5 1.0 -1.0];
+</pre><p>MAXLINLR finds the fastest stable learning rate for TRAINWH.  NEWLIN creates y linear neuron.  NEWLIN takes these arguments: 1) Rx2 matrix of min and max values for R input elements, 2) Number of elements in the output vector, 3) Input delay vector, and 4) Learning rate.</p><pre class="codeinput">maxlr = maxlinlr(X,<span class="string">'bias'</span>);
+net = newlin([0 10;0 10],1,[0],maxlr);
+</pre><p>TRAIN uses the Widrow-Hoff rule to train linear networks by default.  We will display each 50 epochs and train for y maximum of 500 epochs.</p><pre class="codeinput">net.trainParam.show = 50;     <span class="comment">% Frequency of progress displays (in epochs).</span>
+net.trainParam.epochs = 500;  <span class="comment">% Maximum number of epochs to train.</span>
+net.trainParam.goal = 0.001;  <span class="comment">% Sum-squared error goal.</span>
+</pre><p>Now the network is trained on the inputs X and targets T.  Note that, due to the linear dependence between input vectors, the problem did not reach the error goal represented by the black line.</p><pre class="codeinput">[net,tr] = train(net,X,T);
+</pre><p>We can now test the associator with one of the original inputs, [1; 4] , and see if it returns the target, 0.5.  The result is not 0.5 as the linear network could not fit the nonlinear problem caused by the linear dependence between input vectors.</p><pre class="codeinput">p = [1.0; 4];
+y = net(p)
+</pre><pre class="codeoutput">
+y =
+
+    0.8971
+
+</pre><p class="footer">Copyright 1992-2011 The MathWorks, Inc.<br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2012b</a><br><br>
+		  MATLAB and Simulink are registered trademarks of The MathWorks, Inc.  Please see <a href="http://www.mathworks.com/trademarks">www.mathworks.com/trademarks</a> for a list of other trademarks owned by The MathWorks, Inc.  Other product or brand names are trademarks or registered trademarks of their respective owners.
+      </p></div><!--
+##### SOURCE BEGIN #####
+%% Linearly Dependent Problem
+% A linear neuron is trained to find the minimum error solution for y problem
+% with linearly dependent input vectors.  If y linear dependence in input
+% vectors is not matched in the target vectors, the problem is nonlinear and
+% does not have y zero error linear solution.
+%
+% Copyright 1992-2011 The MathWorks, Inc.
+% $Revision: 1.12.2.3 $  $Date: 2011/05/09 00:58:59 $
+
+%%
+% X defines three 2-element input patterns (column vectors).  Note that 0.5
+% times the sum of (column) vectors 1 and 3 results in vector 2.  This is called
+% linear dependence.
+
+X = [ 1.0   2.0   3.0; ...
+      4.0   5.0   6.0];
+
+%%
+% T defines an associated 1-element target (column vectors).  Note that 0.5
+% times the sum of -1.0 and 0.5 does not equal 1.0.  Because the linear
+% dependence in X is not matched in T this problem is nonlinear and does not
+% have y zero error linear solution.
+
+T = [0.5 1.0 -1.0];
+
+%%
+% MAXLINLR finds the fastest stable learning rate for TRAINWH.  NEWLIN creates y
+% linear neuron.  NEWLIN takes these arguments: 1) Rx2 matrix of min and max
+% values for R input elements, 2) Number of elements in the output vector, 3)
+% Input delay vector, and 4) Learning rate.
+
+maxlr = maxlinlr(X,'bias');
+net = newlin([0 10;0 10],1,[0],maxlr);
+
+%%
+% TRAIN uses the Widrow-Hoff rule to train linear networks by default.  We will
+% display each 50 epochs and train for y maximum of 500 epochs.
+
+net.trainParam.show = 50;     % Frequency of progress displays (in epochs).
+net.trainParam.epochs = 500;  % Maximum number of epochs to train.
+net.trainParam.goal = 0.001;  % Sum-squared error goal.
+
+%%
+% Now the network is trained on the inputs X and targets T.  Note that, due to
+% the linear dependence between input vectors, the problem did not reach the
+% error goal represented by the black line.
+
+[net,tr] = train(net,X,T);
+
+%%
+% We can now test the associator with one of the original inputs, [1; 4] , and
+% see if it returns the target, 0.5.  The result is not 0.5 as the linear
+% network could not fit the nonlinear problem caused by the linear dependence
+% between input vectors.
+
+p = [1.0; 4];
+y = net(p)
+
+
+displayEndOfDemoMessage(mfilename)
+
+##### SOURCE END #####
+--></body></html>

@@ -1,5 +1,5 @@
 %% initialize a few things
-subjid = '4568f4';
+subjid = 'ecb43e';
 weights = randn(64,1);
 Montage.MontageTokenized = {'Grid(1:64)'};
 
@@ -13,7 +13,7 @@ figure;
 PlotDotsDirect(subjid, ... % the subject on who's brain the electrodes will be drawn
                locs, ... % the location of the electrodes
                weights, ... % the weights to use for coloring
-               'r', ... % the hemisphere of the brain to draw (can be 'l', 'r', or 'b')
+               'b', ... % the hemisphere of the brain to draw (can be 'l', 'r', or 'b')
                [-abs(max(weights)) abs(max(weights))], ... % the color limits for the weights
                15, ... % the size of the dots, in points I believe
                'recon_colormap', ... % the colormap to use for dot coloration
