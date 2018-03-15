@@ -290,7 +290,7 @@ for i = 1:length(mM)
     end
  
     h = errorbar(i,flip(mM(length(mM)-i+1,1)),flip(mM(length(mM)-i+1,2)),'o','linew',3,'color',colors(j,:),'capsize',10);
-    ylim([20 140])
+    ylim([0 140])
 
     set(h, 'MarkerSize', 5, 'MarkerFaceColor', colors(j,:), ...
         'MarkerEdgeColor', colors(j,:));
@@ -299,7 +299,7 @@ for i = 1:length(mM)
     ax = gca;
 
     if j ==2
-        text(i+0.25,min(mM(:,1))-6,sprintf([num2str(floor(i/4)+1)]),'fontsize',14)
+        text(i+0.25,min(mM(:,1))-24,sprintf([num2str(floor(i/4)+1)]),'fontsize',18)
         
     end
     
@@ -307,18 +307,18 @@ for i = 1:length(mM)
        line = vline(i+0.5);
        line.Color = [0.5 0.5 0.5];
     end
-    ax.FontSize = 12;    
+    ax.FontSize = 16;    
     j = j+1;
 end
-ylabel('CCEP Magnitude (\muV)','fontsize',14,'fontweight','bold')
-xlabel('Subject subdivided by number of conditioning pulses','fontsize',14,'fontweight','bold')
+ylabel('CCEP Magnitude (\muV)','fontsize',24,'fontweight','bold')
+xlabel('Subject subdivided by number of conditioning pulses','fontsize',24,'fontweight','bold')
 
 % set(gca,'XtickLabel',{'','>5','3->4', '1->2','Baseline'},'fontsize',14,'fontweight','bold')
 ax.XTickLabelMode = 'manual';
 ax.XTick = [];
-title({'CCEP Magnitude across Subjects';},'fontsize',16,'fontweight','bold')
+title({'CCEP Magnitude across Subjects';},'fontsize',30,'fontweight','bold')
 
 
 
-[h,icons,plots,legend_text] = legend({'Baseline','1-2','3-4','>5'},'fontsize',12);
+[h,icons,plots,legend_text] = legend({'Baseline','1-2','3-4','>5'},'fontsize',20);
 

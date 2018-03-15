@@ -4,7 +4,7 @@
 % ECO1.data(:,1) has the raw input signal
 % Wave.data(:,4) has the beta signal
 close all;clear all;clc
-load('C:\Users\djcald.CSENETID\GoogleDrive\BetaStim-1_dummySig.mat')
+load('G:\My Drive\BetaStim-1_dummySig.mat')
 %%
 a = ECO1.data(:,1);
 figure
@@ -48,7 +48,7 @@ xlabel('samples')
 
 %%
 clear all
-load('C:\Users\djcald.CSENETID\GoogleDrive\BetaStim-2_dummySig.mat')
+load('G:\My Drive\BetaStim-2_dummySig.mat')
 %%
 a = ECO1.data(:,1);
 figure
@@ -71,7 +71,7 @@ timeStamps = find(d>0);
 timeStamps = 1e3*((timeStamps/2)/fs1);
 vline([timeStamps],'k:');
 
-legend({'Filtered Signal','Raw signal','Stimulation Trigger'})
+legend({'Raw Signal','Filtered Signal','Stimulation Trigger'})
 xlabel('time (ms)')
 ylabel('amplitude')
 set(gca,'fontsize', 14)
@@ -82,14 +82,36 @@ ylim([-0.09 0.09]);
 
 %% find peaks 8-9-2017 
 
-[max,ind] = findpeaks(a,fs1,'minpeakdistance',0.04,'minpeakheight',0);
-[max_2,ind_2] = findpeaks(c,fs1,'minpeakdistance',0.04,'minpeakheight',0);
+[max,ind] = findpeaks(a,fs1,'minpeakdistance',0.04,'minpeakheight',0.01);
+[max_2,ind_2] = findpeaks(c,fs1,'minpeakdistance',0.04,'minpeakheight',0.01);
+
+% add on seven samples for stim delay 
+samps_add = round(1e3*7/fs2);
+ind = ind + samps_add;
+ind_2 = ind_2 + samps_add;
+
+inds_raw = 1e3*(ind(ind> 0.025 & ind < 142.5));
+inds_filt = 1e3*(ind_2(ind_2> 0.025 & ind_2 < 142.5));
+
+% figure
+% plot(t1,a)
+
+% hold on
+% plot(t1,c)
+% vline(inds_raw)
+% vline(inds_filt,'g')
+%%
+inds_raw = inds_raw(inds_raw>2.6e4);
+inds_filt = inds_filt(inds_filt>2.6e4);
+figure
+plot(t1(1e3*t1>2.6e4),a(1e3*t1>2.6e4))
+hold on
+plot(t1(1e3*t1>2.6e4),c(1e3*t1>2.6e4))
+vline(inds_filt)
+vline(inds_raw,'b')
 
 
-inds_raw = ind(ind> 0.025 & ind < 142.5);
-inds_filt = ind_2(ind_2> 0.025 & ind_2 < 142.5);
-
-
+phase_diff = inds_raw-inds_filt;
 
 %%
 

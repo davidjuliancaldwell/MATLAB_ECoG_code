@@ -8,6 +8,7 @@ type1 = [];
 type2 = [];
 average = 0;
 newfig = true;
+highlight_range = [];
 
 for i=1:2:(length(varargin)-1)
     if ~ischar (varargin{i}),
@@ -24,6 +25,8 @@ for i=1:2:(length(varargin)-1)
             average = varargin{i+1};
         case 'newfig'
             newfig = varargin{i+1};
+        case 'highlight_range'
+            highlight_range = varargin{i+1};
             
     end
 end
@@ -51,7 +54,7 @@ nullSig = zeros(length(t),1);
 
 for idx=1:size(signal,2)
     %smplot(p(1),p(2),idx,'axis','on')
-    smplot(8,8,idx,'axis','on')
+    plt_sub = smplot(8,8,idx,'axis','on');
     
     if average
         if ismember(idx,type1)
@@ -87,6 +90,12 @@ for idx=1:size(signal,2)
     
     ylim([-200 200])
     vline(0)
+    
+    if ~isempty(highlight_range)
+        hColor = [116/255 255/255 112/255];
+        y_range = ([-150 150]);
+         highlight(plt_sub, highlight_range, y_range, hColor);
+    end
     
     %subtitle(['Baseline CCEPs by Channel']);
     

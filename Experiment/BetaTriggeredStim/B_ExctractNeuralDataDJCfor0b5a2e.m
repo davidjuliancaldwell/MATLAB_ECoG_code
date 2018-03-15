@@ -105,7 +105,7 @@ for idx = 1:length(SIDS)
             %             chans = [14 15 23 24 26 33 34 35 39 40 42 43];
             betaChan = 23;
             %goods = sort([12 13 14 15 16 20 21 23 31 32 39 40]);
-             goods = [14 21 23 31];
+            goods = [14 21 23 31];
             bads = [20 24 28];
             t_min = 0.008;
             t_max = 0.05;
@@ -452,8 +452,11 @@ for idx = 1:length(SIDS)
                 %% zscore dat
                 for i = 1:length(ulabels)-1
                     total = 1e6*(awins(:,keeps));
-                    base = 1e6*(awins(:,label(keeps)==0));
-                    test = 1e6*(awins(:,label(keeps)==i));
+                    %base = 1e6*(awins(:,label(keeps)==0)); %  FIX TIHS
+                    % test = 1e6*(awins(:,label(keeps)==i));
+                    base = 1e6*(awins(:,label==0 & keeps));
+                    test = 1e6*(awins(:,label==i & keeps));
+                    
                     %[zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
                     [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
                     %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
@@ -470,56 +473,56 @@ for idx = 1:length(SIDS)
                 
                 
                 %
-                                %% - DJC 2-23-2016 - looking at erp_perm_test
+                %% - DJC 2-23-2016 - looking at erp_perm_test
                 
                 
-                                % need to do for each type
-                                %                 CCEPbyNumStim = {};
-                                % dont need to reinitialize CCEPbyNumStim, as it goes
-                                % through the other way first
-                                % i is 1 in this case
-                                
-                                t_minS = 0.005;
-                                t_maxS = 0.040;
-                                
-                                i = 1;
-                                Nperm = 1000;
-                                sp = 95;
-                                extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
-                                extractedSigsBase = extractedSigs(:,label(keeps)==0);
-                                extractedSigsTest = extractedSigs(:,label(keeps)==i);
-                                
-                               tExtract = t(t>t_minS & t<t_maxS);
-                                figure
-                                plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
-                                hold on
-                                plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
-                                plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
+                % need to do for each type
+                %                 CCEPbyNumStim = {};
+                % dont need to reinitialize CCEPbyNumStim, as it goes
+                % through the other way first
+                % i is 1 in this case
+                
+                t_minS = 0.005;
+                t_maxS = 0.040;
+                
+                i = 1;
+                Nperm = 1000;
+                sp = 95;
+                extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
+                extractedSigsBase = extractedSigs(:,label==0 & keeps);
+                extractedSigsTest = extractedSigs(:,label==i & keeps);
+                
+                tExtract = t(t>t_minS & t<t_maxS);
+                figure
+                plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
+                hold on
+                plot(tExtract,mean(extractedSigsBase,2),'g','Linewidth',[4])
+                plot(tExtract,mean(extractedSigsTest,2),'y','Linewidth',[4]);
                 
                 
-                                [CI_loNull, CI_hiNull, sgcNull] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
+                [CI_loNull, CI_hiNull, sgcNull] = stavrosShuffle(extractedSigsBase,extractedSigsTest,Nperm,sp);
                 
-                                hold on
-                                bar(tExtract,100*sgcNull,'linewidth',[2])
-                                % from mathworks to find continuous segment that was at
-                                % least 3 ms long?
+                hold on
+                bar(tExtract,100*sgcNull,'linewidth',[2])
+                % from mathworks to find continuous segment that was at
+                % least 3 ms long?
                 
-                                tSearch = diff([false;sgcNull==1;false]);
-                                p = find(tSearch==1);
-                                q = find(tSearch==-1);
-                                [maxlen,ix] = max(q-p);
-                                firstSearch = p(ix);
-                                lastSearch = q(ix)-1;
+                tSearch = diff([false;sgcNull==1;false]);
+                p = find(tSearch==1);
+                q = find(tSearch==-1);
+                [maxlen,ix] = max(q-p);
+                firstSearch = p(ix);
+                lastSearch = q(ix)-1;
                 
-                                CCEPmed = median(extractedSigs(:,klabel==i),2);
-                                [minval,inx] = min(CCEPmed);
-                                % account for case where inx = 1 to avoid addressing matrix
-                                % outside of bounds
-                                if inx == 1
-                                    inx = inx + 1;
-                                end
-                                CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
-                                CCEPbyNumStimNull{i} = CCEPmag;
+                CCEPmed = median(extractedSigs(:,klabel==i),2);
+                [minval,inx] = min(CCEPmed);
+                % account for case where inx = 1 to avoid addressing matrix
+                % outside of bounds
+                if inx == 1
+                    inx = inx + 1;
+                end
+                CCEPmag = (CCEPmed(inx)+CCEPmed(inx-1)+CCEPmed(inx+1))/3;
+                CCEPbyNumStimNull{i} = CCEPmag;
                 
                 %
                 %                 if anova < 0.05
@@ -892,7 +895,7 @@ for idx = 1:length(SIDS)
         
         
     end
-%     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
+    %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
     %close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
     %     save(fullfile(OUTPUT_DIR, [sid 'epSTATSsigShuffle.mat']), 'shuffleChans');
 end

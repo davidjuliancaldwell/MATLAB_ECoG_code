@@ -149,7 +149,7 @@ elseif (strcmp(sid, '7dbdec'))
     % Wave-3 is the mode time/counter
     % Wave-4 looks like the stim command
     tic;
-    [mode, ~] = tdt_loadStream(tp, block, 'Wavase', 2);
+    [mode, ~] = tdt_loadStream(tp, block, 'Wave', 2);
     [ttype, ~] = tdt_loadStream(tp, block, 'Wave', 1);
     [beta, ~] = tdt_loadStream(tp, block, 'Blck', 1);
     [raw, ~] = tdt_loadStream(tp, block, 'Blck', 2);

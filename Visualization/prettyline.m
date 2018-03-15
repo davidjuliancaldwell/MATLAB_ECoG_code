@@ -34,7 +34,7 @@ function h = prettyline(varargin)
     else
 %         warning('using median');
         mMean = @median;
-%         mMean = @mean;
+          %       mMean = @mean;
         mStd = @std;
     end
     

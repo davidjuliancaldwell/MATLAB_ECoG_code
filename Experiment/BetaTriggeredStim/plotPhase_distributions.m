@@ -102,7 +102,7 @@ elseif strcmp(type,'s')
         % plot frequency stimulus delivery distribution 
     figure
     histogram((f_caus))
-    title('Distribution of Frequency of Oscillatory signal')
+    title('Distribution of Frequency of causally filtered Oscillatory signal')
     ylabel('count')
     xlabel('Frequency in Hz')
         xlim([12 30])

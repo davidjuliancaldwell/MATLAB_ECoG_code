@@ -89,19 +89,19 @@ for idx=1:size(signal,3)
 end
    %colorbar()
 
-obj = scalebar;
-obj.XLen = 500;              %X-Length, 10.
-obj.XUnit = 'ms';            %X-Unit, 'm'.
-% obj.YLen = 200;
-% obj.YUnit = '\muV';
-% 
-obj.Position = [20,-130];
-obj.hTextX_Pos = [5,-50]; %move only the LABEL position
-obj.hTextY_Pos =  [-45,-40];
-% obj.hLineY(2).LineWidth = 5;
-% obj.hLineY(1).LineWidth = 5;
-obj.hLineX(2).LineWidth = 5;
-obj.hLineX(1).LineWidth = 5;
-obj.Border = 'LL';          %'LL'(default), 'LR', 'UL', 'UR'
+% obj = scalebar;
+% obj.XLen = 500;              %X-Length, 10.
+% obj.XUnit = 'ms';            %X-Unit, 'm'.
+%  obj.YLen = 200;
+%  obj.YUnit = 'Hz';
+% % 
+% obj.Position = [-400,-400];
+% obj.hTextX_Pos = [5,-50]; %move only the LABEL position
+% obj.hTextY_Pos =  [-125,-40];
+% % obj.hLineY(2).LineWidth = 5;
+% % obj.hLineY(1).LineWidth = 5;
+% obj.hLineX(2).LineWidth = 5;
+% obj.hLineX(1).LineWidth = 5;
+% obj.Border = 'LL';          %'LL'(default), 'LR', 'UL', 'UR'
 
 end

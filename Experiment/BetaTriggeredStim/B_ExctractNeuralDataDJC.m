@@ -13,7 +13,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % SIDS = SIDS(2:end);
 %SIDS = SIDS(2);
 
-for idx = 7
+for idx = 2
     sid = SIDS{idx};
     %DJC edited 7/20/2015 to fix tp paths
     
@@ -188,9 +188,10 @@ for idx = 7
     ZscoredDataForAnova = {};
     
     % temporary 6/22/2016 to just look at BetaChannel
-     chans = betaChan;
+    chans = betaChan;
     
     %chans = [1:64];
+    chans = 53;
     %% process each ecog channel individually
     for chan = chans
         
@@ -374,7 +375,7 @@ for idx = 7
         elseif (strcmp(sid, 'd5cd55'))
             %         pts = stims(3,:)==0 & (stims(2,:) > 4.5e6);
             pts = stims(3,:)==0 & (stims(2,:) > 4.5e6) & (stims(2, :) > 36536266);
-
+            
         elseif (strcmp(sid, 'c91479'))
             pts = stims(3,:)==0;
         elseif (strcmp(sid, '7dbdec'))
@@ -426,7 +427,7 @@ for idx = 7
         % considered a baseline if it's been at least N seconds since the last
         % burst ended
         
-        baselines = pstims(5,:) > 2 * fs;
+        baselines = pstims(5,:) > 1 * fs;
         
         % modified 9-10-2015 - DJC, find pre condition for each type of
         % test pulse
@@ -516,7 +517,7 @@ for idx = 7
                 
                 [anova,table,stats] = anova1(a1', label(keeps), 'off');
                 if plotIt
-                figure
+                    figure
                 end
                 [c,m,h,gnames] = multcompare(stats,'display','off');
                 sigChans{chan}{typei} = {m c a1Median a1 label keeps};
@@ -525,8 +526,11 @@ for idx = 7
                 %% zscore dat
                 for i = 1:length(ulabels)-1
                     total = 1e6*(awins(:,keeps));
-                    base = 1e6*(awins(:,label(keeps)==0));
-                    test = 1e6*(awins(:,label(keeps)==i));
+                    %base = 1e6*(awins(:,label(keeps)==0)); %  FIX TIHS
+                    % test = 1e6*(awins(:,label(keeps)==i));
+                    base = 1e6*(awins(:,label==0 & keeps));
+                    test = 1e6*(awins(:,label==i & keeps));
+                    
                     %[zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
                     [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
                     %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
@@ -556,8 +560,9 @@ for idx = 7
                         t_maxS = 0.040;
                         
                         extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
-                        extractedSigsBase = extractedSigs(:,label(keeps)==0);
-                        extractedSigsTest = extractedSigs(:,label(keeps)==i);
+                        
+                        extractedSigsBase = extractedSigs(:,label(keeps)==0 );
+                        extractedSigsTest = extractedSigs(:,label(keeps)==i );
                         tExtract = t(t>t_minS & t<t_maxS);
                         figure
                         plot(tExtract,extractedSigsBase,'b',tExtract,extractedSigsTest,'r');
@@ -847,9 +852,9 @@ for idx = 7
                     %                     %                 %
                     %                     %                 %                                     sigstar(pair, p);
                     %
-%                                                         SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
-%                                                         SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
-%                     %
+                    %                                                         SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'eps', '-r600');
+                    %                                                         SaveFig(OUTPUT_DIR, sprintf(['ep-%s-%dUNFILT' suffix{typei}], sid, chan), 'png', '-r600');
+                    %                     %
                     %                     %                 saveFigure(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)), 'eps', '-r600');
                     %                     %                 saveas(gcf,fullfile(OUTPUT_DIR, sprintf('ep-%s-%d.eps', sid, chan)),'eps','-r600');
                 end
@@ -860,7 +865,7 @@ for idx = 7
         end
         
     end
-   % save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
-   % close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
+    % save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
+    % close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
     
 end
