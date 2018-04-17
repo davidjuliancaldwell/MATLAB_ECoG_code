@@ -34,7 +34,6 @@ plot(x, squeeze(nanmean(y,2)), 'color',color) % djc change 2-5-2018
 
 [fillhandle,msg]=jbfill(x,upper',lower',color',edge,add,transparency);
 
-
 if (washeld == false)
     hold off;
 end

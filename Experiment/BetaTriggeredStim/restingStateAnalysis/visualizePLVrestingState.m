@@ -9,7 +9,7 @@ Z_ConstantsRest
 %64 channel grids right now which is fine because it's from TDT recording
 % not looking at subject 1 right now
 
-saveFigures = 1;
+saveFigures = 0;
 prePost = 0;
 diffs = 1;
 
@@ -139,12 +139,17 @@ for z = 1:length(SIDS)
         figure
         fig = gcf;
         fig.Units = 'normalized';
-        fig.Position = [-0.0125 0.0699 0.4143 0.8593];
+        fig.Position = [ -0.0125    0.4227    0.7359    0.5065];
         climsDiff = [-1 1];
         diffsPLV(isnan(diffsPLV)) = 0;
-        diffsPLV(Montage.BadChannels,Montage.BadChannels,:) = 0;
+        
+        % change bad channels montage DJC
+        
+        diffsPLV(Montage.BadChannels,:,:) = 0;
+        diffsPLV(:,Montage.BadChannels,:) = 0;
+        
         for i = 1:length(freqNames)
-            subplot(3,2,i)
+            subplot(2,3,i)
             
             imagesc(diffsPLV(:,:,i),climsDiff)
             
@@ -161,16 +166,19 @@ for z = 1:length(SIDS)
             
             
             colorbar
-            title(['Subject ' num2str(z)  ' Significant differences in Pre-Post ' freqNames{i} ' PLV'])
-            xlabel('Channel')
-            ylabel('Channel')
+            %  title(['Subject ' num2str(z)  ' Significant differences in Pre-Post ' freqNames{i} ' PLV'])
+            title(['Pre-Post ' freqNames{i} ' PLV'])
+            
             if i == 6
                 legend([h1 h2 h3],{'beta channel','stimulation channel','stimulation channel'},'Location','southwest');
                 
             end
             %highlight(gca,[0 betaChan+0.5],[betaChan-0.5 betaChan+0.5],[0.9 0.9 0.9])
             % highlight(gca,[betaChan-0.5 betaChan+0.5],[betaChan-0.5 length(postPLVs)+1],[0.9 0.9 0.9])
+            set(gca,'fontsize',14)
         end
+        xlabel('Channel')
+        ylabel('Channel')
         gcf;
         if saveFigures
             

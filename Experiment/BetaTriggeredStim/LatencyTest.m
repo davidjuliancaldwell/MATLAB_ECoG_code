@@ -40,12 +40,12 @@ for order = 2:2:6
         % b/w butterworth and chebychev
         
         [b, a] = cheby1 (order-1, .25, 2 / (fs/2), 'high');
-%         [b, a] = butter (order, 2 / (fs/2), 'high');
+        % [b, a] = butter (order, 2 / (fs/2), 'high');
 
         fX = filter(b, a, X);
         
         [b, a] = cheby1 (order-1, .25, hp / (fs/2), 'low');
-%         [b, a] = butter (order, hp / (fs/2), 'low');
+     %    [b, a] = butter (order, hp / (fs/2), 'low');
 
         fX = filter(b, a, fX);
 

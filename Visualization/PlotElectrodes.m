@@ -1,7 +1,5 @@
 function PlotElectrodes(subject, electrodeSubset, colors, plotNames, plotGridLines)
 
-
-
 % subject = genPID(subject);
 
 basedir = getSubjDir(subject);

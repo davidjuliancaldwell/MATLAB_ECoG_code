@@ -83,10 +83,10 @@ function [highPolyPatchHandle lowPolyPatchHandle] = PlotCortex(subject, hemisphe
 
     view(90,90);
     l = camlight('headlight');
-    set(l,'color',[lightScale lightScale lightScale]*.5);
+    set(l,'color',[lightScale lightScale lightScale]*.3);
     view(90,-90);
     l = camlight('headlight');
-    set(l,'color',[lightScale lightScale lightScale]*.5);
+    set(l,'color',[lightScale lightScale lightScale]*.3);
     view(90,0);
     l = camlight('headlight');
     set(l,'color',[lightScale lightScale lightScale]);

@@ -6,7 +6,6 @@ Montage.MontageTokenized = {'Grid(1:64)'};
 %% gets the electrode locations for this subject
 % in their native brain space.
 locs = trodeLocsFromMontage(subjid, Montage, false);
-
 % now plot the weights on the subject specific brain. PlotDotsDirect has a
 % bunch of input arguments
 figure;
@@ -28,12 +27,19 @@ PlotDotsDirect(subjid, ... % the subject on who's brain the electrodes will be d
 load('recon_colormap'); % needs to be the same as what was used in the function call above
 colormap(cm);
 colorbar;
+%%
+%PlotCortex('MNI')
+PlotGaussDirect(subjid, locs, weights, 'b', [-abs(max(weights)) abs(max(weights))], 'recon_colormap')
+% very often, after plotting the brain and dots, I add a colorbar for
+% reference as to what the dot colors mean
+%load('recon_colormap'); % needs to be the same as what was used in the function call above
+%colormap(cm);
+colorbar;
 
 %% gets the electrode locations for this subject
 % in TALAIRACH brain space, not the native
 % subject space.
 tlocs = trodeLocsFromMontage(subjid, Montage, true);
-
 % now plot the weights on the talairach brain
 PlotDotsDirect('tail', tlocs, weights, 'r', [-abs(max(weights)) abs(max(weights))], 10, 'recon_colormap', 1:64, true, false);
 
@@ -66,6 +72,8 @@ for sIdx = 1:length(sids)
     
     % and do the plotting.
     PlotDotsDirect('tail', tlocs, weights, 'r', clims, 10, 'recon_colormap', 1:64, true, asOverlay);
+   % PlotDotsDirect('mni', tlocs, weights, 'r', clims, 10, 'recon_colormap', 1:64, true, asOverlay);
+
     pause; % let's pause so we can see this in action
 end
 
