@@ -1,4 +1,4 @@
-function [condPtsPos,condPtsNeg] = extract_testPulse(stims)
+function [condPtsPos,condPtsNeg,testPts] = extract_testPulse(stims)
 
 testPts = stims(3,:) == 0;
 

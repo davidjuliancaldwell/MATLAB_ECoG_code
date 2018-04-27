@@ -6,4 +6,5 @@ setenv('matlab_devel_dir', 'C:\Users\djcald.CSENETID\Code');
 setenv('gridlab_dir', 'C:\Users\djcald.CSENETID\Code');
 setenv('shared_code_dir', 'C:\Users\djcald.CSENETID\SharedCode');
 setenv('subject_dir', 'C:\Users\djcald.CSENETID\Data\Subjects');
+setenv('dbs_subject_dir','G:\My Drive\GRIDLabDavidShared\DBS\');
 setenv('OUTPUT_DIR', 'C:\Users\djcald.CSENETID\Data\Output');

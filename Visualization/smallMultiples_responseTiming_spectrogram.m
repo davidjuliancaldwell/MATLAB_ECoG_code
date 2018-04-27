@@ -74,7 +74,7 @@ for idx=1:size(signal,3)
         
     end
     
-    caxis([min_c max_c])
+    %caxis([min_c max_c])
     axis off
     axis tight
     %xlim([-10 200])

@@ -2,7 +2,7 @@
 % using white matter (c) output to bnc
 % generate sine waves between 12 and 20
 
-Fs = 12207; % sampling rate Hz
+Fs = 24414; % sampling rate Hz
 
 
 % time each frequency

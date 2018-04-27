@@ -13,11 +13,13 @@
 % first written by Andrew ko, modified by DJC 4-13-2018
 
 
-function [amp,pk_loc,tr_loc]=peak_to_peak(signal,opt)
+function [amp,pk_loc,tr_loc]=peak_to_peak(signal,varargin)
 
 if nargin2
     opt='abs';
 end;
+
+
 
 [ppks,plats]=findpeaks(signal,'minpeakprominence',5);
 [npks,nlats]=findpeaks(-signal,'minpeakprominence',5);

@@ -32,8 +32,10 @@ totalFig.Position = [   10.4097    3.4722   13.2708   10.4514];
 CT = cbrewer('qual','Accent',8);
 CT = flipud(CT);
 
-for idx=1:64
-    smplot(8,8,idx,'axis','on')
+[p,n] = numSubplots(size(signal,2));
+
+for idx=1:size(signal,2)
+    smplot(p(1),p(2),idx,'axis','on')
     
     if average
         if ismember(idx,type1)
@@ -64,8 +66,8 @@ for idx=1:64
     
     axis off
     axis tight
-    xlim([-10 50])
-    ylim([-130 130])
+   % xlim([-10 50])
+   % ylim([-130 130])
     vline(0)
     
     %subtitle(['Baseline CCEPs by Channel']);
