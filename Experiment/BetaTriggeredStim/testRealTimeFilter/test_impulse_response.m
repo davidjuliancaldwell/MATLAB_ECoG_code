@@ -1,44 +1,104 @@
-% 4-18-2018
-% DJC - examine sweeps of white matter
+DATA_DIR = "G:\My Drive\betaStim_oScope_test\betaStim_oScope_converted";
 
-DATA_DIR = "G:\My Drive\whiteMatterTestFunctions\4-17-2018-Test-AudioOutput\Matlab";
-
-filesVec = [1:9];
-fsVec = [12:20];
-
-phaseVecPosRaw = [];
-degreesVecPosRaw = [];
-phaseVecNegRaw = [];
-degreesVecNegRaw = [];
-
-phaseVecPosFilt = [];
-degreesVecPosFilt = [];
-phaseVecNegFilt = [];
-degreesVecNegFilt = [];
-
-plotFFT = 0;
-plotTime = 0;
-plotFit = 1;
-
+filesVec = 1;
 for ind = filesVec
-    ind
+    %%
+    ind = 1;
     prefix = 'BetaStim-';
-    filename = strcat(prefix,num2str(ind),'.mat');
+    filename = strcat(prefix,num2str(ind),'-impulseResponse.mat');
     load(fullfile(DATA_DIR,filename))
     
     rawSignal = ECO1.data(:,1);
+    rawSignal = rawSignal(1:end-1);
     fsRawSignal = ECO1.info.SamplingRateHz;
     pre = 50; % pre signal time ms
     post = 0;
     preSamps = round(fsRawSignal * pre/1e3);
     postSamps = round(fsRawSignal * post/1e3);
     
+    filteredSignal = Wave.data(:,3);
+    fsFiltered = Wave.info.SamplingRateHz;
+    trigger = SMon.data(:,2);
+    filteredSignalDecimated = decimate(filteredSignal,2); % decimate because it's stored at double the rate of Eco
+    
+    t= [0:length(rawSignal)-1]*1e3/fsRawSignal;
+    figure
+    %
+    plot(t,rawSignal)
+    hold on
+    plot(t,filteredSignalDecimated)
+    xlabel('time (ms)')
+    set(gca,'fontsize',14)
+    ylabel('signal (V)');
+    title('Impulse Response')
+        legend('raw signal','filtered signal')
+
+    % get rid of noise
+    rawSignal(abs(rawSignal)<3e-4)=0;
+    figure
+    plot(t,rawSignal)
+    hold on
+    plot(t,filteredSignalDecimated)
+    xlabel('time (ms)')
+    set(gca,'fontsize',14)
+    ylabel('signal (V)');
+    title('Impulse Response')
+        legend('raw signal','filtered signal')
+        
+        %
+        
+        rawSignal = rawSignal(t>3.4e4);
+        filteredSignalDecimated = filteredSignalDecimated(t>3.4e4);
+    % use diff of signal to find onsets
+    diffRaw = [diff(rawSignal); 0];
+    figure
+    plot(diffRaw)
+    inds = find(diffRaw>1e-3);
+    diffOfInds = diff(inds);
+    indsFirst = inds([0; diffOfInds<100] & [0; 0; diff(diffOfInds>1000)]);
+    indsFirst = indsFirst(1:end-1);
+   % indsFirst = indsFirst(indsFirst > 200);
+    
+    figure
+    plot(filteredSignalDecimated)
+    hold on
+    plot(rawSignal)
+    vline(indsFirst)
+    
+    filteredEpoched = squeeze(getEpochSignal(filteredSignalDecimated,indsFirst,indsFirst+1000));
+    averageFiltered = mean(filteredEpoched,2);
+    tEpoched = [0:length(filteredEpoched)-1]*1e3/fsRawSignal;
+    hold on
+    plot(tEpoched,averageFiltered,'linewidth',4,'k')
+    figure
+    plot(tEpoched,filteredEpoched)
+    set(gca,'fontsize',14)
+    xlabel('Time (ms)')
+    ylabel('Voltage (V)')
+    title('Overlaid Impulse Responses')
+
+
+        %%
+    figure
+    % use diff of signal to find onsets
+    diffChannel2 = [diff(channel2); 0];
+    plot(diffChannel2)
+    inds = find(diffChannel2>0.1);
+    diffOfInds = diff(inds);
+    indsFirst = inds([diffOfInds<100]);
+    indsFirst = indsFirst(indsFirst > 200);
+    %     hold on
+    % plot vline for first stim in train
+    vline(indsFirst);
+    %%
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
     mode = Wave.data(:,2)';
     ttype = Wave.data(:,1)';
     smon = SMon.data(:,2)';
     [bursts,stims] = build_stim_table(smon,ttype,mode);
     
-    knownStimDelay = round(fsRawSignal*0.2867/1e3);
+    %knownStimDelay = round(fsRawSignal*0.2867/1e3);
     
     
     [condPtsPos,condPtsNeg,testPts] = extract_testPulse(stims);
@@ -117,7 +177,6 @@ for ind = filesVec
         legend('raw signal','filtered signal')
     end
     
-    filteredSignalDecimated = decimate(filteredSignal,2); % decimate because it's stored at double the rate of Eco
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     signalPos = squeeze(getEpochSignal(filteredSignalDecimated ,beginsPos,endsPos));
