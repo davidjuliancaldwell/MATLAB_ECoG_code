@@ -44,7 +44,7 @@ for idx = 2:9
             
             
             chans = [63];
-
+            
             %             %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
             %             tank = TTank;
@@ -75,7 +75,7 @@ for idx = 2:9
             t_max = 0.035;
             
             chans = [ 63 48];
-
+            
             %%%%%%%%%%%%%%%%%%%%
             
             %             tank = TTank;
@@ -144,7 +144,7 @@ for idx = 2:9
             t_max = 0.0425;
             
             chans = [ 52 53 58 57];
-
+            
             %%%%%%%%%%%%%%%%%%%%%%%%
             
             %             tank = TTank;
@@ -173,8 +173,8 @@ for idx = 2:9
             t_max = 0.0425;
             
             
-             chans = [4 21];
-
+            chans = [4 21];
+            
             %%%%%%%%%%%%%%%%%%
             
             %             tank = TTank;
@@ -191,15 +191,15 @@ for idx = 2:9
             block = 'BetaPhase-3';
             stims = [56 64];
             chans = [47 55];
-           % chans = [1:64];
+            % chans = [1:64];
             
             betaChan = 55;
             goods = sort([55 63 54 47 48]);
             t_min = 0.008;
             t_max = 0.05;
             
-                        chans = [47];
-
+            chans = [47];
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             
@@ -216,7 +216,7 @@ for idx = 2:9
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             block = 'BetaPhase-2';
             stims = [22 30];
-            chans = [21 23];
+            chans = [14 21 23 31];
             
             betaChan = 31;
             goods = sort([12 13 14 15 16 20 21 23 31 32 39 40]);
@@ -225,8 +225,8 @@ for idx = 2:9
             t_min = 0.005;
             t_max = 0.05;
             
-                        chans = [21 23];
-
+            %   chans = [21 23];
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             %
@@ -242,7 +242,7 @@ for idx = 2:9
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             block = 'BetaPhase-4';
             stims = [22 30];
-            chans = [14 21 23];
+            chans = [14 21 23 31];
             
             betaChan = 31;
             goods = sort([12 13 14 15 16 21 23 31 32 39 40]);
@@ -250,8 +250,8 @@ for idx = 2:9
             t_min = 0.005;
             t_max = 0.05;
             
-                        chans = [14 21 23];
-
+            %  chans = [14 21 23];
+            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             
             %
@@ -313,7 +313,7 @@ for idx = 2:9
         bursts(3,:) = bursts(3,:) + delay;
         
     end
-
+    lookAtBetaChan = false;
     % temporary 6/22/2016 to just look at BetaChannel
     % chans = betaChan;
     %% process each ecog channel individually
@@ -321,6 +321,13 @@ for idx = 2:9
         tank = TTank;
         tank.openTank(tp);
         tank.selectBlock(block);
+        if lookAtBetaChan
+            Wave = tank.readWaveEvent('Wave');
+            filt_sig = Wave(:,3);
+            filt_sig_decimate = decimate(filt_sig,2)';
+            clear Wave filt_sig
+        end
+        
         %% load in ecog data for that channel
         fprintf('loading in ecog data for %s:\n',sid);
         fprintf('channel %d:\n',chan);
@@ -396,10 +403,10 @@ for idx = 2:9
             eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
             
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                       
+            
         end
         acausal_filt = bandpass(eco,12,20,efs,4,'acausal'); % was 20,12 ? should be 12 20!
-      %  causal_filt = bandpass(eco,12,20,efs,4,'causal');
+        %  causal_filt = bandpass(eco,12,20,efs,4,'causal');
         
         %% process triggers
         
@@ -440,6 +447,7 @@ for idx = 2:9
         % changing presamps - DJC - 2/24/2016
         presamps = round(0.05*efs);
         postsamps = round(0.00*efs);
+        
         if exist('ptsPos') & exist('ptsNeg')
             ptisPos = round(stims(2,ptsPos)/fac);
             ptisNeg = round(stims(2,ptsNeg)/fac);
@@ -447,7 +455,6 @@ for idx = 2:9
         if exist('pts')
             ptis = round(stims(2,pts)/fac);
         end
-        
         
         t = (-presamps:postsamps)/efs;
         
@@ -458,20 +465,25 @@ for idx = 2:9
         index = find(t==0);
         ct = index + ct - round(0.025*efs);
         
-        % use raw_sig or filtered
-        raw_sig = true;
+        
+        % plot intermediate steps?
+        plotIt = false;
+        
+        % set parameters for fit function
+        f_range = [12 25]; % was 10 30
+        smooth_span = 5; % was 13, try 19
+        
         
         if (exist('ptsPos') & exist('ptsNeg'))
             
             winsPos = squeeze(getEpochSignal(eco', ptisPos-presamps, ptisPos+postsamps+1));
             winsNeg = squeeze(getEpochSignal(eco', ptisNeg-presamps, ptisNeg+postsamps+1));
             
-            
             % median is subtracted off in function! dont do it twice!
             
-                        % normalize the windows to each other, using pre data
-                        awinsPos = winsPos-repmat(median(winsPos(t<0,:),1), [size(winsPos, 1), 1]);
-                        awinsNeg = winsNeg-repmat(median(winsNeg(t<0,:),1), [size(winsNeg, 1), 1]);
+            % normalize the windows to each other, using pre data
+            %             awinsPos = winsPos-repmat(median(winsPos(t<0,:),1), [size(winsPos, 1), 1]);
+            %            awinsNeg = winsNeg-repmat(median(winsNeg(t<0,:),1), [size(winsNeg, 1), 1]);
             
             %             % normalize windows with DC subtract for whole thing
             %             awinsPos = winsPos - repmat(median(winsPos,1), [size(winsPos,1),1]);
@@ -481,12 +493,12 @@ for idx = 2:9
             awinsPos = winsPos;
             awinsNeg = winsNeg;
             
-         %   % DJC 1-14-2017 - attempt to look at epoched acausal
-        %    winsPos_caus = squeeze(getEpochSignal(causal_filt', ptisPos-presamps, ptisPos+postsamps+1));
-         %   winsNeg_caus = squeeze(getEpochSignal(causal_filt', ptisNeg-presamps, ptisNeg+postsamps+1));
+            %   % DJC 1-14-2017 - attempt to look at epoched acausal
+            %    winsPos_caus = squeeze(getEpochSignal(causal_filt', ptisPos-presamps, ptisPos+postsamps+1));
+            %   winsNeg_caus = squeeze(getEpochSignal(causal_filt', ptisNeg-presamps, ptisNeg+postsamps+1));
             
-          %  awinsPos_caus = winsPos_caus;
-         %   awinsNeg_caus = winsNeg_caus;
+            %  awinsPos_caus = winsPos_caus;
+            %   awinsNeg_caus = winsNeg_caus;
             
             winsPos_acaus = squeeze(getEpochSignal(acausal_filt', ptisPos-presamps, ptisPos+postsamps+1));
             winsNeg_acaus = squeeze(getEpochSignal(acausal_filt', ptisNeg-presamps, ptisNeg+postsamps+1));
@@ -496,12 +508,6 @@ for idx = 2:9
             
             % do the fit on the mean signal
             
-            % plot intermediate steps?
-            plotIt = false;
-            
-            % set parameters for fit function
-            f_range = [8 25]; % was 10 30
-            smooth_span = 19; % was 13, try 19
             
             % do it on different conditions
             
@@ -512,9 +518,17 @@ for idx = 2:9
             
             % causal
             
-          %  [phase_at_0_pos_caus,f_pos_caus,r_square_pos_caus,fitline_pos_caus] = phase_calculation(awinsPos_caus,t,smooth_span,f_range,efs,plotIt);
-          %  [phase_at_0_neg_caus,f_neg_caus,r_square_neg_caus,fitline_neg_caus] = phase_calculation(awinsNeg_caus,t,smooth_span,f_range,efs,plotIt);
+            %  [phase_at_0_pos_caus,f_pos_caus,r_square_pos_caus,fitline_pos_caus] = phase_calculation(awinsPos_caus,t,smooth_span,f_range,efs,plotIt);
+            %  [phase_at_0_neg_caus,f_neg_caus,r_square_neg_caus,fitline_neg_caus] = phase_calculation(awinsNeg_caus,t,smooth_span,f_range,efs,plotIt);
             
+            if lookAtBetaChan
+                betaPos = squeeze(getEpochSignal(filt_sig_decimate', ptisPos-presamps, ptisPos+postsamps+1));
+                betaNeg = squeeze(getEpochSignal(filt_sig_decimate', ptisNeg-presamps, ptisNeg+postsamps+1));
+                
+                plotIt = true;
+                [phase_at_0_pos_filt,f_pos_filt,r_square_pos_filt,fitline_pos_filt] = phase_calculation(betaPos,t,smooth_span,f_range,efs,plotIt);
+                [phase_at_0_neg_filt,f_neg_filt,r_square_neg_filt,fitline_neg_filt] = phase_calculation(betaNeg,t,smooth_span,f_range,efs,plotIt);
+            end
             
             % acausal
             [phase_at_0_pos_acaus,f_pos_acaus,r_square_pos_acaus,fitline_pos_acaus] = phase_calculation(awinsPos_acaus,t,smooth_span,f_range,efs,plotIt);
@@ -529,112 +543,108 @@ for idx = 2:9
                 r_square= 0;
                 fitline = 0;
                 
-             %   f_caus = 0;
-              %  phase_at_0_caus= 0;
-               % r_square_caus= 0;
-               % fitline_caus = 0;
+                %   f_caus = 0;
+                %  phase_at_0_caus= 0;
+                % r_square_caus= 0;
+                % fitline_caus = 0;
                 
                 f_acaus=0;
                 phase_at_0_acaus= 0;
                 r_square_acaus = 0;
                 fitline_acaus = 0;
             end
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            
+            
+            %         % dont normalize for beta
+            %         awinsPos = winsPos;
+            %         awinsNeg = winsNeg;
+            %
+            %         pstimsPos = stims(:,ptsPos);
+            %         pstimsneg = stims(:,ptsNeg);
+            %
+            %         figure
+            %         plot(1e3*t,awinsPos)
+            %         figure
+            %         plot(1e3*t,awinsNeg)
+            %
+            %         figure
+            %         plot(1e3*t,awinsPos)
+            %         hold on
+            %         ave = mean(awinsPos,2);
+            %         plot(1e3*t,ave,'k','LineWidth',4)
+            %         vline(0)
+            %         title('beta filtered signal around positive conditioning stimuli')
+            %
+            %         figure
+            %         plot(1e3*t,awinsNeg)
+            %         hold on
+            %         ave = mean(awinsNeg,2);
+            %         plot(1e3*t,ave,'k','LineWidth',4)
+            %         vline(0)
+            %         title('beta filtered signal around negative conditioning stimuli')
+            
+            
+            %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % try hilbert amp phase approach
+            
+            fband = [12 20];
+            
+            [amp, phase] = hilbAmp(eco', fband, efs);
+            wins_amp_pos = squeeze(getEpochSignal(amp,ptisPos-presamps,ptisPos+postsamps+1));
+            wins_phase_pos = squeeze(getEpochSignal(phase,ptisPos-presamps,ptisPos+postsamps+1));
+            
+            wins_amp_neg = squeeze(getEpochSignal(amp,ptisNeg-presamps,ptisNeg+postsamps+1));
+            wins_phase_neg = squeeze(getEpochSignal(phase,ptisNeg-presamps,ptisNeg+postsamps+1));
+            
+            
+            figure
+            plot(1e3*t,wins_amp_pos)
+            hold on
+            ave = mean(wins_amp_pos,2);
+            plot(1e3*t,ave,'k','LineWidth',4)
+            vline(0)
+            title('Hilbert Amplitude - positive')
+            
+            figure
+            plot(1e3*t,wins_phase_pos)
+            hold on
+            ave = mean(wins_phase_pos,2);
+            plot(1e3*t,ave,'k','LineWidth',4)
+            vline(0)
+            title('Hilbert Phase - positive ')
+            
+            figure
+            plot(1e3*t,wins_amp_neg)
+            hold on
+            ave = mean(wins_amp_neg,2);
+            plot(1e3*t,ave,'k','LineWidth',4)
+            vline(0)
+            title('Hilbert Amplitude - negative ')
+            
+            figure
+            plot(1e3*t,wins_phase_neg)
+            hold on
+            ave = mean(wins_phase_neg,2);
+            plot(1e3*t,ave,'k','LineWidth',4)
+            vline(0)
+            title('Hilbert Phase - negative ')
         end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
-        
-        %         % dont normalize for beta
-        %         awinsPos = winsPos;
-        %         awinsNeg = winsNeg;
-        %
-        %         pstimsPos = stims(:,ptsPos);
-        %         pstimsneg = stims(:,ptsNeg);
-        %
-        %         figure
-        %         plot(1e3*t,awinsPos)
-        %         figure
-        %         plot(1e3*t,awinsNeg)
-        %
-        %         figure
-        %         plot(1e3*t,awinsPos)
-        %         hold on
-        %         ave = mean(awinsPos,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('beta filtered signal around positive conditioning stimuli')
-        %
-        %         figure
-        %         plot(1e3*t,awinsNeg)
-        %         hold on
-        %         ave = mean(awinsNeg,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('beta filtered signal around negative conditioning stimuli')
-        
-        
-        %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %         % try hilbert amp phase approach
-        %
-        %         fband = [12 20];
-        %
-        %         [amp, phase] = hilbAmp(eco', fband, efs);
-        %         wins_amp_pos = squeeze(getEpochSignal(amp,ptisPos-presamps,ptisPos+postsamps+1));
-        %         wins_phase_pos = squeeze(getEpochSignal(phase,ptisPos-presamps,ptisPos+postsamps+1));
-        %
-        %         wins_amp_neg = squeeze(getEpochSignal(amp,ptisNeg-presamps,ptisNeg+postsamps+1));
-        %         wins_phase_neg = squeeze(getEpochSignal(phase,ptisNeg-presamps,ptisNeg+postsamps+1));
-        %
-        %
-        %
-        %
-        %         figure
-        %         plot(1e3*t,wins_amp_pos)
-        %         hold on
-        %         ave = mean(wins_amp_pos,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('Hilbert Amplitude - positive')
-        %
-        %         figure
-        %         plot(1e3*t,wins_phase_pos)
-        %         hold on
-        %         ave = mean(wins_phase_pos,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('Hilbert Phase - positive ')
-        %
-        %         figure
-        %         plot(1e3*t,wins_amp_neg)
-        %         hold on
-        %         ave = mean(wins_amp_neg,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('Hilbert Amplitude - negative ')
-        %
-        %         figure
-        %         plot(1e3*t,wins_phase_neg)
-        %         hold on
-        %         ave = mean(wins_phase_neg,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('Hilbert Phase - negative ')
-        %
-        %     end
         
         if exist('pts')
             
             wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
             % subtract pre
-            awins =    wins-repmat(median(wins(t<0,:),1), [size(wins, 1), 1]);
+            % awins =    wins-repmat(median(wins(t<0,:),1), [size(wins, 1), 1]);
             % DJC 1-14-2017 - attempt to look at epoched acausal
             
             wins_acaus = squeeze(getEpochSignal(acausal_filt', ptis-presamps, ptis+postsamps+1));
-           % wins_caus = squeeze(getEpochSignal(causal_filt', ptis-presamps, ptis+postsamps+1));
+            % wins_caus = squeeze(getEpochSignal(causal_filt', ptis-presamps, ptis+postsamps+1));
             
             awins_acaus = wins_acaus;
-           % awins_caus = wins_caus;
+            % awins_caus = wins_caus;
             
-            
+            awins = wins;
             % median is subtracted off in function! dont do it twice!
             
             % subtract whole thing
@@ -642,26 +652,60 @@ for idx = 2:9
             
             % DJC 1-23-2017 - add in sinfit
             
-            f_range = [8 25]; % changed 10 30 to 8 25 DJC 4-30-2018 
-            smooth_span = 19; % 19 
             
             % do the fit on the mean signal
             
             % plot intermediate steps?
             plotIt = false;
             
-            % raw
+%             % raw
+%             
+             [phase_at_0,f,r_square,fitline] = phase_calculation(awins,t,smooth_span,f_range,efs,plotIt);
+%             % causal
+%             
+%             %[phase_at_0_caus,f_caus,r_square_caus,fitline_caus] = phase_calculation(awins_caus,t,smooth_span,f_range,efs,plotIt);
+%             
+%             % acausal
+             [phase_at_0_acaus,f_acaus,r_square_acaus,fitline_acaus] = phase_calculation(awins_acaus,t,smooth_span,f_range,efs,plotIt);
+%             
+                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %
+            %         figure
+            %         plot(1e3*t,awins)
+            %         hold on
+            %         ave = mean(awins,2);
+            %         plot(1e3*t,ave,'k','LineWidth',4)
+            %         vline(0)
+            %         title('beta filtered signal around conditioning stimuli')
+            %
+            %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %         % try hilbert amp phase approach
+            %
+           
+            fband = [12 20];
             
-            [phase_at_0,f,r_square,fitline] = phase_calculation(awins,t,smooth_span,f_range,efs,plotIt);
-            % causal
+            [amp, phase] = hilbAmp(eco', fband, efs);
+            wins_amp = squeeze(getEpochSignal(amp,ptis-presamps,ptis+postsamps+1));
+            wins_phase = squeeze(getEpochSignal(phase,ptis-presamps,ptis+postsamps+1));
+            wins_phase_unwrapped = unwrap(wins_phase);
             
-            %[phase_at_0_caus,f_caus,r_square_caus,fitline_caus] = phase_calculation(awins_caus,t,smooth_span,f_range,efs,plotIt);
-          
-            % acausal
-            [phase_at_0_acaus,f_acaus,r_square_acaus,fitline_acaus] = phase_calculation(awins_acaus,t,smooth_span,f_range,efs,plotIt);
+            pstims = stims(:,pts);
             
+            figure
+            plot(1e3*t,wins_amp)
+            hold on
+            ave = mean(wins_amp,2);
+            plot(1e3*t,ave,'k','LineWidth',4)
+            vline(0)
+            title('Hilbert Amplitude')
             
-            
+            figure
+            plot(1e3*t,wins_phase)
+            hold on
+            ave = mean(wins_phase,2);
+            plot(1e3*t,ave,'k','LineWidth',4)
+            vline(0)
+            title('Hilbert Phase')
             % make fake vector
             
             if ~strcmp('ecb43e',sid)
@@ -675,15 +719,15 @@ for idx = 2:9
                 r_square_neg= 0;
                 fitline_neg= 0;
                 
-               % f_pos_caus = 0;
-               % f_neg_caus = 0;
+                % f_pos_caus = 0;
+                % f_neg_caus = 0;
                 
-               % phase_at_0_pos_caus= 0;
-               % r_square_pos_caus= 0;
-               % fitline_pos_caus= 0;
-               % phase_at_0_neg_caus= 0;
-               % r_square_neg_caus= 0;
-               % fitline_neg_caus= 0;
+                % phase_at_0_pos_caus= 0;
+                % r_square_pos_caus= 0;
+                % fitline_pos_caus= 0;
+                % phase_at_0_neg_caus= 0;
+                % r_square_neg_caus= 0;
+                % fitline_neg_caus= 0;
                 
                 f_pos_acaus = 0;
                 f_neg_acaus = 0;
@@ -694,49 +738,8 @@ for idx = 2:9
                 r_square_neg_acaus= 0;
                 fitline_neg_acaus= 0;
             end
-            
-            
+         
         end
-        
-        
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %
-        %         figure
-        %         plot(1e3*t,awins)
-        %         hold on
-        %         ave = mean(awins,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('beta filtered signal around conditioning stimuli')
-        %
-        %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %         % try hilbert amp phase approach
-        %
-        %         fband = [12 20];
-        %
-        %         [amp, phase] = hilbAmp(eco', fband, efs);
-        %         wins_amp = squeeze(getEpochSignal(amp,ptis-presamps,ptis+postsamps+1));
-        %         wins_phase = squeeze(getEpochSignal(phase,ptis-presamps,ptis+postsamps+1));
-        %
-        %
-        %         pstims = stims(:,pts);
-        %
-        %         figure
-        %         plot(1e3*t,wins_amp)
-        %         hold on
-        %         ave = mean(wins_amp,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('Hilbert Amplitude')
-        %
-        %         figure
-        %         plot(1e3*t,wins_phase)
-        %         hold on
-        %         ave = mean(wins_phase,2);
-        %         plot(1e3*t,ave,'k','LineWidth',4)
-        %         vline(0)
-        %         title('Hilbert Phase')
-        %     end
         
         
         
@@ -888,14 +891,14 @@ for idx = 2:9
             sid = '0b5a2e_mod';
         end
         
-%         save(fullfile(OUTPUT_DIR, [sid '_' num2str(chan) '_phaseDelivery_v2.mat']), 'sid','t','r_square','r_square_acaus','r_square_caus','r_square_neg_acaus','r_square_pos','r_square_neg','r_square_neg_caus',...
-%             'r_square_pos_acaus','r_square_pos_caus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
-%             'phase_at_0_pos_caus','fitline_pos_caus','phase_at_0_neg_caus','fitline_neg_caus',...
-%             'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
-%             'phase_at_0','r_square','fitline','phase_at_0_caus','r_square_caus','fitline_caus','phase_at_0_acaus','r_square_acaus','fitline_acaus',...
-%             'f','f_caus','f_acaus','f_pos','f_neg','f_pos_caus','f_neg_caus','f_pos_acaus','f_neg_acaus');
-%         
-                save(fullfile(OUTPUT_DIR, [sid '_' num2str(chan) '_phaseDelivery_v2.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
+        %         save(fullfile(OUTPUT_DIR, [sid '_' num2str(chan) '_phaseDelivery_v2.mat']), 'sid','t','r_square','r_square_acaus','r_square_caus','r_square_neg_acaus','r_square_pos','r_square_neg','r_square_neg_caus',...
+        %             'r_square_pos_acaus','r_square_pos_caus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
+        %             'phase_at_0_pos_caus','fitline_pos_caus','phase_at_0_neg_caus','fitline_neg_caus',...
+        %             'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
+        %             'phase_at_0','r_square','fitline','phase_at_0_caus','r_square_caus','fitline_caus','phase_at_0_acaus','r_square_acaus','fitline_acaus',...
+        %             'f','f_caus','f_acaus','f_pos','f_neg','f_pos_caus','f_neg_caus','f_pos_acaus','f_neg_acaus');
+        %
+        save(fullfile(OUTPUT_DIR, [sid '_' num2str(chan) '_phaseDelivery_v3.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
             'r_square_pos_acaus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
             'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
             'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...
@@ -904,7 +907,7 @@ for idx = 2:9
         if strcmp(sid,'0b5a2e_mod')
             sid = '0b5a2e';
         end
-                
+        
         close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR chan chans sid tp block 'bursts' 'fs' 'stims'
     end
     

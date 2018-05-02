@@ -27,7 +27,7 @@ else
 end
 
 Ysm = smooth(Y,SPAN,'moving',0); % smooth data via moving average
-%Ysm = Ysm-median(Ysm); % DC correction
+Ysm = Ysm-median(Ysm); % DC correction
 
 % lower/upper values
 amp_lu = [max(abs(Ysm))/3 max(abs(Ysm))*3];
@@ -36,12 +36,9 @@ T_lu = sort(TRANGE);
 
 % start values
 amp_sv = max(abs(Ysm));
-if Ysm(end) < 0
-    ph_sv = 3*pi/2;
-else
-    ph_sv = pi/2; % DJC - change 4/29/2018 
 
-end
+ph_sv = (pi + pi) *rand(1,1) - pi; % generate random start in order to try and get decent distributions 
+
 T_sv = mean(TRANGE);
 
 f = fitoptions('method','NonlinearLeastSquares','Robust','On',...

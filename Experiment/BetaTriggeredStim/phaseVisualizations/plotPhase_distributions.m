@@ -21,8 +21,8 @@ if strcmp(type,'m')
     xlim([12 30])
     % plot frequency stimulus delivery distribution
     figure
-    histogram((f_pos_caus))
-    title('Distribution of Frequency of Oscillatory signal for causally filtered signal for Phase 1')
+    histogram((f_pos_acaus))
+    title('Distribution of Frequency of Oscillatory signal for acausally filtered signal for Phase 1')
     ylabel('count')
     xlabel('Frequency in Hz')
     xlim([12 30])
@@ -40,12 +40,22 @@ if strcmp(type,'m')
     
     
     figure
-    histogram(rad2deg(phase_at_0_pos_caus))
-    title('Distribution of Phases on the causally filtered fit signal for Phase 1')
+    histogram(rad2deg(phase_at_0_pos_acaus))
+    title('Distribution of Phases on the acausally filtered fit signal for Phase 1')
     ylabel('count')
     xlabel('Phase in degrees')
     xlim([0 360])
     vline([desired])
+    
+             
+    figure
+    histogram(rad2deg(phase_at_0_pos_acaus(r_square_pos_acaus>0.8)));
+        title('Distribution of phase delivery on the raw fit signal for phase 1 >0.8')
+    ylabel('count')
+    xlabel('Phase in degrees')
+    xlim([0 360])
+    
+    
     
     
     %%%%%%%%%%%%%%%%
@@ -60,11 +70,12 @@ if strcmp(type,'m')
     xlim([12 30])
     % plot frequency stimulus delivery distribution
     figure
-    histogram((f_neg_caus))
-    title('Distribution of Frequency of Oscillatory signal - causally filtered for Phase 2')
+    histogram((f_neg_acaus))
+    title('Distribution of Frequency of Oscillatory signal - acausally filtered for Phase 2')
     ylabel('count')
     xlabel('Frequency in Hz')
     xlim([12 30])
+    
     
     
     % plot phase distribution
@@ -79,13 +90,23 @@ if strcmp(type,'m')
     
     
     figure
-    histogram(rad2deg(phase_at_0_neg_caus))
-    title('Distribution of Phases on the causally filtered fit signal for Phase 2')
+    histogram(rad2deg(phase_at_0_neg_acaus))
+    title('Distribution of Phases on the acausally filtered fit signal for Phase 2')
     ylabel('count')
     xlabel('Phase in degrees')
     xlim([0 360])
     vline([desired])
     
+            
+    figure
+    histogram(rad2deg(phase_at_0_neg_acaus(r_square_neg_acaus>0.8)));
+        title('Distribution of phase delivery on the raw fit signal for phase 2 >0.8')
+    ylabel('count')
+    xlabel('Phase in degrees')
+    xlim([0 360])
+    
+    
+   
     
 elseif strcmp(type,'s')
     
@@ -100,8 +121,8 @@ elseif strcmp(type,'s')
     xlim([12 30])
     % plot frequency stimulus delivery distribution
     figure
-    histogram((f_caus))
-    title('Distribution of Frequency of causally filtered Oscillatory signal')
+    histogram((f_acaus))
+    title('Distribution of Frequency of acausally filtered Oscillatory signal')
     ylabel('count')
     xlabel('Frequency in Hz')
     xlim([12 30])
@@ -119,8 +140,8 @@ elseif strcmp(type,'s')
     
     
     figure
-    histogram(rad2deg(phase_at_0_caus))
-    title('Distribution of Phases on the causally filtered fit signal')
+    histogram(rad2deg(phase_at_0_acaus))
+    title('Distribution of Phases on the acausally filtered fit signal')
     ylabel('count')
     xlabel('Phase in degrees')
     xlim([0 360])

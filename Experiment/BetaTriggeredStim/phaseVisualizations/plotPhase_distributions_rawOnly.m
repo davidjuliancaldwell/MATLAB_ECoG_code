@@ -42,7 +42,7 @@ if strcmp(type,'m')
         
     figure
     histogram(rad2deg(phase_at_0_pos(r_square_pos>0.8)));
-        title('Distribution of r^2 values on the raw fit signal for phase 1 >0.8')
+        title('Distribution of phase delivery on the raw fit signal for phase 1 >0.8')
     ylabel('count')
     xlabel('Phase in degrees')
     xlim([0 360])
@@ -60,7 +60,6 @@ if strcmp(type,'m')
     % plot phase distribution
     figure
     desired = input('input desired degree of stimulus phase \n');
-    
     histogram(rad2deg(phase_at_0_neg))
     title('Distribution of Phases on the raw fit signal for Phase 2')
     ylabel('count')
@@ -78,7 +77,7 @@ if strcmp(type,'m')
     
     figure
     histogram(rad2deg(phase_at_0_neg(r_square_neg>0.8)));
-        title('Distribution of r^2 values on the raw fit signal for phase 2 >0.8')
+        title('Distribution of phase delivery on the raw fit signal for phase 2 >0.8')
     ylabel('count')
     xlabel('Phase in degrees')
     xlim([0 360])
