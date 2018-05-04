@@ -14,7 +14,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 %sid = input('input SID \n','s');
 %DJC edited 7/20/2015 to fix tp paths
-for idx = 2:9
+for idx = 2:2
     sid = SIDS{idx};
     switch(sid)
         case '8adc5c'
@@ -42,7 +42,7 @@ for idx = 2:9
             t_max = 0.05;
             
             
-            chans = [63];
+            chans = [53 61 63 55];
             
             %             %%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
@@ -73,8 +73,8 @@ for idx = 2:9
             t_min = 0.008;
             t_max = 0.035;
             
-            chans = [ 63 48];
-            
+            chans = [ 48 63 64];
+            chans = 64;
             %%%%%%%%%%%%%%%%%%%%
             
             %             tank = TTank;
@@ -173,7 +173,7 @@ for idx = 2:9
             
             
             chans = [4 21];
-            
+            chans = 5;
             %%%%%%%%%%%%%%%%%%
             
             %             tank = TTank;
@@ -317,6 +317,9 @@ for idx = 2:9
     % chans = betaChan;
     %% process each ecog channel individually
     for chan = chans
+        
+        lookAtBetaChan = false;
+        
         tank = TTank;
         tank.openTank(tp);
         tank.selectBlock(block);
@@ -533,9 +536,9 @@ for idx = 2:9
             [phase_at_0_pos_acaus,f_pos_acaus,r_square_pos_acaus,fitline_pos_acaus] = phase_calculation(awinsPos_acaus,t,smooth_span,f_range,efs,plotIt);
             [phase_at_0_neg_acaus,f_neg_acaus,r_square_neg_acaus,fitline_neg_acaus] = phase_calculation(awinsNeg_acaus,t,smooth_span,f_range,efs,plotIt);
             
-            %%%%%%%%%%%%%%%%% hilbert 
+            %%%%%%%%%%%%%%%%% hilbert
             
-                 fband = [12 20];
+            fband = [12 25];
             
             [amp, phase] = hilbAmp(eco', fband, efs);
             wins_amp_pos = squeeze(getEpochSignal(amp,ptisPos-presamps,ptisPos+postsamps+1));
@@ -544,40 +547,40 @@ for idx = 2:9
             wins_amp_neg = squeeze(getEpochSignal(amp,ptisNeg-presamps,ptisNeg+postsamps+1));
             wins_phase_neg = squeeze(getEpochSignal(phase,ptisNeg-presamps,ptisNeg+postsamps+1));
             
-            hilbPhase0Pos = wins_phase_pos(end,:);
-            hilbPhase0Neg = wins_phase_neg(end,:);
+            hilbPhasePos0 = wins_phase_pos(end,:);
+            hilbPhaseNeg0 = wins_phase_neg(end,:);
             
-%             figure
-%             plot(1e3*t,wins_amp_pos)
-%             hold on
-%             ave = mean(wins_amp_pos,2);
-%             plot(1e3*t,ave,'k','LineWidth',4)
-%             vline(0)
-%             title('Hilbert Amplitude - positive')
-%             
-%             figure
-%             plot(1e3*t,wins_phase_pos)
-%             hold on
-%             ave = mean(wins_phase_pos,2);
-%             plot(1e3*t,ave,'k','LineWidth',4)
-%             vline(0)
-%             title('Hilbert Phase - positive ')
-%             
-%             figure
-%             plot(1e3*t,wins_amp_neg)
-%             hold on
-%             ave = mean(wins_amp_neg,2);
-%             plot(1e3*t,ave,'k','LineWidth',4)
-%             vline(0)
-%             title('Hilbert Amplitude - negative ')
-%             
-%             figure
-%             plot(1e3*t,wins_phase_neg)
-%             hold on
-%             ave = mean(wins_phase_neg,2);
-%             plot(1e3*t,ave,'k','LineWidth',4)
-%             vline(0)
-%             title('Hilbert Phase - negative ')
+            %             figure
+            %             plot(1e3*t,wins_amp_pos)
+            %             hold on
+            %             ave = mean(wins_amp_pos,2);
+            %             plot(1e3*t,ave,'k','LineWidth',4)
+            %             vline(0)
+            %             title('Hilbert Amplitude - positive')
+            %
+            %             figure
+            %             plot(1e3*t,wins_phase_pos)
+            %             hold on
+            %             ave = mean(wins_phase_pos,2);
+            %             plot(1e3*t,ave,'k','LineWidth',4)
+            %             vline(0)
+            %             title('Hilbert Phase - positive ')
+            %
+            %             figure
+            %             plot(1e3*t,wins_amp_neg)
+            %             hold on
+            %             ave = mean(wins_amp_neg,2);
+            %             plot(1e3*t,ave,'k','LineWidth',4)
+            %             vline(0)
+            %             title('Hilbert Amplitude - negative ')
+            %
+            %             figure
+            %             plot(1e3*t,wins_phase_neg)
+            %             hold on
+            %             ave = mean(wins_phase_neg,2);
+            %             plot(1e3*t,ave,'k','LineWidth',4)
+            %             vline(0)
+            %             title('Hilbert Phase - negative ')
             
             % make fake vector for non pts
             if ~strcmp('ecb43e',sid)
@@ -633,7 +636,7 @@ for idx = 2:9
             %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             % try hilbert amp phase approach
             
-       
+            
         end
         
         if exist('pts')
@@ -663,17 +666,17 @@ for idx = 2:9
             % plot intermediate steps?
             plotIt = false;
             
-%             % raw
-%             
-             [phase_at_0,f,r_square,fitline] = phase_calculation(awins,t,smooth_span,f_range,efs,plotIt);
-%             % causal
-%             
-%             %[phase_at_0_caus,f_caus,r_square_caus,fitline_caus] = phase_calculation(awins_caus,t,smooth_span,f_range,efs,plotIt);
-%             
-%             % acausal
-             [phase_at_0_acaus,f_acaus,r_square_acaus,fitline_acaus] = phase_calculation(awins_acaus,t,smooth_span,f_range,efs,plotIt);
-%             
-                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            %             % raw
+            %
+            [phase_at_0,f,r_square,fitline] = phase_calculation(awins,t,smooth_span,f_range,efs,plotIt);
+            %             % causal
+            %
+            %             %[phase_at_0_caus,f_caus,r_square_caus,fitline_caus] = phase_calculation(awins_caus,t,smooth_span,f_range,efs,plotIt);
+            %
+            %             % acausal
+            [phase_at_0_acaus,f_acaus,r_square_acaus,fitline_acaus] = phase_calculation(awins_acaus,t,smooth_span,f_range,efs,plotIt);
+            %
+            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %
             %         figure
             %         plot(1e3*t,awins)
@@ -686,8 +689,8 @@ for idx = 2:9
             %         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %         % try hilbert amp phase approach
             %
-           
-            fband = [12 20];
+            
+            fband = [12 25];
             
             [amp, phase] = hilbAmp(eco', fband, efs);
             wins_amp = squeeze(getEpochSignal(amp,ptis-presamps,ptis+postsamps+1));
@@ -698,22 +701,22 @@ for idx = 2:9
             
             hilbPhase0 = wins_phase(end,:);
             
-%             figure
-%             plot(1e3*t,wins_amp)
-%             hold on
-%             ave = mean(wins_amp,2);
-%             plot(1e3*t,ave,'k','LineWidth',4)
-%             vline(0)
-%             title('Hilbert Amplitude')
-%             
-%             figure
-%             plot(1e3*t,wins_phase)
-%             hold on
-%             ave = mean(wins_phase,2);
-%             plot(1e3*t,ave,'k','LineWidth',4)
-%             vline(0)
-%             title('Hilbert Phase')
-%             % make fake vector
+            %             figure
+            %             plot(1e3*t,wins_amp)
+            %             hold on
+            %             ave = mean(wins_amp,2);
+            %             plot(1e3*t,ave,'k','LineWidth',4)
+            %             vline(0)
+            %             title('Hilbert Amplitude')
+            %
+            %             figure
+            %             plot(1e3*t,wins_phase)
+            %             hold on
+            %             ave = mean(wins_phase,2);
+            %             plot(1e3*t,ave,'k','LineWidth',4)
+            %             vline(0)
+            %             title('Hilbert Phase')
+            %             % make fake vector
             
             if ~strcmp('ecb43e',sid)
                 
@@ -745,10 +748,10 @@ for idx = 2:9
                 r_square_neg_acaus= 0;
                 fitline_neg_acaus= 0;
                 
-                hilbPhasePos0 = 0
+                hilbPhasePos0 = 0;
                 hilbPhaseNeg0 = 0;
             end
-         
+            
         end
         
         
@@ -913,7 +916,7 @@ for idx = 2:9
             'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
             'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...
             'f','f_acaus','f_pos','f_neg','f_pos_acaus','f_neg_acaus',...
-            'hilbPhase0','hilbPhase0Pos','hilbPhase0Neg');
+            'hilbPhase0','hilbPhasePos0','hilbPhaseNeg0');
         
         if strcmp(sid,'0b5a2e_mod')
             sid = '0b5a2e';

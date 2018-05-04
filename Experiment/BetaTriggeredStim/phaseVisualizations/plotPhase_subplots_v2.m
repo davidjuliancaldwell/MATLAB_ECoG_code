@@ -18,7 +18,7 @@ type = input('single or multiple phase of delivery? input "s" or "m"\n','s');
 if strcmp(type,'m')
     figure
     
-    subplot(2,2,1)
+    subplot(2,1,1)
     plot(1e3*t,fitline_pos)
     hold on
     plot(1e3*t,mean(fitline_pos,2),'k','linewidth',4)
@@ -34,7 +34,7 @@ if strcmp(type,'m')
     set(gca,'fontsize',14)
     xlim([-50 0])
     
-    subplot(2,2,3)
+    subplot(2,1,2)
     plotBTLError(1e3*t,fitline_pos,'CI');
     %xlabel('time before stimulation (ms)')
     %ylabel('\mu V')
@@ -42,26 +42,26 @@ if strcmp(type,'m')
     set(gca,'fontsize',14)
     xlim([-50 0])
     
-    subplot(2,2,2)
-    plot(1e3*t,fitline_pos_caus)
-    hold on
-    plot(1e3*t,mean(fitline_pos_caus,2),'k','linewidth',4)
-    %xlabel('time before stimulation (ms)')
-    %ylabel('\mu V')
-    title('causal positive fitline')
-    set(gca,'fontsize',14)
-    xlim([-50 0])
-    
-    fprintf('causal positive mean r_square value = %0.4f \n',mean(r_square_pos_caus));
-    fprintf('causal positive mean phase at stimulus = %1.4f \n',mean(phase_at_0_pos_caus));
-    fprintf('causal positive mean frequency of fit curve = %2.1f \n',mean(f_pos_caus));
-    
-    subplot(2,2,4)
-    plotBTLError(1e3*t,fitline_pos_caus,'CI');
-    xlabel('time before stimulation (ms)')
-    ylabel('\mu V')
-    title({'causal positive fitline',' 95% confidence interval'})
-    xlim([-50 0])
+%     subplot(2,2,2)
+%     plot(1e3*t,fitline_pos_caus)
+%     hold on
+%     plot(1e3*t,mean(fitline_pos_caus,2),'k','linewidth',4)
+%     %xlabel('time before stimulation (ms)')
+%     %ylabel('\mu V')
+%     title('causal positive fitline')
+%     set(gca,'fontsize',14)
+%     xlim([-50 0])
+%     
+%     fprintf('causal positive mean r_square value = %0.4f \n',mean(r_square_pos_caus));
+%     fprintf('causal positive mean phase at stimulus = %1.4f \n',mean(phase_at_0_pos_caus));
+%     fprintf('causal positive mean frequency of fit curve = %2.1f \n',mean(f_pos_caus));
+%     
+%     subplot(2,2,4)
+%     plotBTLError(1e3*t,fitline_pos_caus,'CI');
+%     xlabel('time before stimulation (ms)')
+%     ylabel('\mu V')
+%     title({'causal positive fitline',' 95% confidence interval'})
+%     xlim([-50 0])
     
     set(gca,'fontsize',14)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,7 +70,7 @@ if strcmp(type,'m')
     
     figure
     
-    subplot(2,2,1)
+    subplot(2,1,1)
     
     plot(1e3*t,fitline_neg)
     hold on
@@ -86,7 +86,7 @@ if strcmp(type,'m')
     fprintf('raw negative mean frequency of fit curve = %2.1f \n',mean(f_neg));
     
     
-    subplot(2,2,3)
+    subplot(2,1,2)
     plotBTLError(1e3*t,fitline_neg,'CI');
     %xlabel('time before stimulation (ms)')
     %ylabel('\mu V')
@@ -95,27 +95,27 @@ if strcmp(type,'m')
     xlim([-50 0])
     
     
-    subplot(2,2,2)
-    plot(1e3*t,fitline_neg_caus)
-    hold on
-    plot(1e3*t,mean(fitline_neg_caus,2),'k','linewidth',4)
-    %xlabel('time before stimulation (ms)')
-    %ylabel('\mu V')
-    title('causal negative fitline')
-    set(gca,'fontsize',14)
-    xlim([-50 0])
+%     subplot(2,2,2)
+%     plot(1e3*t,fitline_neg_caus)
+%     hold on
+%     plot(1e3*t,mean(fitline_neg_caus,2),'k','linewidth',4)
+%     %xlabel('time before stimulation (ms)')
+%     %ylabel('\mu V')
+%     title('causal negative fitline')
+%     set(gca,'fontsize',14)
+%     xlim([-50 0])
     
-    fprintf('causal negative mean r_square value = %0.4f \n',mean(r_square_neg_caus));
-    fprintf('causal negative mean phase at stimulus = %1.4f \n',mean(phase_at_0_neg_caus));
-    fprintf('causal negative mean positive frequency of fit curve = %2.1f \n',mean(f_neg_caus));
-    
-    subplot(2,2,4)
-    plotBTLError(1e3*t,fitline_neg_caus,'CI');
-    xlabel('time before stimulation (ms)')
-    ylabel('\mu V')
-    title({'causal negative fitline',' 95% confidence interval'})
-    set(gca,'fontsize',14)
-    xlim([-50 0])
+%     fprintf('causal negative mean r_square value = %0.4f \n',mean(r_square_neg_caus));
+%     fprintf('causal negative mean phase at stimulus = %1.4f \n',mean(phase_at_0_neg_caus));
+%     fprintf('causal negative mean positive frequency of fit curve = %2.1f \n',mean(f_neg_caus));
+%     
+%     subplot(2,2,4)
+%     plotBTLError(1e3*t,fitline_neg_caus,'CI');
+%     xlabel('time before stimulation (ms)')
+%     ylabel('\mu V')
+%     title({'causal negative fitline',' 95% confidence interval'})
+%     set(gca,'fontsize',14)
+%     xlim([-50 0])
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % acausal
