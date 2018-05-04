@@ -13,6 +13,8 @@ xlim([12 25])
 if saveIt
     SaveFig(OUTPUT_DIR, sprintf(['freqDist-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'svg');
     SaveFig(OUTPUT_DIR, sprintf(['freqDist-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'png','-r600');
+    SaveFig(OUTPUT_DIR, sprintf(['freqDist-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'png','-r600');
+
 end
 
 % plot phase distribution
@@ -78,10 +80,9 @@ end
 % R^2 plot
 figure
 histogram(r_square);
-title({['Subject ' num2str(subjectNum) ' R^2 distribution of fits '],[' on the ' signalType ' fit signal for Phase ' num2str(desiredF) char(176) ' R^2 > 0.7'],['Channel ' num2str(chan)]})
+title({['Subject ' num2str(subjectNum) ' R^2 distribution of fits '],[' on the ' signalType ' fit signal for Phase ' num2str(desiredF) char(176)],['Channel ' num2str(chan)]})
 ylabel('Density Estimate')
 xlabel('Phase in degrees')
-xlim([0 360])
 vline(desiredF)
 
 if saveIt

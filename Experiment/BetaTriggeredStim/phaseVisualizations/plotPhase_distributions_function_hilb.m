@@ -10,8 +10,8 @@ xlim([0 360])
 vline(desiredF)
 
 if saveIt
-    SaveFig(OUTPUT_DIR, sprintf(['phaseDist-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'svg');
-    SaveFig(OUTPUT_DIR, sprintf(['phaseDist-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'png','-r600');
+    SaveFig(OUTPUT_DIR, sprintf(['phaseDist-phase-%d-sid-%s-chan-%d-type-%s'],desiredF,sid, chan,type), 'svg');
+    SaveFig(OUTPUT_DIR, sprintf(['phaseDist-phase-%d-sid-%s-chan-%d-type-%s'],desiredF,sid, chan,type), 'png','-r600');
 end
 
 % bootstrap on raw
@@ -25,8 +25,8 @@ xlim([0 360])
 vline(desiredF)
 
 if saveIt
-    SaveFig(OUTPUT_DIR, sprintf(['bootDist-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'svg');
-    SaveFig(OUTPUT_DIR, sprintf(['bootDist-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'png','-r600');
+    SaveFig(OUTPUT_DIR, sprintf(['bootDist-phase-%d-sid-%s-chan-%d-type-%s'],desiredF,sid, chan,type), 'svg');
+    SaveFig(OUTPUT_DIR, sprintf(['bootDist-phase-%d-sid-%s-chan-%d-type-%s'],desiredF,sid, chan,type), 'png','-r600');
 end
 
 
