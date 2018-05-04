@@ -17,7 +17,7 @@ gcp; % parallel pool
 files = dir('*.mat');
 
 % settings
-hilbPhasePlot = 1;
+hilbPlot = 1;
 acausalPlot = 1;
 rawPlot = 1;
 saveIt = 1;
@@ -38,24 +38,35 @@ for file = files'
     
     
     if strcmp(type,'m')
-                
+        
         if rawPlot
             
-            plotPhase_distributions_function(f_pos,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
-                       
-            plotPhase_distributions_function(f_neg,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
+            signalType = 'raw';
+            plotPhase_distributions_function(f_pos,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            
+            plotPhase_distributions_function(f_neg,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            
+            plotPhase_subplots_func(t,fitline_pos,f_pos,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            
+            plotPhase_subplots_func(t,fitline_neg,f_neg,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
             if closeAll
                 close all
             end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+        
         if acausalPlot
             
-            plotPhase_distributions_function(f_pos_acaus,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
+            signalType = 'filtered';
+            plotPhase_distributions_function(f_pos_acaus,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
-            plotPhase_distributions_function(f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
+            plotPhase_distributions_function(f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            
+            
+            plotPhase_subplots_func(t,fitline_pos_acaus,f_pos_acaus,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            
+            plotPhase_subplots_func(t,fitline_neg_acaus,f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
             if closeAll
                 close all
@@ -65,9 +76,9 @@ for file = files'
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if hilbPlot
             
-            plotPhase_distributions_function_hilb(hilbPhasePos0,desiredF(1),sid,subjectNum,chan,type,phaseInt,OUTPUT_DIR,saveIt)
+            plotPhase_distributions_function_hilb(hilbPhasePos0,desiredF(1),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
             
-            plotPhase_distributions_function_hilb(hilbPhaseNeg0,desiredF(2),sid,subjectNum,chan,type,phaseInt,OUTPUT_DIR,saveIt)
+            plotPhase_distributions_function_hilb(hilbPhaseNeg0,desiredF(2),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
             
             
             if closeAll
@@ -80,11 +91,12 @@ for file = files'
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
     elseif strcmp(type,'s')
-             
+        
         if rawPlot
             
             plotPhase_distributions_function(f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
-    
+            plotPhase_subplots_func(t,fitline,f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            
             if closeAll
                 close all
             end
@@ -95,7 +107,9 @@ for file = files'
         if acausalPlot
             
             plotPhase_distributions_function(f_acaus,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
-
+            
+            plotPhase_subplots_func(t,fitline_acaus,f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            
             if closeAll
                 close all
             end
@@ -104,8 +118,8 @@ for file = files'
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if hilbPlot
             
-            plotPhase_distributions_function_hilb(hilbPhase0,desiredF,sid,subjectNum,chan,type,phaseInt,OUTPUT_DIR,saveIt)
-
+            plotPhase_distributions_function_hilb(hilbPhase0,desiredF,sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
+            
             if closeAll
                 close all
             end
