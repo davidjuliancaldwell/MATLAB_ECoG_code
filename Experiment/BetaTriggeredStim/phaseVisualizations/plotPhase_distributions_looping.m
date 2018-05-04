@@ -13,6 +13,11 @@ gcp; % parallel pool
 
 files = dir('*.mat');
 
+% settings 
+hilbPhasePlot = 0;
+acausalPlot = 0;
+
+
 for file = files'
     load(file.name);
     subStrings = split(file.name,'_');
@@ -26,6 +31,8 @@ for file = files'
         
         desiredF = info{2};
         
+        % raw
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         % plot frequency stimulus delivery distribution
         figure
         histogram((f_pos))
@@ -138,7 +145,7 @@ for file = files'
         degVec = [0:0.5:360];
         [boot,confBoot,pdf] = density_bootstrap_plot(degVec,rad2deg(phase_at_0_neg));
         title({['Subject ' num2str(info{3}) ' Bootstrapped distribution of phases '],[' on the raw fit signal for Phase 2']})
-        ylabel('count')
+        ylabel('Density Estimate')
         xlabel('Phase in degrees')
         xlim([0 360])
         vline(desiredF(2))
@@ -225,7 +232,7 @@ for file = files'
         degVec = [0:0.5:360];
         [boot,confBoot,pdf] = density_bootstrap_plot(degVec,rad2deg(phase_at_0));
         title({['Subject ' num2str(info{3}) '  bootstrapped distribution of phases '],[' on the raw fit signal']})
-        ylabel('count')
+        ylabel('Density Estimate')
         xlabel('Phase in degrees')
         xlim([0 360])
         vline(desiredF)
