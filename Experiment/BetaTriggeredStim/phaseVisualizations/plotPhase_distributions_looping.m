@@ -20,8 +20,8 @@ files = dir('*.mat');
 hilbPlot = 1;
 acausalPlot = 1;
 rawPlot = 1;
-saveIt = 1;
-closeAll = 1;
+saveIt = 0;
+closeAll = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
