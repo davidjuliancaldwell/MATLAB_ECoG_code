@@ -93,8 +93,9 @@ for file = files'
     elseif strcmp(type,'s')
         
         if rawPlot
-            
-            plotPhase_distributions_function(f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
+                        signalType = 'raw';
+
+            plotPhase_distributions_function(f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             plotPhase_subplots_func(t,fitline,f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
             if closeAll
@@ -105,8 +106,9 @@ for file = files'
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         if acausalPlot
-            
-            plotPhase_distributions_function(f_acaus,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
+                        signalType = 'filtered';
+
+            plotPhase_distributions_function(f_acaus,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
             plotPhase_subplots_func(t,fitline_acaus,f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
