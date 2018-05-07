@@ -14,7 +14,7 @@ elseif ismac
     setenv('gridlab_dir', '/Users/djcald/MATLAB/Code');
     setenv('shared_code_dir', '/Users/djcald/MATLAB/');
     setenv('subject_dir', '/Users/djcald/Subjects/');
-    setenv('dbs_subject_dir','/Google\ Drive \File \Stream/My \Drive/GRIDLabDavidShared/DBS');
+    setenv('dbs_subject_dir','/Volumes/GoogleDrive/My Drive/GRIDLabDavidShared/DBS');
     setenv('OUTPUT_DIR', '/Users/djcald/MATLAB/Output');
     
 end

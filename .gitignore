@@ -1,0 +1,10 @@
+*.asv
+pathdef.m
+setupEnvironment.m
+setupPath.m
+*.wav
+*.png
+*.eps
+*.svg
+*.jpg
+
