@@ -7,4 +7,5 @@ setupPath.m
 *.eps
 *.svg
 *.jpg
-
+*/pathdef.m
+*pathdef.m
