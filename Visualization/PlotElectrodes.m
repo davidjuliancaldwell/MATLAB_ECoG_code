@@ -4,6 +4,7 @@ function PlotElectrodes(subject, electrodeSubset, colors, plotNames, plotGridLin
 
 basedir = getSubjDir(subject);
 
+% add another color - DJC 5-10-2018
 if(~exist('colors', 'var') || isempty(colors))
     colors = [
         [1 0 0];
@@ -17,6 +18,7 @@ if(~exist('colors', 'var') || isempty(colors))
         [1 0.5 0.5];
         [0.5 1 0.5];
         [0.5 0.5 1];
+        [0.5 0.5 0.75];
     ];
 end
 

@@ -1,4 +1,4 @@
-function smallMultiples_responseTiming_spectogram(signal,t,f,varargin)
+function small_multiples_spectogram(signal,t,f,varargin)
 %% DJC - 9-29-2017 small multiples plotting for response timing
 % plot small mutliple plots - time x channels x trials
 
@@ -35,44 +35,31 @@ CT = flipud(CT);
 p = numSubplots(size(signal,3));
 %min_c = squeeze(min(min(min(signal))));
 %max_c = squeeze(max(max(max(signal))));
-min_c = -3;
-max_c = 3;
- cmap=flipud(cbrewer('div', 'RdBu', 13));
- colormap(cmap)
+minC = -10;
+maxC = 10;
+cmap=flipud(cbrewer('div', 'RdBu', 13));
+colormap(cmap)
 
 for idx=1:size(signal,3)
     %smplot(p(1),p(2),idx,'axis','on')
-    smplot(8,8,idx,'axis','on')
-
-    if average
-        if ismember(idx,type1)
-            imagesc(1e3*t,f,zeros(size(signal(:,:,idx))));
-            axis xy;
-            title([num2str(idx)],'Color',CT(3,:))
-            
-        elseif ismember(idx,type2)
-            imagesc(1e3*t,f,signal(:,:,idx));
-            axis xy;           
-            title([num2str(idx)],'Color',CT(2,:))
-        else
-            imagesc(1e3*t,f,signal(:,:,idx));
-            axis xy;
-            title([num2str(idx)],'color',CT(1,:))
-        end
+    smplot(p(1),p(2),idx,'axis','on')
+    
+    if ismember(idx,type1)
+        surf(1e3*t,f,zeros(size(signal(:,:,idx))),'edgecolor','none');
+        title([num2str(idx)],'Color',CT(3,:))
         
-    elseif ~average
-        if ismember(idx,type1)
-            plot(1e3*t,1e6*squeeze(signal(:,idx,:)),'Color',CT(3,:),'LineWidth',2)
-            title([num2str(idx)],'Color',CT(3,:))
-        elseif ismember(idx,type2)
-            plot(1e3*t,1e6*squeeze(signal(:,idx)),'Color',CT(2,:),'LineWidth',2)
-            title([num2str(idx)],'Color',CT(2,:))
-        else
-            plot(1e3*t,1e6*squeeze(signal(:,idx)),'Color',CT(1,:),'LineWidth',2)
-            title([num2str(idx)],'color',CT(1,:))
-        end
-        
+    elseif ismember(idx,type2)
+        surf(1e3*t,f,signal(:,:,idx),'edgecolor','none');
+        title([num2str(idx)],'Color',CT(2,:))
+    else
+        surf(1e3*t,f,signal(:,:,idx),'edgecolor','none');
+        title([num2str(idx)],'color',CT(1,:))
     end
+    view(0,90);
+    axis tight;
+    
+    colormap(cmap);
+    set_colormap_threshold(gcf, [-1 1], [minC maxC], [.5 .5 .5])
     
     %caxis([min_c max_c])
     axis off
@@ -84,17 +71,17 @@ for idx=1:size(signal,3)
     ylabel('frequency (Hz)');
     %subtitle(['Baseline CCEPs by Channel']);
     
-      %  colorbar()
-
+    %  colorbar()
+    
 end
-   %colorbar()
+%colorbar()
 
 % obj = scalebar;
 % obj.XLen = 500;              %X-Length, 10.
 % obj.XUnit = 'ms';            %X-Unit, 'm'.
 %  obj.YLen = 200;
 %  obj.YUnit = 'Hz';
-% % 
+% %
 % obj.Position = [-400,-400];
 % obj.hTextX_Pos = [5,-50]; %move only the LABEL position
 % obj.hTextY_Pos =  [-125,-40];
