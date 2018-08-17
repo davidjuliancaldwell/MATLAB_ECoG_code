@@ -15,20 +15,22 @@
 
 function [amp,pk_loc,tr_loc]=peak_to_peak(signal,varargin)
 
-if nargin2
+if nargin < 2
     opt='abs';
 end;
 
 
+% min peak prominence - before 8-16-2018 , 5e-6 
+% min peak prominence - 8-16-2018 , 5e-6
 
-[ppks,plats]=findpeaks(signal,'minpeakprominence',5);
-[npks,nlats]=findpeaks(-signal,'minpeakprominence',5);
+[ppks,plats]=findpeaks(signal,'minpeakprominence',1e-6); 
+[npks,nlats]=findpeaks(-signal,'minpeakprominence',1e-6);
 
 falling=[];
 falling_pk=[];
 falling_tr=[];
-for ii=1length(plats)
-    nix=find(nlatsplats(ii),1);
+for ii=1:length(plats)
+    nix=find(nlats>plats(ii),1);
     if ~isempty(nix)
         falling(length(falling)+1)=...
             ppks(ii)+npks(nix);
@@ -41,8 +43,8 @@ end
 rising=[];
 rising_tr=[];
 rising_pk=[];
-for ii=1length(nlats)
-    pix=find(platsnlats(ii),1);
+for ii=1:length(nlats)
+    pix=find(plats>nlats(ii),1);
     if ~isempty(pix)
         rising(length(rising)+1)=...
             npks(ii)+ppks(pix);

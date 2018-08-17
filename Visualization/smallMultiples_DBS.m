@@ -1,12 +1,14 @@
-function smallMultiples(signal,t,varargin)
-%% DJC - 5/10/2017 small multiples plotting
+function smallMultiples_DBS(signal,t,varargin)
+%% small multiples plot for 1x8 DBS strips
 % plot small mutliple plots - time x channels x trials
-
+% 7.27.2018 David.J.Caldwell 
 
 % defaults
 type1 = [];
 type2 = [];
 average = 0;
+ xlims =  [-10 100];
+   ylims = [-250 250];
 
 for i=1:2:(length(varargin)-1)
     if ~ischar (varargin{i}),
@@ -21,6 +23,10 @@ for i=1:2:(length(varargin)-1)
             type2 = varargin{i+1};
         case 'average'
             average = varargin{i+1};
+        case 'xlims'
+            xlims = varargin{i+1};
+        case 'ylims'
+            ylims = varargin{i+1};
             
     end
 end
@@ -28,14 +34,13 @@ end
 %
 totalFig = figure;
 totalFig.Units = 'inches';
-totalFig.Position = [   10.4097    3.4722   13.2708   10.4514];
+totalFig.Position = [ 1.7569 8.8750 23.5903 4.7292];
 CT = cbrewer('qual','Accent',8);
 CT = flipud(CT);
 
-[p,n] = numSubplots(size(signal,2));
 
 for idx=1:size(signal,2)
-    smplot(p(1),p(2),idx,'axis','on')
+    smplot(1,8,idx,'axis','on')
     
     if average
         if ismember(idx,type1)
@@ -66,8 +71,8 @@ for idx=1:size(signal,2)
     
     axis off
     axis tight
-    xlim([-10 200])
-   ylim([-130 130])
+    xlim(xlims)
+   ylim(ylims)
     vline(0)
     
     %subtitle(['Baseline CCEPs by Channel']);
@@ -77,12 +82,12 @@ end
 obj = scalebar;
 obj.XLen = 25;              %X-Length, 10.
 obj.XUnit = 'ms';            %X-Unit, 'm'.
-obj.YLen = 100;
+obj.YLen = 50;
 obj.YUnit = '\muV';
 
 obj.Position = [20,-130];
-obj.hTextX_Pos = [5,-30]; %move only the LABEL position
-obj.hTextY_Pos =  [30,-15];
+obj.hTextX_Pos = [5,-10]; %move only the LABEL position
+obj.hTextY_Pos =  [32,-5];
 obj.hLineY(2).LineWidth = 5;
 obj.hLineY(1).LineWidth = 5;
 obj.hLineX(2).LineWidth = 5;

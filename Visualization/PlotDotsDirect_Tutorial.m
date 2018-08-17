@@ -1,6 +1,7 @@
 %% initialize a few things
-subjid = 'ecb43e';
+subjid = '20f8a3';
 weights = randn(64,1);
+weights = ones(64,1);
 Montage.MontageTokenized = {'Grid(1:64)'};
 
 %% gets the electrode locations for this subject

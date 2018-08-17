@@ -70,7 +70,7 @@ for ind = filesVec
     % set parameters for fit function
     fRange = [10 30];
     smoothSpan = 13;
-    plotFit = 1;
+    plotFit = 0;
     [phaseAt0,f,Rsquare,FITLINE] = phase_calculation(epochedBeta,tEpoch,smoothSpan,fRange,fs,plotFit);
     
     phaseDeg = rad2deg(phaseAt0);

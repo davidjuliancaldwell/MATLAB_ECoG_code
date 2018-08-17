@@ -1,4 +1,4 @@
-function output=rereference_CAR_median(data,mode,bad_channels,permuteOrder,channelReference)
+function output=rereference_CAR_median(data,mode,badChannels,permuteOrder,channelReference)
 % DJC 6-12-2017. Function to either common average, or median rereference,
 % while excluding bad channels.
 %
@@ -9,7 +9,7 @@ function output=rereference_CAR_median(data,mode,bad_channels,permuteOrder,chann
 
 
 if (~exist('bad_channels','var'))
-    bad_channels = []; % default no bad channels
+    badChannels = []; % default no bad channels
 end
 
 if (~exist('permuteOrder','var'))
@@ -22,44 +22,44 @@ end
 
 data = permute(data,permuteOrder);
 
-output = zeros(size(data));
+output = data; % default output of data with permute order 
 
-channel_mask = logical(ones(size(data,2),1));
-channel_mask(bad_channels) = 0;
+channelMask = logical(ones(size(data,2),1));
+channelMask(badChannels) = 0;
 
 switch(mode)
     case 'mean'
-        avg = mean(data(:,channel_mask,:),2);
-        avg = repmat(avg, 1, size(data(:,channel_mask,:),2));
-        output(:,channel_mask,:) = data(:,channel_mask,:) - avg;
+        avg = mean(data(:,channelMask,:),2);
+        avg = repmat(avg, 1, size(data(:,channelMask,:),2));
+        output(:,channelMask,:) = data(:,channelMask,:) - avg;
         
         % shift data if needed
         output = permute(output,permuteOrder);
     case 'median'
-        med = median(data(:,channel_mask,:),2);
-        med = repmat(med, 1, size(data(:,channel_mask,:),2));
-        output(:,channel_mask,:) = data(:,channel_mask,:) - med;
+        med = median(data(:,channelMask,:),2);
+        med = repmat(med, 1, size(data(:,channelMask,:),2));
+        output(:,channelMask,:) = data(:,channelMask,:) - med;
         
         % shift data if needed
         output = permute(output,permuteOrder);
         
     case 'singleChan'
         chan = data(:,channelReference,:);
-        repmat_chan = repmat(chan,1,size(data,2));
-        output = data - repmat_chan;
+        repmatChan = repmat(chan,1,size(data,2));
+        output = data - repmatChan;
         
         output = permute(output,permuteOrder);
         
         
     case 'bipolarPair' % do 1 vs 2, 3 vs 4, etc
         for i = [1:2:size(data,2)]
-            chan_odd = data(:,i,:);
-            chan_even = data(:,i+1,:);
+            chanOdd = data(:,i,:);
+            chanEven = data(:,i+1,:);
             
-            new_chan = chan_even-chan_odd;
+            newChan = chanEven-chanOdd;
             
-            output(:,i,:) = zeros(size(new_chan));
-            output(:,i+1,:) = new_chan;
+            output(:,i,:) = zeros(size(newChan));
+            output(:,i+1,:) = newChan;
             
             
         end
@@ -69,15 +69,19 @@ switch(mode)
         
     case 'bipolar' % do 1 vs 2, 3 vs 4, etc
         for i = [1:7] % for R side , do 8:end
-            chan_odd = data(:,i,:);
-            chan_even = data(:,i+1,:);
+            chanOdd = data(:,i,:);
+            chanEven = data(:,i+1,:);
             
-            new_chan = chan_even-chan_odd;
+            newChan = chanEven-chanOdd;
             
-            output(:,i,:) = new_chan;
+            output(:,i,:) = newChan;
         end
         
         output = permute(output,permuteOrder);
+    case 'none'
+        output = data;
+    case ''
+        output = data;
         
         
 end
