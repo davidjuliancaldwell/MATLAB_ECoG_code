@@ -1,5 +1,8 @@
-%% 5-3-2018 - script to plot phase distributions of beta triggered stim signal
+%% script to plot phase distributions of beta triggered stim signal
+% takes in fit signals from all subjects, for all channels, and generates
+% plots
 
+% David.J.Caldwell 8.26.2018 
 %%
 close all;clear all;clc
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\BetaStimManuscript_4_30-2018\';
@@ -25,24 +28,24 @@ closeAll = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+chans = [1:64];
+
 for file = files'
     load(file.name);
     subStrings = split(file.name,'_');
     sid = subStrings{1};
-    chan = str2num(subStrings{2});
     
     info = M(sid);
     type = info{1};
     subjectNum = info{3};
     desiredF = info{2};
     
-    
     if strcmp(type,'m')
         
         if rawPlot
             
             signalType = 'raw';
-            plotPhase_distributions_function(f_pos,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
+            plotPhase_distributions_function(f_pos(:,chan),phase_at_0_pos(:,chan),r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
             plotPhase_distributions_function(f_neg,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
@@ -67,19 +70,6 @@ for file = files'
             plotPhase_subplots_func(t,fitline_pos_acaus,f_pos_acaus,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
             
             plotPhase_subplots_func(t,fitline_neg_acaus,f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
-            
-            if closeAll
-                close all
-            end
-            
-        end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if hilbPlot
-            
-            plotPhase_distributions_function_hilb(hilbPhasePos0,desiredF(1),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
-            
-            plotPhase_distributions_function_hilb(hilbPhaseNeg0,desiredF(2),sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
-            
             
             if closeAll
                 close all
@@ -118,14 +108,7 @@ for file = files'
             
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if hilbPlot
-            
-            plotPhase_distributions_function_hilb(hilbPhase0,desiredF,sid,subjectNum,chan,type,OUTPUT_DIR,saveIt)
-            
-            if closeAll
-                close all
-            end
-        end
+
         
     end
     

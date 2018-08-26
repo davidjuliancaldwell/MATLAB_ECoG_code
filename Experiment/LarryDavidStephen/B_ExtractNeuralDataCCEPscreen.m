@@ -104,6 +104,13 @@ switch(sid)
         stimChans = [27 28];
         chans = [1:64];
         
+        case '3f2113' % added DJC 5-24-2016
+        tp = strcat(SUB_DIR,'\3f2113\data\data\d6\BetaStim\BetaStim');
+        block = 'BetaPhase-5';
+        stims = [32 31];
+        stimChans = [32 31];
+        chans = [1:64];
+        
 end
 %% load in the trigger data
 if strcmp(sid,'0b5a2ePlayback')
@@ -136,7 +143,7 @@ else
     % below is for original miah style burst tables
     %         load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
     % below is for modified burst tables
-    load(fullfile(META_DIR, [sid '_tables.mat']), 'bursts', 'fs', 'stims');
+    load(fullfile(META_DIR, [sid '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
 end
 
 % drop any stims that happen in the first 500 milliseconds
@@ -339,7 +346,7 @@ end
 
 ECoGDataAverage = squeeze(mean(ECoGData,2));
 
-save(fullfile(META_DIR, [sid '_StimulationAndCCEPs_filterV2.mat']), 't','ECoGData','ECoGDataAverage','-v7.3');
+save(fullfile(META_DIR, [sid '_StimulationAndCCEPs.mat']), 't','ECoGData','ECoGDataAverage','-v7.3');
 
 % close all; clearvars -except i
 % end
@@ -351,6 +358,6 @@ for i=1:64
     plot(t,ECoGDataAverage(:,i))
     title(['channel ', num2str(i)])
     xlim([0 0.05])
-    ylim([-100e-6 100e-6])
+    %ylim([-100e-6 100e-6])
    % subtitle([sid]);
 end
