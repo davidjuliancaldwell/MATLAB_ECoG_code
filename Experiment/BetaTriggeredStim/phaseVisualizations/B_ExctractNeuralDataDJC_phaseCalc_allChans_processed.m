@@ -2,13 +2,15 @@
 close all; clear all;clc
 Z_Constants;
 
-SUB_DIR = META_DIR
+SUB_DIR = META_DIR;
 %% parameters
 
 for idx = 2:9
     sid = SIDS{idx};
-    switch(sid)
+    
     tp = fullfile(SUB_DIR,sid,'BetaStim');
+
+    switch(sid)
 
         case 'd5cd55'
             stims = [54 62];
@@ -416,10 +418,6 @@ for idx = 2:9
         'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
         'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...
         'f','f_acaus','f_pos','f_neg','f_pos_acaus','f_neg_acaus');
-
-    if strcmp(sid,'0b5a2e_mod')
-        sid = '0b5a2e';
-    end
 
     close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR chan chans sid tp block 'bursts' 'fs' 'stims'
 end
