@@ -1,15 +1,21 @@
 %% Constants
 close all; clear all;clc
-Z_Constants;
 
+addpath(genpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/Experiment/BetaTriggeredStim'))
+addpath(genpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/DataPrep'))
+addpath(genpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/SigAnal'))
+addpath(genpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/Experiment/Subdermal_QuickScreen'))
+
+Z_Constants;
 SUB_DIR = META_DIR;
 %% parameters
+numCores = feature('numcores');
+parpool(numCores);
 
+addpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/Experiment/Subdermal_QuickScreen')
 for idx = 2:9
     sid = SIDS{idx};
-    
-    tp = fullfile(SUB_DIR,sid,'BetaStim');
-
+   
     switch(sid)
 
         case 'd5cd55'
@@ -62,6 +68,7 @@ for idx = 2:9
 
     chans = [1:64];
     chans(ismember(chans, badsTotal)) = [];
+    
 
     %% load in the trigger data
     % 9-2-2015 DJC added mod DJC
@@ -103,28 +110,34 @@ for idx = 2:9
         stims(2,:) = stims(2,:)+delay;
         bursts(2,:) = bursts(2,:) + delay;
         bursts(3,:) = bursts(3,:) + delay;
-
+sid = '0b5a2e';
     end
+
+% add in delay between stim command time sent and registration on the ECoG channels
+% 17 @ 12 kHz, so 34 @ 24 kHz
+stims(2,:) = stims(2,:) + 34;
     %
 
     %% process each ecog channel individually
     for chan = chans
-        tank = TTank;
-        tank.openTank(tp);
-        tank.selectBlock(block);
+   
 
         %% load in ecog data for that channel
         fprintf('loading in ecog data for %s:\n',sid);
         fprintf('channel %d:\n',chan);
         tic;
+        
         grp = floor((chan-1)/16);
-        ev = sprintf('ECO%d', grp+1);
+        ev = sprintf('ECO%d',grp+1);
         achan = chan - grp*16;
 
-        %         [eco, efs] = tdt_loadStream(tp, block, ev, achan);
-        [eco, info] = tank.readWaveEvent(ev, achan);
-        eco = eco';
-        efs = info.SamplingRateHz;
+if achan==1 || achan == 2          
+     load(fullfile(SUB_DIR,sid,[block '.mat']),ev);
+     dataStruct = eval(ev);
+end       
+eco = dataStruct.data(:,achan);
+        eco = 4*eco';
+        efs = dataStruct.info.SamplingRateHz;
 
         toc;
 
@@ -139,7 +152,6 @@ for idx = 2:9
 
         sts = round(stims(2,:) / fac);
         edd = zeros(size(sts));
-
         temp = squeeze(getEpochSignal(eco', sts-presamps, sts+postsamps+1));
         foo = mean(temp,2);
         lastsample = round(0.040 * efs);
@@ -411,7 +423,9 @@ for idx = 2:9
 
         toc;
     end
-
+if idx == 9
+sid = '0b5a2ePlayBack';
+end
     %%
     save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery_allChans.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
         'r_square_pos_acaus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...

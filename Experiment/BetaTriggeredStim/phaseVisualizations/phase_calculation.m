@@ -16,7 +16,7 @@ FITLINE = zeros(size(X,1),size(X,2));
 Rsquare = zeros(size(X,2),1);
 f = zeros(size(X,2),1);
 
-for k = 1:size(X,2)
+parfor k = 1:size(X,2)
     sig_ind = X(:,k);
 
     [pha_a,T_a,amp_a,rsquare_a,fitline] = sinfit(1e6*sig_ind,smooth_span,t_range);
