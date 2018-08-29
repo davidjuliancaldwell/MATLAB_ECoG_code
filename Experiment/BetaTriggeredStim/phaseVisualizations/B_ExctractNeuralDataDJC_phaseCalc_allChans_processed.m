@@ -114,8 +114,8 @@ sid = '0b5a2e';
     end
 
 % add in delay between stim command time sent and registration on the ECoG channels
-% 17 @ 12 kHz, so 34 @ 24 kHz
-stims(2,:) = stims(2,:) + 34;
+% try 15 samples @ 12 khz, so 30 for this
+stims(2,:) = stims(2,:) + 30;
     %
 
     %% process each ecog channel individually

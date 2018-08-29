@@ -31,18 +31,18 @@ Ysm = Ysm-median(Ysm); % DC correction
 
 % lower/upper values
 amp_lu = [max(abs(Ysm))/3 max(abs(Ysm))*3];
-ph_lu = [-pi pi];
+ph_lu = [0 2*pi];
 T_lu = sort(TRANGE);
 
 % start values
 amp_sv = max(abs(Ysm));
 
-ph_sv = (pi + pi) *rand(1,1) - pi; % generate random start in order to try and get decent distributions 
+ph_sv = 2*pi *rand(1,1); % generate random start in order to try and get decent distributions 
 
 T_sv = mean(TRANGE);
 
 f = fitoptions('method','NonlinearLeastSquares','Robust','On',...
-    'Lower',[amp_lu(1) ph_lu(1) T_lu(1)],'Upper',[amp_lu(2) ph_lu(2) T_lu(2)],'Display','off','MaxFunEvals',800,'MaxIter',1200); % DJC - turn off display
+    'Lower',[amp_lu(1) ph_lu(1) T_lu(1)],'Upper',[amp_lu(2) ph_lu(2) T_lu(2)],'Display','off','MaxFunEvals',1200,'MaxIter',1400); % DJC - turn off display
 
 st = [amp_sv ph_sv T_sv];
 set(f,'Startpoint',st);
