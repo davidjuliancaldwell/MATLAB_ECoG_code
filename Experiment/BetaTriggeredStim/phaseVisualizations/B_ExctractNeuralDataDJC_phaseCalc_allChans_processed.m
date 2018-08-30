@@ -114,8 +114,8 @@ sid = '0b5a2e';
     end
 
 % add in delay between stim command time sent and registration on the ECoG channels
-% try 15 samples @ 12 khz, so 30 for this
-stims(2,:) = stims(2,:) + 30;
+% try 7 samples @ 12 khz 
+stims(2,:) = stims(2,:) + 14;
     %
 
     %% process each ecog channel individually
@@ -257,8 +257,8 @@ eco = dataStruct.data(:,achan);
         plotIt = false;
 
         % set parameters for fit function
-        f_range = [12 25]; % was 10 30
-        smooth_span = 5; % was 13, try 19
+        f_range = [10 30]; % was 10 30, then 12 25, changed back 8.28.2018
+        smooth_span = 17; % was 13, try 19, then 5, now try 17 8.28.2018
 
 
         if (exist('ptsPos','var') & exist('ptsNeg','var'))
