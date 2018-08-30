@@ -58,7 +58,7 @@ if ~overlay
     PlotCortex(subjid,'b')
     hold on
 else
-    gcf
+    gcf;
     hold on
 end
 
@@ -66,11 +66,11 @@ for index = 1:length(chans)
     logicalMat = zeros(size(locs,1),1);
     logicalMat(chans{index}) = 1;
     logicIndex = logical(logicalMat);
-    h(index) = scatter3(locs(logicIndex,1),locs(logicIndex,2),locs(logicIndex,3),150,colors(index+2,:),'filled');
+    h(index) = scatter3(locs(logicIndex,1),locs(logicIndex,2),locs(logicIndex,3),150,colors(index,:),'filled');
     hold on
 end
 
-legend([h(1),h(2)],{'Stimulation electrodes','Recording evoked potentials'})
+%legend([h(1),h(2)],{'Stimulation electrodes','Recording evoked potentials'})
 
 %legend([h(1),h(2)],{'Non Stimulation electrodes','Map EPs'})
 

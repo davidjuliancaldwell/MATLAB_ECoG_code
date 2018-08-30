@@ -9,7 +9,7 @@ CONV_DIR = 'C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles';
 
 %% parameters
 
-for idx = 2:9
+for idx = 5:9
     sid = SIDS{idx};
     switch(sid)
         
@@ -119,10 +119,11 @@ for idx = 2:9
         bursts(3,:) = bursts(3,:) + delay;
         
     end
-    %
+    % try 14 
+    stims(2,:) = stims(2,:) + 14;
     
     %% process each ecog channel individually
-    for chan = chans
+   for chan = chans
         tank = TTank;
         tank.openTank(tp);
         tank.selectBlock(block);
@@ -137,7 +138,7 @@ for idx = 2:9
         
         %         [eco, efs] = tdt_loadStream(tp, block, ev, achan);
         [eco, info] = tank.readWaveEvent(ev, achan);
-        eco = eco';
+        eco = 4*eco';
         efs = info.SamplingRateHz;
         
         toc;
@@ -300,10 +301,10 @@ for idx = 2:9
         wins_acaus_total = rereference_CAR_median(wins_acaus_total,rerefMode,badsTotal,[1 3 2]);
     end
     if (exist('ptsPos','var') & exist('ptsNeg','var'))
-        winsPos_total = rereference_CAR_median(winsPos_total,rerefMode,badsTotal,[1 3 2]);
-        winsNeg_total = rereference_CAR_median(winsNeg_total,rerefMode,badsTotal,[1 3 2]);
-        winsPos_acaus_total = rereference_CAR_median(winsPos_acaus_total,rerefMode,badsTotal,[1 3 2]);
-        winsNeg_acaus_total = rereference_CAR_median(winsNeg_acaus_total,rerefMode,badsTotal,[1 3 2]);
+        winsPos_total_new = rereference_CAR_median(winsPos_total,rerefMode,badsTotal,[1 3 2]);
+        winsNeg_total_new = rereference_CAR_median(winsNeg_total,rerefMode,badsTotal,[1 3 2]);
+        winsPos_acaus_total_new = rereference_CAR_median(winsPos_acaus_total,rerefMode,badsTotal,[1 3 2]);
+        winsNeg_acaus_total_new = rereference_CAR_median(winsNeg_acaus_total,rerefMode,badsTotal,[1 3 2]);
     end
     
     fprintf('rereferencing done');

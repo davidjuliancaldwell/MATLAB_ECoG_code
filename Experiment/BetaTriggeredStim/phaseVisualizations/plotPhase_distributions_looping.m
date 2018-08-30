@@ -3,7 +3,7 @@
 %%
 close all;clear all;clc
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\BetaStimManuscript_4_30-2018\';
-cd(baseDir);
+addpath(baseDir);
 
 OUTPUT_DIR = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\BetaStimManuscript_4_30-2018\allChans';
 TouchDir(OUTPUT_DIR);
