@@ -1,4 +1,4 @@
-function PlotBrainJustDots(subjid,chans,colors,overlay)
+function [h] = PlotBrainJustDots(subjid,chans,colors,overlay,markerSize)
 
 
 if(~exist('colors', 'var') || isempty(colors))
@@ -44,6 +44,11 @@ if (~exist('overlay','var') || isempty(overlay))
     overlay = false;
 end
 
+if (~exist('markerSize','var') || isempty(overlay))
+markerSize = 150;
+end
+
+
 
 % plots brain, and just the channels of interest
 load(fullfile(getSubjDir(subjid),'trodes.mat'))
@@ -66,7 +71,7 @@ for index = 1:length(chans)
     logicalMat = zeros(size(locs,1),1);
     logicalMat(chans{index}) = 1;
     logicIndex = logical(logicalMat);
-    h(index) = scatter3(locs(logicIndex,1),locs(logicIndex,2),locs(logicIndex,3),150,colors(index,:),'filled');
+    h(index) = scatter3(locs(logicIndex,1),locs(logicIndex,2),locs(logicIndex,3),markerSize,colors(index,:),'filled');
     hold on
 end
 
