@@ -11,7 +11,7 @@ saveIt = 0;
 plotIt = 1;
 plotItTrials = 0;
 %%
-for idx = 8:8
+for idx = 8:9
     sid = SIDS{idx};
     
     switch(sid)
@@ -97,6 +97,8 @@ for idx = 8:8
             betaChan = 23;
             %goods = sort([12 13 14 15 16 20 21 23 31 32 39 40]);
             goods = [14 21 23 31];
+            
+           goods = [ 14 21 23];
             bads = [20 24 28];
             t_min = 0.008;
             t_max = 0.05;
@@ -368,43 +370,49 @@ for idx = 8:8
             klabel = label(keeps);
             ulabels = unique(klabel);
             colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
-            
-            tMin = t_min;
-            tMax = t_max;
-            
-            a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
-            a1Median = median(a1);
-            a1 = a1 - median(a1(label(keeps)==0));
-            
-            a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
-            dataForAnova{chan}{typei} = {a label keeps};
-            
-            [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'on');
-            [c,m,h,gnames] = multcompare(statsNull,'display','on');
-            sigChans{chan}{typei} = {m c a1Median a1 label keeps};
-            
+            %
+            %             tMin = t_min;
+            %             tMax = t_max;
+            %
+            %             a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
+            %             a1Median = median(a1);
+            %             a1 = a1 - median(a1(label(keeps)==0));
+            %
+            %             a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
+            %             dataForAnova{chan}{typei} = {a label keeps};
+            %
+            %             [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'on');
+            %             [c,m,h,gnames] = multcompare(statsNull,'display','on');
+            %             sigChans{chan}{typei} = {m c a1Median a1 label keeps};
+            %
             %% peak to peak values
             tBegin = 0.01;
             tEnd = 0.06;
             smooth = 1;
-[signalPP,pkLocs,trLocs] =  extract_PP_betaStim(awins,t,tBegin,tEnd,smooth);
-%% zscore
-            plotItTrials
-            for i = 1:length(ulabels)-1
-                total = 1e6*(awins(:,keeps));
-                base = 1e6*(awins(:,label==0 & keeps));
-                test = 1e6*(awins(:,label==i & keeps));
-                %[zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
-                [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
-                %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
-                [zB,magB,latB] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
-                CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
-            end
+            [signalPP,pkLocs,trLocs] =  extract_PP_betaStim(awins,t,tBegin,tEnd,smooth);
             
-            % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC
-            total = 1e6*(awins(:,keeps));
-            %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
-            [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
+            dataForPPanalysis{chan}{typei} = {signalPP pkLocs trLocs label keeps};
+            %%
+                        
+                        [anova,table,stats] = anova1(signalPP(keeps), label(keeps), 'on');
+                        [c,m,h,gnames] = multcompare(stats,'display','on');
+            %% zscore
+            plotItTrials = 0;
+            %             for i = 1:length(ulabels)-1
+            %                 total = 1e6*(awins(:,keeps));
+            %                 base = 1e6*(awins(:,label==0 & keeps));
+            %                 test = 1e6*(awins(:,label==i & keeps));
+            %                 %[zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
+            %                 [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
+            %                 %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
+            %                 [zB,magB,latB] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
+            %                 CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
+            %             end
+            %
+%             % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC
+%             total = 1e6*(awins(:,keeps));
+%             %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
+%             [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
             
             shuffleSig = 0;
             if shuffleSig
@@ -532,21 +540,21 @@ for idx = 8:8
                 end
                 
                 subplot(3,1,3)
-                prettybar(a1, label(keeps), colors, gcf);
+                prettybar(signalPP(keeps), label(keeps), colors, gcf);
                 set(gca, 'xtick', []);
                 ylabel('\DeltaEP_N (uV)');
                 
-                title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', tableNull{2,5}, tableNull{2,6}));
+                title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
                 figure
-                [pNull,tblNull,statsNull] = kruskalwallis(a1',label(keeps));
+                [p,tbl,stats] = kruskalwallis(signalPP(keeps),label(keeps));
             end
         end
         
         
     end
     if saveIt
-        save(fullfile(OUTPUT_DIR, [sid 'epSTATSsig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
+        save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig.mat']), 'sigChans','CCEPbyNumStim','dataForAnova','ZscoredDataForAnova');
         close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
-        save(fullfile(OUTPUT_DIR, [sid 'epSTATSsigShuffle.mat']), 'shuffleChans');
+       
     end
 end

@@ -5,14 +5,12 @@ function [signalPP,pkLocs,trLocs] =  extract_PP_betaStim(signal,t,tBegin,tEnd,sm
 % time x trials
 
 % David.J.Caldwell
-% 6.19.2018
+% 9.7.2018
 
 numTrials = size(signal,2);
 signalPP = zeros(1,numTrials);
 pkLocs = zeros(1,numTrials);
 trLocs = zeros(1,numTrials);
-
-% original was above before 7/27/2018
 
 order = 3;
 framelen = 25;
@@ -40,7 +38,7 @@ for i = 1:size(signal,2)
     
     if plotIt
         figure
-        plot(t,tempSignalExtract)
+        plot(tempSignalExtract)
         vline(pk_loc)
         vline(tr_loc)
     end

@@ -4,7 +4,7 @@
 
 % David.J.Caldwell 8.26.2018
 %%
-close all;clear all;clc
+%close all;clear all;clc
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\BetaStimManuscript_4_30-2018\';
 addpath(baseDir);
 
@@ -16,24 +16,22 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},{'m',[0 180],2,[55 56],[2 3 31 5
     {'s',270,4,[59 60],[1 9 10 35 43],51},{'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],5},...
     {'m',[90,180],6,[56 64],[57:64],55},{'m',[90,270],7,[22 30],[17 18 19 25 29],31},{'m',[90,270],8,[22 30],[17 18 19 25 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
+%SIDS = {'0b5a2ePlayback'}
 
-SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
+%SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
 %SIDS = {'c91479'}
 %gcp;  %parallel pool
 %
 % settings
 hilbPlot = 0;
-acausalPlot = 1;
+acausalPlot = 0;
 rawPlot = 1;
 saveIt = 0;
 closeAll = 0;
-
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for sid = SIDS
     sid = sid{:};
-    load([sid '_phaseDelivery_allChans.mat']);
-    
-    fprintf(['running for subject ' sid '\n']);
     info = M(sid);
     type = info{1};
     subjectNum = info{3};
@@ -45,7 +43,18 @@ for sid = SIDS
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
+    
+     load([sid '_phaseDelivery_allChans.mat']);
+
+    
+     fprintf(['running for subject ' sid '\n']);
+
+    if strcmp(sid,'0b5a2ePlayback')     
+            locs = trodeLocsFromMontage('0b5a2e', Montage, false);
+            sid = '0b5a2e';
+    else
     locs = trodeLocsFromMontage(sid, Montage, false);
+    end
     
     markerMin = 5;
     markerMax = 30;

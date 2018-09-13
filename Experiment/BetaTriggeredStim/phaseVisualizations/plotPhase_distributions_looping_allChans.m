@@ -18,13 +18,13 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},{'m',[0 180],2,[55 56],[2 3 31 5
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 
 
-SIDS = {'d5cd55'};
+SIDS = {'0b5a2e','0b5a2ePlayback'};
 
 gcp;  %parallel pool
 %
 % settings
 hilbPlot = 0;
-acausalPlot = 1;
+acausalPlot = 0;
 rawPlot = 1;
 saveIt = 0;
 closeAll = 0;
@@ -41,7 +41,8 @@ for sid = SIDS
     stims = info{4};
     bads = info{5};
     betaChan = info{6};
-    chans = [1:64];
+   % chans = [1:64];
+   chans = [14,21,23,31];
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     
