@@ -1,5 +1,6 @@
 %% Constants
-close all; clear all;clc
+%close all; clear all;
+
 Z_Constants
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 % OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
@@ -11,7 +12,7 @@ saveIt = 1;
 plotIt = 1;
 plotItTrials = 0;
 %%
-for idx = 2:9
+for idx = 8:9
     sid = SIDS{idx};
     
     switch(sid)
@@ -46,7 +47,7 @@ for idx = 2:9
             goods = sort([ 39 40 47 48 63 64]);
             bads = [2 3 31 57];
             
-            t_min = 0.008;
+            t_min = 0.003;
             t_max = 0.033;
         case '7dbdec'
             tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
@@ -55,8 +56,8 @@ for idx = 2:9
             chans = [4 5 14];
             goods = sort([4 5 10 13]);
             betaChan = 4;
-            t_min = 0.005;
-            t_max = 0.06;
+            t_min = 0.007;
+            t_max = 0.048;
             bads = [57];
             
         case '9ab7ab'
@@ -68,8 +69,8 @@ for idx = 2:9
             betaChan = 51;
             
             goods = sort([42 43 49 50 51 52 53 57 58]);
-            t_min = 0.005;
-            t_max = 0.0425;
+            t_min = 0.006;
+            t_max = 0.06;
             bads = [1 9 10 35 43];
             
         case '702d24'
@@ -79,7 +80,7 @@ for idx = 2:9
             chans = [4 5 21];
             goods = [ 5 ];
             t_min = 0.008;
-            t_max = 0.0425;
+            t_max = 0.046;
             bads = [23 27 28 29 30 32 44 52 60];
             
             
@@ -110,8 +111,8 @@ for idx = 2:9
             
             goods = [ 14 21 23];
             bads = [24 25 29];
-            t_min = 0.008;
-            t_max = 0.05;
+            t_min = 0.005;
+            t_max = 0.075;
         case '0b5a2ePlayback' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             block = 'BetaPhase-4';
@@ -125,7 +126,7 @@ for idx = 2:9
             goods = sort([12 13 14 15 16 21 23 31 32 39 40]);
             bads = [24 25 29];
             t_min = 0.005;
-            t_max = 0.06;
+            t_max = 0.075;
         case '0a80cf' % added DJC 5-24-2016
             tp = strcat(SUB_DIR,'\0a80cf\data\d10\0a80cf_BetaStim\0a80cf_BetaStim');
             block = 'BetaPhase-4';
@@ -210,6 +211,7 @@ for idx = 2:9
     % set statistical threshold
     statThresh = length(chans);
     
+%     chans = [14 21 23 31]
     for chan = chans
         
         %% load in ecog data for that channel
@@ -415,6 +417,7 @@ for idx = 2:9
             
             [kruskalWallisResult,table,stats] = kruskalwallis(signalPP(keeps), label(keeps), 'off');
             if kruskalWallisResult < 0.05/statThresh
+                figure
                 [c,m,h,gnames] = multcompare(stats,'display','on');
             end
             
@@ -488,7 +491,9 @@ for idx = 2:9
             
             if plotIt
                 %
-                if kruskalWallisResult < 0.05/statThresh
+              %  if kruskalWallisResult < 0.05/statThresh
+              if 0
+                  %%
                     figure
                     % this sets the figure to be the whole screen
                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
@@ -581,7 +586,11 @@ for idx = 2:9
     end
     if saveIt
         save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig.mat']), 'dataForPPanalysis','kruskalWallisStats');
-        close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR
+        %close all; 
+                fprintf('saved %s:\n',sid);
+
+        clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR savePlot saveIt plotIt plotItTrials
+        
     end
 end
 

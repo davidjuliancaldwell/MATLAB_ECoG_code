@@ -13,10 +13,13 @@ pkLocs = zeros(1,numTrials);
 trLocs = zeros(1,numTrials);
 
 order = 3;
-framelen = 25;
+framelen = 171;
+
+% was 25 before 
 
 plotIt = 0;
 
+tTemp = t(t>tBegin & t<tEnd);
 for i = 1:size(signal,2)
     
     tempSignalExtract = squeeze(signal(t>tBegin & t<tEnd,i));
@@ -24,7 +27,7 @@ for i = 1:size(signal,2)
         tempSignalExtract = sgolayfilt_complete(tempSignalExtract,order,framelen);
     end
     
-    [amp,pk_loc,tr_loc]=peak_to_peak(tempSignalExtract);
+    [amp,pk_loc,tr_loc]=peak_to_peak_beta_stim(tempSignalExtract);
     
     if isempty(amp)
         amp = nan;
@@ -36,11 +39,11 @@ for i = 1:size(signal,2)
     pkLocs(i) = pk_loc;
     trLocs(i) = tr_loc;
     
-    if plotIt
+    if plotIt && mod(i,10) == 0
         figure
-        plot(tempSignalExtract)
-        vline(pk_loc)
-        vline(tr_loc)
+        plot(tTemp,tempSignalExtract)
+        vline(tTemp(pk_loc),'r')
+        vline(tTemp(tr_loc),'b')
     end
     
 end

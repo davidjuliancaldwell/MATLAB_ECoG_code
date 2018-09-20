@@ -5,7 +5,7 @@ SIDS = {'8adc5c', 'd5cd55', 'c91479', '7dbdec', '9ab7ab', '702d24', 'ecb43e','0b
 % CSNESiteVisit
 
 %OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'BetaStimManuscript');
-OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'BetaStimManuscript_4_30-2018'); % DJC 4-30-2018 
+OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'PeakToPeakEP'); % DJC 4-30-2018 
 
 TouchDir(OUTPUT_DIR);
 META_DIR = fullfile(myGetenv('OUTPUT_DIR'), 'BetaTriggeredStim', 'meta');

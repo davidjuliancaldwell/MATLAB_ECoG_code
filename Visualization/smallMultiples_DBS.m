@@ -8,7 +8,7 @@ type1 = [];
 type2 = [];
 average = 0;
  xlims =  [-10 100];
-   ylims = [-250 250];
+   ylims = [-300 300];
 
 for i=1:2:(length(varargin)-1)
     if ~ischar (varargin{i}),
