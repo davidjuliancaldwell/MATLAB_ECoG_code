@@ -1,4 +1,4 @@
-function [PHA,T,AMP,Rsquare,FITLINE] = sinfit (Y,SPAN,TRANGE,X)
+function [PHA,T,AMP,Rsquare,FITLINE,OFFSET] = sinfit (Y,SPAN,TRANGE,X)
 %SINFIT  Sine wave fit to data.
 %   [PHA T AMP Rsquare FITLINE] = sinfit (Y,SPAN,TRANGE,X)
 %
@@ -37,14 +37,14 @@ offset_lu = [-max(abs(Ysm))*3 max(abs(Ysm))*3];
 % start values
 amp_sv = max(abs(Ysm));
 
-ph_sv = 0; 
+ph_sv = -pi + (2*pi)*rand(1,1); 
 
 T_sv = mean(TRANGE);
 
 offset_sv = median(Ysm);
 
 f = fitoptions('method','NonlinearLeastSquares','Robust','On',...
-    'Lower',[amp_lu(1) ph_lu(1) T_lu(1) offset_lu(1)],'Upper',[amp_lu(2) ph_lu(2) T_lu(2) offset_lu(2)],'Display','off','MaxFunEvals',1200,'MaxIter',1400); % DJC - turn off display
+    'Lower',[amp_lu(1) ph_lu(1) T_lu(1) offset_lu(1)],'Upper',[amp_lu(2) ph_lu(2) T_lu(2) offset_lu(2)],'Display','off','MaxFunEvals',1600,'MaxIter',2000); % DJC - turn off display
 
 st = [amp_sv ph_sv T_sv offset_sv];
 set(f,'Startpoint',st);
@@ -57,6 +57,7 @@ ft = fittype('a*sin(b+2*pi*X/c)+d',...
 
 AMP = cfun.a;
 PHA = cfun.b;
+OFFSET = cfun.d;
 T = cfun.c;
 FITLINE = cfun(X);
 Rsquare = gof.rsquare;

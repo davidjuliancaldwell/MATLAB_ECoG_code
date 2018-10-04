@@ -19,12 +19,12 @@ f = zeros(size(X,2),1);
 parfor k = 1:size(X,2)
     sig_ind = X(:,k);
 
-    [pha_a,T_a,amp_a,rsquare_a,fitline] = sinfit(1e6*sig_ind,smooth_span,t_range);
+    [pha_a,T_a,amp_a,rsquare_a,fitline,offset] = sinfit(1e6*sig_ind,smooth_span,t_range);
 
     f_calculated = 1/(T_a/fs);
     length_sig = length(sig_ind);
     x = 1:length_sig;
-    a = amp_a.*sin(pha_a+(2*pi*x/T_a));
+    a = amp_a.*sin(pha_a+(2*pi*x/T_a))+offset;
     
     phase_delivery = mod((pha_a+(length_sig*pi*2/T_a)),(2*pi));
 
@@ -48,7 +48,7 @@ parfor k = 1:size(X,2)
         legend({'curve fit','original sig'})
         title('Curve fitting')
         set(gca,'fontsize',14);
-        pause(1)
+        %pause(1)
     end
 end
 
