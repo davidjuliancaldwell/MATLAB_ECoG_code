@@ -17,8 +17,9 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},{'m',[0 180],2,[55 56],[2 3 31 5
     {'m',[90,180],6,[56 64],[57:64],55},{'m',[90,270],7,[22 30],[17 18 19 25 29],31},{'m',[90,270],8,[22 30],[17 18 19 25 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 
+modifier = '_51samps_12_20_60ms_randomstart';
 
-SIDS = {'0b5a2ePlayback'};
+SIDS = {'0b5a2e','0b5a2ePlayback'};
 
 %gcp;  %parallel pool
 %
@@ -31,7 +32,7 @@ closeAll = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for sid = SIDS
     sid = sid{:};
-    load([sid '_phaseDelivery_allChans_51samps_12_20_60ms_randomStart.mat']);
+    load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -48,7 +49,8 @@ for sid = SIDS
     bads = info{5};
     betaChan = info{6};
      chans = [1:64];
-    %chans = [14,21,23,31];
+    chans = [14,21,23,31];
+    chans = 23;
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     
@@ -72,10 +74,10 @@ for sid = SIDS
             for chan = chans
                 fprintf(['chan ' num2str(chan) '\n'])
                 signalType = 'filtered';
-                plotPhase_distributions_function(f_pos_acaus(:,chan),phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)      ;
-                plotPhase_distributions_function(f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)     ;
-                plotPhase_subplots_func(t,fitline_pos_acaus(:,:,chan),f_pos_acaus,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)    ;
-                plotPhase_subplots_func(t,fitline_neg_acaus(:,:,chan),f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt);
+                plotPhase_distributions_function(f_pos_acaus(:,chan),phase_at_0_pos_acaus(:,chan),r_square_pos_acaus(:,chan),desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)      ;
+                plotPhase_distributions_function(f_neg_acaus,phase_at_0_neg_acaus(:,chan),r_square_neg_acaus(:,chan),desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)     ;
+                plotPhase_subplots_func(t,fitline_pos_acaus(:,:,chan),f_pos_acaus(:,chan),phase_at_0_pos_acaus(:,chan),r_square_pos_acaus(:,chan),desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)    ;
+                plotPhase_subplots_func(t,fitline_neg_acaus(:,:,chan),f_neg_acaus(:,chan),phase_at_0_neg_acaus(:,chan),r_square_neg_acaus(:,chan),desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt);
             end
             if closeAll
                 close all

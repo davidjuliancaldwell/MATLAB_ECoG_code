@@ -47,6 +47,8 @@ plotColor = [
     [0.2, 0.2, 0.6];...    % dark blue         (20)
     ];
 
+modifier = '_51samps_12_20_60ms_randomstart';
+
 %%
 
 figure
@@ -78,7 +80,7 @@ for sid = SIDS
     
     
     load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans_51samps.mat']);
+    load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -167,7 +169,7 @@ for sid = SIDS(end-1:end)
     threshold = 0.8;
     
     load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans.mat']);
+    load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -183,8 +185,8 @@ for sid = SIDS(end-1:end)
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos_acaus,...
+                threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,[],[]);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
                 threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[]);
@@ -249,7 +251,7 @@ for sid = SIDS(end-1)
     threshold = 0.3;
     
     load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans.mat']);
+    load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -339,7 +341,7 @@ for sid = SIDS
     
     
     load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans_51samps.mat']);
+    load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -428,11 +430,11 @@ for sid = SIDS(end-1:end)
     minData = -1;
     maxData = 1;
     
-    threshold = 0.3;
+    threshold = 0.8;
     
     
     load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans_51samps.mat']);
+    load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -449,12 +451,12 @@ for sid = SIDS(end-1:end)
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos_acaus,...
+                threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,[],[]);
             fDeliver = f_pos;
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg_acaus,...
+                threshold,phase_at_0_neg_acaus,chans,desiredF(2),markerMin,markerMax,[],[]);
             fDeliver = f_neg;
             
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)

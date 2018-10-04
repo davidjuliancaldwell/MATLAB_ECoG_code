@@ -22,6 +22,7 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},...
     {'m',[90,270],8,[22 30],[24 25 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 %SIDS = {'0b5a2ePlayback'}
+modifier = '_51samps_12_20_60ms_randomstart';
 
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
 %SIDS = {'c91479'}
@@ -54,7 +55,7 @@ for sid = SIDS
     
     %      load([sid '_phaseDelivery_allChans_51samps.mat']);
     
-    load([sid '_phaseDelivery_allChans.mat']);
+    load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
