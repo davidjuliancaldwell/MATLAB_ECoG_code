@@ -18,9 +18,9 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},{'m',[0 180],2,[55 56],[2 3 31 5
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 
 
-SIDS = {'0b5a2e','0b5a2ePlayback'};
+SIDS = {'0b5a2ePlayback'};
 
-gcp;  %parallel pool
+%gcp;  %parallel pool
 %
 % settings
 hilbPlot = 0;
@@ -31,9 +31,15 @@ closeAll = 0;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for sid = SIDS
     sid = sid{:};
-    load([sid '_phaseDelivery_allChans.mat']);
+    load([sid '_phaseDelivery_allChans_51samps_12_20_60ms_randomStart.mat']);
     
     fprintf(['running for subject ' sid '\n']);
+    
+    if (strcmpi(sid,'0b5a2ePlayback'))
+        sid = '0b5a2ePlayback';
+    end
+    
+    
     info = M(sid);
     type = info{1};
     subjectNum = info{3};
@@ -41,19 +47,19 @@ for sid = SIDS
     stims = info{4};
     bads = info{5};
     betaChan = info{6};
-   % chans = [1:64];
-   chans = [14,21,23,31];
+     chans = [1:64];
+    %chans = [14,21,23,31];
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     
     if strcmp(type,'m')
-          if rawPlot
+        if rawPlot
             for chan = chans
                 fprintf(['chan ' num2str(chan) '\n'])
                 signalType = 'raw';
                 plotPhase_distributions_function(f_pos(:,chan),phase_at_0_pos(:,chan),r_square_pos(:,chan),desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt);
                 plotPhase_distributions_function(f_neg(:,chan),phase_at_0_neg(:,chan),r_square_neg(:,chan),desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)   ;
-                plotPhase_subplots_func(t,fitline_pos(:,:,chan),f_pos(:,chan),phase_at_0_pos(:,chan),r_square_pos(:,chan),desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)    ;    
+                plotPhase_subplots_func(t,fitline_pos(:,:,chan),f_pos(:,chan),phase_at_0_pos(:,chan),r_square_pos(:,chan),desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)    ;
                 plotPhase_subplots_func(t,fitline_neg(:,:,chan),f_neg(:,chan),phase_at_0_neg(:,chan),r_square_neg(:,chan),desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt);
             end
             
@@ -61,49 +67,49 @@ for sid = SIDS
                 close all
             end
         end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%      
-        if acausalPlot    
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        if acausalPlot
             for chan = chans
-                fprintf(['chan ' num2str(chan) '\n'])   
+                fprintf(['chan ' num2str(chan) '\n'])
                 signalType = 'filtered';
                 plotPhase_distributions_function(f_pos_acaus(:,chan),phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)      ;
-                plotPhase_distributions_function(f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)     ; 
-                plotPhase_subplots_func(t,fitline_pos_acaus(:,:,chan),f_pos_acaus,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)    ;           
+                plotPhase_distributions_function(f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)     ;
+                plotPhase_subplots_func(t,fitline_pos_acaus(:,:,chan),f_pos_acaus,phase_at_0_pos,r_square_pos,desiredF(1),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)    ;
                 plotPhase_subplots_func(t,fitline_neg_acaus(:,:,chan),f_neg_acaus,phase_at_0_neg,r_square_neg,desiredF(2),sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt);
             end
             if closeAll
                 close all
-            end    
+            end
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     elseif strcmp(type,'s')
         if rawPlot
             
-
+            
             for chan = chans
-                fprintf(['chan ' num2str(chan) '\n'])  
-                signalType = 'raw';         
+                fprintf(['chan ' num2str(chan) '\n'])
+                signalType = 'raw';
                 plotPhase_distributions_function(f(:,chan),phase_at_0(:,chan),r_square(:,chan),desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt);
-                plotPhase_subplots_func(t,fitline(:,:,chan),f(:,chan),phase_at_0(:,chan),r_square(:,chan),desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)   ;       
+                plotPhase_subplots_func(t,fitline(:,:,chan),f(:,chan),phase_at_0(:,chan),r_square(:,chan),desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)   ;
             end
             if closeAll
                 close all
-            end        
+            end
         end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
-        if acausalPlot       
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        if acausalPlot
             signalType = 'filtered';
             for chan = chans
-                fprintf(['chan ' num2str(chan) '\n'])            
-                plotPhase_distributions_function(f_acaus(:,chan),phase_at_0(:,chan),r_square(:,chan),desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)     ;         
+                fprintf(['chan ' num2str(chan) '\n'])
+                plotPhase_distributions_function(f_acaus(:,chan),phase_at_0(:,chan),r_square(:,chan),desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)     ;
                 plotPhase_subplots_func(t,fitline_acaus(:,:,chan),f,phase_at_0,r_square,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt);
             end
             if closeAll
                 close all
-            end          
+            end
         end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%         
-    end      
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    end
 end
 
 

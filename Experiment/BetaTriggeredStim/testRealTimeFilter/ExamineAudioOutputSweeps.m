@@ -18,7 +18,7 @@ degreesVecNegFilt = [];
 
 plotFFT = 0;
 plotTime = 0;
-plotFit = 1;
+plotFit = 0;
 
 for ind = filesVec
     ind

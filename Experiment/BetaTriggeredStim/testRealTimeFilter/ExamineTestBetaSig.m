@@ -4,7 +4,8 @@
 % ECO1.data(:,1) has the raw input signal
 % Wave.data(:,4) has the beta signal
 close all;clear all;clc
-load('G:\My Drive\betaStimTest_WMsweep.mat')
+load('G:\My Drive\whiteMatterTestFunctions\betaStimTest_WMsweep.mat')
+
 %%
 % example find phase difference 
 % peak to peak difference = 3028-3019 in ms @ 13 Hz

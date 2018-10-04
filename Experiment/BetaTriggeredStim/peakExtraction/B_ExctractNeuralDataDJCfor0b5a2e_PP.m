@@ -304,8 +304,7 @@ for idx = 2:9
         elseif (strcmp(sid, '0b5a2ePlayback'))
             pts = stims(3,:) == 0;
         elseif (strcmp(sid,'3f2113'))
-            pts = stims(3,:) == 0;
-            
+            pts = stims(3,:) == 0;        
         else
             error 'unknown sid';
         end
@@ -324,8 +323,7 @@ for idx = 2:9
         awins = wins-repmat(mean(wins(t<-0.005,:),1), [size(wins, 1), 1]);
         
         pstims = stims(:,pts);
-        
-        
+  
         % considered a baseline if it's been at least N seconds since the last
         % burst ended
         

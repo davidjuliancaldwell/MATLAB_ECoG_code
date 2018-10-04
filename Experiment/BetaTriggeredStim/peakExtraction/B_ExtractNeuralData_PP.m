@@ -8,11 +8,11 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 %% additional options
 
 savePlot = 0;
-saveIt = 1;
+saveIt = 0;
 plotIt = 1;
 plotItTrials = 0;
 %%
-for idx = 8:9
+for idx = 6:6
     sid = SIDS{idx};
     
     switch(sid)
@@ -35,7 +35,7 @@ for idx = 8:9
             % have to set t_min and t_max for each subject
             %t_min = 0.004833;
             % t_min of 0.005 would find the really early ones
-            t_min = 0.008;
+            t_min = 0.006;
             t_max = 0.06;
             
         case 'c91479'
@@ -45,7 +45,7 @@ for idx = 8:9
             chans = [64 63 48];
             betaChan = 64;
             goods = sort([ 39 40 47 48 63 64]);
-            bads = [2 3 31 57];
+            bads = [1 2 3 31 57];
             
             t_min = 0.003;
             t_max = 0.033;
@@ -58,7 +58,7 @@ for idx = 8:9
             betaChan = 4;
             t_min = 0.007;
             t_max = 0.048;
-            bads = [57];
+            bads = [8 57];
             
         case '9ab7ab'
             tp = strcat(SUB_DIR,'\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
@@ -210,8 +210,8 @@ for idx = 8:9
     
     % set statistical threshold
     statThresh = length(chans);
-    
-%     chans = [14 21 23 31]
+    chans = [29 36 37 38 46];
+    chans = [5];
     for chan = chans
         
         %% load in ecog data for that channel
@@ -491,9 +491,8 @@ for idx = 8:9
             
             if plotIt
                 %
-              %  if kruskalWallisResult < 0.05/statThresh
-              if 0
-                  %%
+             %  if kruskalWallisResult < 0.05/statThresh
+                    %%
                     figure
                     % this sets the figure to be the whole screen
                     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
@@ -507,6 +506,10 @@ for idx = 8:9
                     yl = ylim;
                     yl(1) = min(-10, max(yl(1),-140*4));
                     yl(2) = max(10, min(yl(2),100*4));
+                    
+                     yl(1) = min(-10, max(yl(1),-340*4));
+                    yl(2) = max(10, min(yl(2),300*4));
+                    
                     ylim(yl);
                     highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
                     vline(0);
@@ -578,7 +581,7 @@ for idx = 8:9
                         %     SaveFig(OUTPUT_DIR, sprintf(['EP-phase-%d-sid-%s-chan-%d'],typei,sid, chan,type,signalType), 'svg');
                         SaveFig(OUTPUT_DIR, sprintf(['EP-phase-%d-sid-%s-chan-%d'],typei,sid, chan), 'png','-r600');
                     end
-                end
+               % end
             end
         end
         
@@ -586,9 +589,9 @@ for idx = 8:9
     end
     if saveIt
         save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig.mat']), 'dataForPPanalysis','kruskalWallisStats');
-        %close all; 
-                fprintf('saved %s:\n',sid);
-
+        %close all;
+        fprintf('saved %s:\n',sid);
+        
         clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR savePlot saveIt plotIt plotItTrials
         
     end

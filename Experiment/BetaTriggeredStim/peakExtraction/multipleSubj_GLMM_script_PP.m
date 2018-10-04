@@ -9,6 +9,21 @@ Z_Constants;
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
 
+%% parameters
+
+
+SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
+valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53},2.5,...
+    {'m',[0 180],2,[55 56],[1 2 3 31 57],[31 39 40 47 48 63 64],64},3,...
+    {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4},3.5,...
+    {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51},0.75,...
+    {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5},0.75,...
+    {'t',[90,180],6,[56 64],[57:64],[46 48 54 55 63],55},1.75...
+    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31},...
+    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31}};
+M = containers.Map(SIDS,valueSet,'UniformValues',false);
+%%
+
 BetaMags5 = [];
 BetaMags3 = [];
 BetaMags1 = [];
@@ -18,15 +33,30 @@ NumStims = {};
 TotalMags = [];
 Chan = {};
 Type = {};
-StimLevel = [];
 %answer = input('use zscore or raw values? Enter "zscore" or "raw"  \n','s');
 
 % exclude playback for now
 % which
 subdir = 'PeaktoPeakEP';
 
-for i = 2:length(SIDS)-4
-    sid = SIDS{i};
+for sid = SIDS
+    
+        sid = sid{:};
+    subjid = sid;
+    info = M(sid);
+    type = info{1};
+    subjectNum = info{3};
+    desiredF = info{2};
+    stims = info{4};
+    bads = info{5};
+    goodEPs = info{6};
+    betaChan = info{7};
+    stimLevel = info{8};
+    chans = [1:64];
+    badsTotal = [stims bads];
+    chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
+    
+    
     switch sid
         case 'd5cd55'
             load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'d5cd55epSTATS-PP-sig'))

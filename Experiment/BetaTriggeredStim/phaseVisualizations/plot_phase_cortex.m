@@ -1,6 +1,9 @@
-function [] = plot_phase_cortex(r_square,threshold,phase_at_0,signalType,desiredF,markerMin,markerMax,minData,maxData,sid,subjectNum,locs,chans,stims,betaChan)
+function [] = plot_phase_cortex(r_square,threshold,phase_at_0,signalType,desiredF,markerMin,markerMax,minData,maxData,sid,subjectNum,locs,chans,stims,betaChan,magnitudeOnly)
 %% plot the distribution of phases on each cortical surface
 % 8.30.2018 David.J.Caldwell
+
+% define colormap
+cmap = flipud(cbrewer('seq','PuRd',40));
 
 % anonymous functions to define the size of the markers based on desired
 % values
@@ -17,7 +20,12 @@ phase_at_0_screened(~rSquareThresh) = nan;
 
 % calculate the weights based off of the desired frequency, as well as the
 % direction in which the frequency was off
+
+if ~magnitudeOnly
 weights = calculate_direction_shift(desiredF,peakPhase).*theta_min_func(desiredF,peakPhase);
+else
+    weights = theta_min_func(desiredF,peakPhase);
+end
 
 % set defaults, if wanting to use the data to set things leave these as []
 % when calling the function
@@ -29,16 +37,24 @@ if (~exist('maxData','var') || isempty(maxData))
     maxData = min(peakStd);
 end
 
+
 % define marker size
 markerSize = marker_size_func(markerMin,markerMax,minData,maxData,peakStd);
 markerSize(isnan(markerSize)) = markerMin;
 
 % plot the dots
+
+if magnitudeOnly
+        PlotDotsDirect(sid, locs(chans,:), weights, 'b',...
+    [0 180], markerSize,cmap,[],false,false)
+
+else
 PlotDotsDirect(sid, locs(chans,:), weights, 'b',...
-    [-max(abs(weights)) max(abs(weights))], markerSize,'america',[],false,false)
+    [-max(abs(weights)) max(abs(weights))], markerSize,cmap,[],false,false)
+end
 % needs to be the same as what was used in the function call above
-load('america'); 
-colormap(cm);
+%load('america'); 
+colormap(cmap);
 cbar = colorbar;
 cbar.Label.String = 'difference in degrees from desired frequency';
 
@@ -49,11 +65,17 @@ title({['Subject ' num2str(subjectNum) ' '  signalType ' signal stimulation deli
 [minChanVal,minChanIndex] = max(peakStd);
 [maxChanVal,maxChanIndex] = min(peakStd);
 
-PlotDotsDirect(sid, locs(chans(minChanIndex),:), weights(minChanIndex), 'b',...
-    [-max(abs(weights)) max(abs(weights))], markerSize(minChanIndex),'america',[],false,true)
+if magnitudeOnly
+    PlotDotsDirect(sid, locs(chans(minChanIndex),:), weights(minChanIndex), 'b',...
+    [0 180], markerSize(minChanIndex),cmap,[],false,true)
 PlotDotsDirect(sid, locs(chans(maxChanIndex),:), weights(maxChanIndex), 'b',...
-    [-max(abs(weights)) max(abs(weights))], markerSize(maxChanIndex),'america',[],false,true)
-
+    [0 180], markerSize(maxChanIndex),cmap,[],false,true)
+else
+PlotDotsDirect(sid, locs(chans(minChanIndex),:), weights(minChanIndex), 'b',...
+    [-max(abs(weights)) max(abs(weights))], markerSize(minChanIndex),cmap,[],false,true)
+PlotDotsDirect(sid, locs(chans(maxChanIndex),:), weights(maxChanIndex), 'b',...
+    [-max(abs(weights)) max(abs(weights))], markerSize(maxChanIndex),cmap,[],false,true)
+end
 % plot stimulation channels
 stimulationPlot = PlotBrainJustDots(sid,{stims(1),stims(2)},[0 0 0; 0 0 0],true);
 
