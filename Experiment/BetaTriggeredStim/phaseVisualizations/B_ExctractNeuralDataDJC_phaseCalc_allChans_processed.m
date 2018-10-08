@@ -11,9 +11,10 @@ SUB_DIR = META_DIR;
 %% parameters
 numCores = feature('numcores');
 parpool(numCores);
+idxVec = [4 6 7];
 
 addpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/Experiment/Subdermal_QuickScreen')
-for idx = [2:7]
+for idx = idxVec
     sid = SIDS{idx};
     
     switch(sid)
@@ -431,7 +432,7 @@ for idx = [2:7]
         'r_square_pos_acaus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
         'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
         'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...
-        'f','f_acaus','f_pos','f_neg','f_pos_acaus','f_neg_acaus');
+        'f','f_acaus','f_pos','f_neg','f_pos_acaus','f_neg_acaus','-v7.3');
     
     close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR chan chans sid tp block 'bursts' 'fs' 'stims'
 end
