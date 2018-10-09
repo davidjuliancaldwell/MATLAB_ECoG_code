@@ -9,7 +9,6 @@ cmap = flipud(cbrewer('seq','PuRd',40));
 % values
 marker_size_func= @(minNew,maxNew,minData,maxData,val) (maxNew-minNew)*(val-minData)/(maxData-minData)+minNew;
 
-figure
 % threshold the data
 rSquareThresh = (r_square) > threshold;
 phase_at_0_screened = phase_at_0;
@@ -43,6 +42,8 @@ markerSize = marker_size_func(markerMin,markerMax,minData,maxData,peakStd);
 markerSize(isnan(markerSize)) = markerMin;
 
 % plot the dots
+
+figure
 
 if magnitudeOnly
         PlotDotsDirect(sid, locs(chans,:), weights, 'b',...

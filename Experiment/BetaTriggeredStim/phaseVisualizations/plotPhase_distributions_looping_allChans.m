@@ -49,8 +49,9 @@ for sid = SIDS
     bads = info{5};
     betaChan = info{6};
      chans = [1:64];
-    chans = [14,21,23,31];
-    chans = 23;
+   % chans = [14,21,23,31];
+   chans = 31;
+   % chans = 23;
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     

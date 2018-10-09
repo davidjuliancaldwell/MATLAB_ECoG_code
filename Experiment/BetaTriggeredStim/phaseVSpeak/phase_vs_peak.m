@@ -49,8 +49,9 @@ plotColor = [
 
 modifier = '_51samps_12_20_60ms_randomstart';
 
-%%
+%SIDS = {'d5cd55'};
 
+%% plot EP modulation vs phase for all subjects
 figure
 hold on
 h = [];
@@ -81,7 +82,7 @@ for sid = SIDS
     
     load(strcat(subjid,'epSTATS-PP-sig.mat'))
     load([sid '_phaseDelivery_allChans' modifier '.mat']);
-    
+
     fprintf(['running for subject ' sid '\n']);
     
     %%
@@ -123,6 +124,8 @@ for sid = SIDS
     
     
 end
+xlim([0 360])
+xticks([0 45 90 135 180 225 270 315 360])
 
 legend([h],{'Subject 1',...
     'Subject 2',...
@@ -138,7 +141,7 @@ ylabel('Percent change in EP size from baseline to >5 conditioning stimuli')
 set(gca,'fontsize',18)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%
+%% plot EP modulation vs phase for subj. 7 with playback
 
 figure
 clearvars hPlayback1
@@ -166,7 +169,7 @@ for sid = SIDS(end-1:end)
     minData = -1;
     maxData = 1;
     
-    threshold = 0.8;
+    threshold = 0.3;
     
     load(strcat(subjid,'epSTATS-PP-sig.mat'))
     load([sid '_phaseDelivery_allChans' modifier '.mat']);
@@ -185,8 +188,8 @@ for sid = SIDS(end-1:end)
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos_acaus,...
-                threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[]);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
                 threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[]);
@@ -213,7 +216,8 @@ for sid = SIDS(end-1:end)
     countScatter = countScatter + 1;
     
 end
-
+xlim([0 360])
+xticks([0 45 90 135 180 225 270 315 360])
 legend(hPlayback,{'Subject 7',...
     'Subject 7 Playback'})
 title('Phase of delivery and CEP modulation')
@@ -221,7 +225,7 @@ xlabel('Phase of delivery (degrees)')
 ylabel('Percent change in EP size from baseline to >5 conditioning stimuli')
 set(gca,'fontsize',18)
 
-%% null fit
+%% null fit for subject 7
 figure
 clearvars hNull
 hold on
@@ -300,7 +304,8 @@ for sid = SIDS(end-1)
     hNull(countScatter) =  scatter(peakPhase,w(:,index),125,plotColor(subjectNum+2,:),'d','filled');
     
 end
-
+xlim([0 360])
+xticks([0 45 90 135 180 225 270 315 360])
 legend(hNull,{'Subject 7',...
     'Subject 7 Null Control'})
 title('Phase of delivery and CEP modulation')
@@ -309,7 +314,7 @@ ylabel('Percent change in EP size from baseline to >5 conditioning stimuli')
 set(gca,'fontsize',18)
 
 
-%% fit all non-bad channels - see phases
+%% all subjects fit all non-bad channels - see phases
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure
@@ -385,7 +390,8 @@ for sid = SIDS
     
     
 end
-
+xlim([0 360])
+xticks([0 45 90 135 180 225 270 315 360])
 legend([h],{'Subject 1',...
     'Subject 2',...
     'Subject 3',...
@@ -401,7 +407,8 @@ set(gca,'fontsize',18)
 
 
 
-%% fit all non-bad channels - see phases playback only
+%% subject 7 - with/without playback
+% fit all non-bad channels - see phases playback only
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 figure
@@ -451,11 +458,11 @@ for sid = SIDS(end-1:end)
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos_acaus,...
+            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
                 threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,[],[]);
             fDeliver = f_pos;
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg_acaus,...
+            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
                 threshold,phase_at_0_neg_acaus,chans,desiredF(2),markerMin,markerMax,[],[]);
             fDeliver = f_neg;
             
@@ -480,7 +487,8 @@ for sid = SIDS(end-1:end)
     
     
 end
-
+xlim([0 360])
+xticks([0 45 90 135 180 225 270 315 360])
 legend(hPlayback,{'Subject 7',...
     'Subject 7 Playback'})
 title('Phase of delivery and frequency of fit beta')
