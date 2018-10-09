@@ -4,3 +4,4 @@ OUTPUT_DIR = '/gscratch/gridlab/djcald/Data/Output/BetaStim'
 TouchDir(OUTPUT_DIR);
 
 META_DIR = '/gscratch/gridlab/djcald/Data/Subjects/BetaStim'
+META_DIR = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\meta';
