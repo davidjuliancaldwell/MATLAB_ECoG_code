@@ -47,8 +47,11 @@ plotColor = [
     [0.2, 0.2, 0.6];...    % dark blue         (20)
     ];
 
-modifier = '_51samps_12_20_60ms_randomstart';
 
+plotColor = distinguishable_colors(8);
+
+modifierPhase = '_51samps_12_20_60ms_randomstart';
+modifierEP = '-reref';
 %SIDS = {'d5cd55'};
 
 %% plot EP modulation vs phase for all subjects
@@ -77,11 +80,11 @@ for sid = SIDS
     minData = -1;
     maxData = 1;
     
-    threshold = 0.7;
+    threshold = 0;
     
     
-    load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans' modifier '.mat']);
+    load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
+    load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
 
     fprintf(['running for subject ' sid '\n']);
     
@@ -169,10 +172,10 @@ for sid = SIDS(end-1:end)
     minData = -1;
     maxData = 1;
     
-    threshold = 0.3;
+    threshold = 0;
     
-    load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans' modifier '.mat']);
+    load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
+    load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -254,8 +257,8 @@ for sid = SIDS(end-1)
     
     threshold = 0.3;
     
-    load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans' modifier '.mat']);
+    load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
+    load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -342,11 +345,11 @@ for sid = SIDS
     minData = -1;
     maxData = 1;
     
-    threshold = 0.7;
+    threshold = 0;
     
     
-    load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans' modifier '.mat']);
+    load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
+    load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
@@ -437,11 +440,11 @@ for sid = SIDS(end-1:end)
     minData = -1;
     maxData = 1;
     
-    threshold = 0.8;
+    threshold = 0.5;
     
     
-    load(strcat(subjid,'epSTATS-PP-sig.mat'))
-    load([sid '_phaseDelivery_allChans' modifier '.mat']);
+    load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
+    load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     

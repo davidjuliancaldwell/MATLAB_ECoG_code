@@ -110,8 +110,7 @@ for idx = 1:length(SIDS)
             t_min = 0.008;
             t_max = 0.05;
         case '0b5a2ePlayback' % added DJC 7-23-2015
-            tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
-            block = 'BetaPhase-4';
+c            block = 'BetaPhase-4';
             stims = [22 30];
             %             chans = [23 31 21 14 15 32 40];
             %             chans = [23 31];

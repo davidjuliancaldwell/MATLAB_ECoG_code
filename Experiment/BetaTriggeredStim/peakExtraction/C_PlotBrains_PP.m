@@ -20,6 +20,7 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31},...
     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
+modifier = '-reref';
 %SIDS = {'d5cd55'}
 %%
 for sid = SIDS
@@ -39,7 +40,7 @@ for sid = SIDS
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
     
-    load(strcat(subjid,'epSTATS-PP-sig.mat'))
+    load(strcat(subjid,['epSTATS-PP-sig' modifier '.mat']))
     
     if (strcmpi(sid,'0b5a2ePlayback'))
         load(fullfile(getSubjDir('0b5a2e'), 'trodes.mat'));

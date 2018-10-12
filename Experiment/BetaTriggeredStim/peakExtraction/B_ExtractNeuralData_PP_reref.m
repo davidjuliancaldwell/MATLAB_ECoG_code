@@ -1,25 +1,25 @@
 %% constants
 close all; clear all;clc
-
-SUB_DIR = 'C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles';
 %% parameters
 
 Z_Constants
+SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 %% additional options
 
 savePlot = 0;
-saveIt = 1;
-plotIt = 0;
+saveIt = 0;
+plotIt = 1;
 plotItTrials = 0;
 %%
-for idx = 2:9
+for idx = 3:3
     sid = SIDS{idx};
     
     switch(sid)
         
         case 'd5cd55'
             block = 'Block-49';
+            tp = strcat(SUB_DIR,'\d5cd55\data\D8\d5cd55_BetaTriggeredStim');
             
             stims = [54 62];
             chans = [53 61 63];
@@ -37,6 +37,7 @@ for idx = 2:9
             
         case 'c91479'
             block = 'BetaPhase-14';
+            tp = strcat(SUB_DIR,'\c91479\data\d7\c91479_BetaTriggeredStim');
             
             stims = [55 56];
             chans = [64 63 48];
@@ -50,6 +51,7 @@ for idx = 2:9
         case '7dbdec'
             block = 'BetaPhase-17';
             rerefChans = [1:3 7 15 1:16 17:19 22:24 33:56 58:64];
+            tp = strcat(SUB_DIR,'\7dbdec\data\d7\7dbdec_BetaTriggeredStim');
             
             stims = [11 12];
             chans = [4 5 14];
@@ -61,6 +63,7 @@ for idx = 2:9
             
         case '9ab7ab'
             block = 'BetaPhase-3';
+            tp = strcat(SUB_DIR,'\9ab7ab\data\d7\9ab7ab_BetaTriggeredStim');
             
             stims = [59 60];
             chans = [51 52 53 58 57];
@@ -76,6 +79,7 @@ for idx = 2:9
         case '702d24'
             block = 'BetaPhase-4';
             rerefChans = [1:4 6:12 15:22 24 25:27 33:40 41:43 45:51 53:58 62:64];
+            tp = strcat(SUB_DIR,'\702d24\data\d7\702d24_BetaStim');
             
             stims = [13 14];
             chans = [4 5 21];
@@ -88,6 +92,7 @@ for idx = 2:9
         case 'ecb43e' % added DJC 7-23-2015
             block = 'BetaPhase-3';
             rerefChans = [1:40 41:44 49:52];
+            tp = strcat(SUB_DIR,'\ecb43e\data\d7\BetaStim');
             
             stims = [56 64];
             chans = [47 55];
@@ -98,6 +103,8 @@ for idx = 2:9
             t_min = 0.008;
             t_max = 0.06;
         case '0b5a2e' % added DJC 7-23-2015
+            tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+            
             block = 'BetaPhase-2';
             rerefChans = [1:8 9:12 17:20 24 25:28 33:37 38 41:48 49:64];
             
@@ -117,6 +124,8 @@ for idx = 2:9
             t_min = 0.005;
             t_max = 0.075;
         case '0b5a2ePlayback' % added DJC 7-23-2015
+            tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
+            
             block = 'BetaPhase-4';
             rerefChans = [1:8 9:12 17:20 24 25:28 33:37 38 41:48 49:64];
             
@@ -138,8 +147,13 @@ for idx = 2:9
     badsTotal = [stims bads];
     
     chans = [1:64];
+    chans = goods;
     chans(ismember(chans, badsTotal)) = [];
     %% load in the trigger data
+    
+    tank = TTank;
+    tank.openTank(tp);
+    tank.selectBlock(block);
     
     if strcmp(sid,'0b5a2ePlayback')
         load(fullfile(META_DIR, ['0b5a2e' '_tables_modDJC.mat']), 'bursts', 'fs', 'stims');
@@ -187,21 +201,18 @@ for idx = 2:9
     for chan = rerefChans
         
         %% load in ecog data for that channel
-        fprintf('loading in ecog data for %s:\n',sid);
+        fprintf('loading in ecog data for:%s \n',sid);
         fprintf('channel %d:\n',chan);
-        tic;
         
+        tic;
         grp = floor((chan-1)/16);
-        ev = sprintf('ECO%d',grp+1);
+        ev = sprintf('ECO%d', grp+1);
         achan = chan - grp*16;
         
-        if achan==1 || achan == 2
-            load(fullfile(SUB_DIR,sid,[block '.mat']),ev);
-            dataStruct = eval(ev);
-        end
-        eco = dataStruct.data(:,achan);
+        %         [eco, efs] = tdt_loadStream(tp, block, ev, achan);
+        [eco, info] = tank.readWaveEvent(ev, achan);
+        efs = info.SamplingRateHz;
         eco = 4*eco';
-        efs = dataStruct.info.SamplingRateHz;
         
         toc;
         
@@ -262,23 +273,19 @@ for idx = 2:9
     statThresh = length(chans);
     
     for chan = chans
-        
         %% load in ecog data for that channel
-        fprintf('loading in ecog data for %s:\n',sid);
+        fprintf('loading in ecog data for: %s \n',sid);
         fprintf('channel %d:\n',chan);
-        tic;
         
+        tic;
         grp = floor((chan-1)/16);
-        ev = sprintf('ECO%d',grp+1);
+        ev = sprintf('ECO%d', grp+1);
         achan = chan - grp*16;
         
-        %if achan==1 || achan == 2
-        load(fullfile(SUB_DIR,sid,[block '.mat']),ev);
-        dataStruct = eval(ev);
-        %  end
-        eco = dataStruct.data(:,achan);
+        %         [eco, efs] = tdt_loadStream(tp, block, ev, achan);
+        [eco, info] = tank.readWaveEvent(ev, achan);
+        efs = info.SamplingRateHz;
         eco = 4*eco';
-        efs = dataStruct.info.SamplingRateHz;
         
         toc;
         
@@ -459,8 +466,8 @@ for idx = 2:9
             %             sigChans{chan}{typei} = {m c a1Median a1 label keeps};
             %
             %% peak to peak values
-            tBegin = 0.01;
-            tEnd = 0.06;
+            % tBegin = 0.01;
+            % tEnd = 0.06;
             
             tBegin = t_min;
             tEnd = t_max;

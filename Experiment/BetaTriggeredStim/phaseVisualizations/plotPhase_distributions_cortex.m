@@ -22,7 +22,9 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},...
     {'m',[90,270],8,[22 30],[24 25 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 %SIDS = {'0b5a2ePlayback'}
+SIDS = {'d5cd55'};
 modifier = '_51samps_12_20_60ms_randomstart';
+modifier = '_51samps_12_20_40ms_randomstart';
 
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
 %SIDS = {'c91479'}
@@ -71,7 +73,7 @@ for sid = SIDS
     minData = -1;
     maxData = 1;
     
-    threshold = 0.3;
+    threshold = 0;
     
     %%
     if strcmp(type,'m')
