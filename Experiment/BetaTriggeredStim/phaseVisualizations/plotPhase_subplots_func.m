@@ -1,10 +1,23 @@
 function [] = plotPhase_subplots_func(t,fitline,f,phase,rSquare,threshold,desiredF,sid,subjectNum,chan,type,signalType,OUTPUT_DIR,saveIt)
 
+subtractMean = 1;
+
 figure
 subplot(2,1,1)
-plot(1e3*t,fitline(:,rSquare>threshold,:))
+
+fitlineTemp = fitline(:,rSquare>threshold,:);
+
+if subtractMean
+    fitlineMean = repmat(mean(fitlineTemp,1),size(fitlineTemp,1),1);
+else
+    fitlineMean = zeros(size(fitlineTemp))
+end
+
+fitlineTemp = fitlineTemp - fitlineMean;
+
+plot(1e3*t,fitlineTemp-fitlineMean)
 hold on
-plot(1e3*t,mean(fitline(:,rSquare>threshold,:),2),'k','linewidth',4)
+plot(1e3*t,mean(fitlineTemp,2),'k','linewidth',4)
 
 title({['Subject ' num2str(subjectNum) ' Phase ' num2str(desiredF) char(176) ' fitline sweeps']})
 set(gca,'fontsize',14)
@@ -17,7 +30,7 @@ set(gca,'fontsize',14)
 xlim([-50 0])
 
 subplot(2,1,2)
-plotBTLError(1e3*t,fitline(:,rSquare>threshold,:),'CI');
+plotBTLError(1e3*t,fitlineTemp,'CI');
 xlabel('time before stimulation (ms)')
 ylabel('\mu V')
 title({[' fitline 95% confidence interval']})

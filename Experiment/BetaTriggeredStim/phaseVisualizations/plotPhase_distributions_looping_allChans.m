@@ -4,7 +4,7 @@
 
 % David.J.Caldwell 8.26.2018
 %%
-close all;clear all;clc
+%close all;clear all;clc
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery\';
 addpath(baseDir);
 
@@ -21,7 +21,7 @@ modifier = '_51samps_12_20_60ms_randomstart';
 modifier = '_51samps_12_20_40ms_randomstart';
 
 SIDS = {'0b5a2e','0b5a2ePlayback'};
-SIDS = {'d5cd55'};
+SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
 
 %gcp;  %parallel pool
 %
@@ -31,7 +31,7 @@ acausalPlot = 0;
 rawPlot = 1;
 saveIt = 0;
 closeAll = 0;
-threshold = 0.3;
+threshold = 0.7;
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for sid = SIDS
@@ -58,6 +58,8 @@ for sid = SIDS
    % chans = 23;
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
+    
+    chans = betaChan
     
     if strcmp(type,'m')
         if rawPlot
