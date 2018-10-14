@@ -11,7 +11,7 @@ SUB_DIR = META_DIR;
 %% parameters
 numCores = feature('numcores');
 parpool(numCores);
-idxVec = [4 6 7];
+idxVec = [4:9];
 
 addpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/Experiment/Subdermal_QuickScreen')
 for idx = idxVec
@@ -237,7 +237,7 @@ for idx = idxVec
         end
         
         % changing presamps - DJC - 2/24/2016
-        presamps = round(0.06*efs);
+        presamps = round(0.04*efs);
         postsamps = round(0.00*efs);
         
         if exist('ptsPos','var') & exist('ptsNeg','var')
@@ -428,10 +428,10 @@ for idx = idxVec
         sid = '0b5a2ePlayBack';
     end
     %%
-    save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery_allChans_51samps_12_20_60ms_randomStart.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
+    save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery_allChans_51samps_12_20_40ms_randomStart.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
         'r_square_pos_acaus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
-        'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
-        'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...
+	'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
+	'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...
         'f','f_acaus','f_pos','f_neg','f_pos_acaus','f_neg_acaus','-v7.3');
     
     close all; clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR chan chans sid tp block 'bursts' 'fs' 'stims'
