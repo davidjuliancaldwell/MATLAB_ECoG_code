@@ -11,7 +11,7 @@ SUB_DIR = META_DIR;
 %% parameters
 numCores = feature('numcores');
 parpool(numCores);
-idxVec = [4:9];
+idxVec = [2:9];
 
 addpath('/gscratch/gridlab/djcald/MATLAB_ECoG_code/Experiment/Subdermal_QuickScreen')
 for idx = idxVec
@@ -428,7 +428,7 @@ for idx = idxVec
         sid = '0b5a2ePlayBack';
     end
     %%
-    save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery_allChans_51samps_12_20_40ms_randomStart.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
+    save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery_allChans_51samps_12_20_40m_0startPhase.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
         'r_square_pos_acaus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
 	'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
 	'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...

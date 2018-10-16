@@ -38,6 +38,7 @@ offset_lu = [-max(abs(Ysm))*3 max(abs(Ysm))*3];
 amp_sv = max(abs(Ysm));
 
 ph_sv = -pi + (2*pi)*rand(1,1); 
+ph_sv = 0;
 
 T_sv = mean(TRANGE);
 
