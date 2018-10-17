@@ -1,5 +1,5 @@
 %% initialize a few things
-subjid = '20f8a3';
+subjid = '3ada8b';
 weights = randn(64,1);
 weights = ones(64,1);
 Montage.MontageTokenized = {'Grid(1:64)'};

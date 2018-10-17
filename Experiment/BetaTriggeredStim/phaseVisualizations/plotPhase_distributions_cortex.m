@@ -21,10 +21,9 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},...
     {'m',[90,270],7,[22 30],[24 25 29],31},...
     {'m',[90,270],8,[22 30],[24 25 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
-%SIDS = {'0b5a2ePlayback'}
-SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24'};
 modifier = '_51samps_12_20_60ms_randomstart';
 modifier = '_51samps_12_20_40ms_randomstart';
+SIDS = {'c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
 %SIDS = {'c91479'}
@@ -73,8 +72,9 @@ for sid = SIDS
     minData = -1;
     maxData = 1;
     typePlot = 'value';
-    
-    threshold = 0;
+    metricToUse = 'vecLength';
+    testStatistic = 'omnibus';
+    threshold = 0.7;
     
     %%
     if strcmp(type,'m')
@@ -83,21 +83,21 @@ for sid = SIDS
             signalType = 'unfiltered';
             
             plot_phase_cortex(r_square_pos,threshold,phase_at_0_pos,signalType,desiredF(1),markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot)
+                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
             plot_phase_cortex(r_square_neg,threshold,phase_at_0_neg,signalType,desiredF(2),markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot)
+                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if acausalPlot
             signalType = 'filtered';
             
             plot_phase_cortex(r_square_pos_acaus,threshold,phase_at_0_pos_acaus,signalType,desiredF(1),markerMin,...
-                markerMax,minData,maxData,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot)
+                markerMax,minData,maxData,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
             rSquareThresh_neg = (r_square_neg) > threshold;
             plot_phase_cortex(r_square_neg_acaus,threshold,phase_at_0_neg_acaus,signalType,desiredF(2),markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot)
+                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -108,7 +108,7 @@ for sid = SIDS
             signalType = 'unfiltered';
             
             plot_phase_cortex(r_square,threshold,phase_at_0,signalType,desiredF,markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot)
+                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
             
             %   objhl = findobj(objh, 'type', 'patch'); % objects of legend of type patch
@@ -120,11 +120,12 @@ for sid = SIDS
             signalType = 'filtered';
             
             plot_phase_cortex(r_square_acaus,threshold,phase_at_0_acaus,signalType,desiredF,markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot)
+                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
+    pause
 end
 
 

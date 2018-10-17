@@ -8,18 +8,18 @@ subplot(2,1,1)
 fitlineTemp = fitline(:,rSquare>threshold,:);
 
 if subtractMean
-    fitlineMean = repmat(mean(fitlineTemp,1),size(fitlineTemp,1),1);
+    fitlineMean = repmat(nanmean(fitlineTemp,1),size(fitlineTemp,1),1);
 else
-    fitlineMean = zeros(size(fitlineTemp))
+    fitlineMean = zeros(size(fitlineTemp));
 end
 
 fitlineTemp = fitlineTemp - fitlineMean;
 
-plot(1e3*t,fitlineTemp-fitlineMean)
+plot(1e3*t,fitlineTemp)
 hold on
-plot(1e3*t,mean(fitlineTemp,2),'k','linewidth',4)
+plot(1e3*t,nanmean(fitlineTemp,2),'k','linewidth',4)
 
-title({['Subject ' num2str(subjectNum) ' Phase ' num2str(desiredF) char(176) ' fitline sweeps']})
+title({['Subject ' num2str(subjectNum) ' Phase ' num2str(desiredF) char(176) ' fitline sweeps'], ['Channel ' num2str(chan)]})
 set(gca,'fontsize',14)
 xlim([-50 0])
 

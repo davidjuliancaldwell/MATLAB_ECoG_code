@@ -50,9 +50,14 @@ plotColor = [
 
 plotColor = distinguishable_colors(8);
 
-modifierPhase = '_51samps_12_20_60ms_randomstart';
+modifierPhase = '_51samps_12_20_40ms_randomstart';
+%modifierPhase = '_51samps_12_20_40m_0startPhase';
 modifierEP = '-reref';
 %SIDS = {'d5cd55'};
+
+% decide how to plot circles - std deviation or vector length
+markerToUse = 'vecLength';
+testStatistic = 'omnibus';
 
 %% plot EP modulation vs phase for all subjects
 figure
@@ -80,12 +85,12 @@ for sid = SIDS
     minData = -1;
     maxData = 1;
     
-    threshold = 0;
+    threshold = 0.7;
     
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
-
+    
     fprintf(['running for subject ' sid '\n']);
     
     %%
@@ -101,14 +106,14 @@ for sid = SIDS
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[],markerToUse,testStatistic);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[],markerToUse,testStatistic);
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[],markerToUse,testStatistic);
         end
         
         w = nan(length(chans), length(indices));
@@ -191,14 +196,14 @@ for sid = SIDS(end-1:end)
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[],markerToUse,testStatistic);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[],markerToUse,testStatistic);
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[],markerToUse,testStatistic);
         end
         
         w = nan(length(chans), length(indices));
@@ -270,11 +275,11 @@ for sid = SIDS(end-1)
     for index = 1:2
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[],markerToUse,testStatistic);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[],markerToUse,testStatistic);
         end
         w = nan(length(chans), indices);
         count = 1;
@@ -366,17 +371,17 @@ for sid = SIDS
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,[],[],markerToUse,testStatistic);
             fDeliver = f_pos;
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,[],[],markerToUse,testStatistic);
             fDeliver = f_neg;
             
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[],markerToUse,testStatistic);
             fDeliver = f;
             
         end
@@ -440,7 +445,7 @@ for sid = SIDS(end-1:end)
     minData = -1;
     maxData = 1;
     
-    threshold = 0.5;
+    threshold = 0;
     
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
@@ -461,17 +466,17 @@ for sid = SIDS(end-1:end)
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
+                threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,[],[],markerToUse,testStatistic);
             fDeliver = f_pos;
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg_acaus,chans,desiredF(2),markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
+                threshold,phase_at_0_neg_acaus,chans,desiredF(2),markerMin,markerMax,[],[],markerToUse,testStatistic);
             fDeliver = f_neg;
             
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
-            [peakPhase,peakStd,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[]);
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,[],[],markerToUse,testStatistic);
             fDeliver = f;
             
         end

@@ -53,6 +53,9 @@ addToPath(genpath(fullfile(sharedCode, 'RHI'))); %11-17-2017
 addToPath(genpath(fullfile(sharedCode, 'ElectrodeModeling'))); %1-30-2017 
 
 rmpath(genpath(fullfile(codebase,'FileExchange','Toolboxes','distributionPlot'))); % DJC 1-8-2016, temporary to allow use of matlab 2015 hist function over the one in the distributionPlot toolbox
+addToPath(genpath(fullfile(sharedCode,'CircStat2012a')));
+addToPath(genpath(fullfile(sharedCode,'phasemap')));
+
 
 % try adding the python executable to integrate matlabengine with python
 %addToPath('C:\Users\David\Anaconda2'); % DJC 1-18-2015 

@@ -27,7 +27,7 @@ leg = legend([stimulationPlot(1),stimulationPlot(2),betaChanPlot],...
     {['stimulation channel'],['stimulation channel'],...
     ['beta recording channel = ' num2str(betaChan)]});
 
-colormap(cmap);
+colormap(cm);
 h = colorbar;
 ylabel(h,'Volts (\muV)')
 title({sid 'Peak to peak evoked potential magnitude '})
