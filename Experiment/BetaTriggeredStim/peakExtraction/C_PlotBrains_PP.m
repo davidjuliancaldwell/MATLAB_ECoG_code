@@ -1,6 +1,6 @@
 %% plot peak to peak differences on individual cortical surfaces
 
-%close all
+close all; clear all;clc
 Z_Constants;
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PeaktoPeakEP';
 addpath(baseDir);
@@ -22,6 +22,8 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 modifier = '-reref';
 %SIDS = {'d5cd55'}
+
+saveFig = 1;
 %%
 for sid = SIDS
     
@@ -53,18 +55,18 @@ for sid = SIDS
     
     if strcmp(type,'s')
         index = 1;
-        plot_brains_peak_func(dataForPPanalysis,subjid,sid,Grid,betaChan,stims,badsTotal,goodEPs,index)
+        plot_brains_peak_func(dataForPPanalysis,subjid,sid,subjectNum,Grid,betaChan,stims,badsTotal,goodEPs,index,saveFig)
         
     elseif strcmp(type,'m')
         
         for index = 1:2
-            plot_brains_peak_func(dataForPPanalysis,subjid,sid,Grid,betaChan,stims,badsTotal,goodEPs,index)
+            plot_brains_peak_func(dataForPPanalysis,subjid,sid,subjectNum,Grid,betaChan,stims,badsTotal,goodEPs,index,saveFig)
             
         end
         
     elseif strcmp(type,'t')
         for index = [1,2,4]
-            plot_brains_peak_func(dataForPPanalysis,subjid,sid,Grid,betaChan,stims,badsTotal,goodEPs,index)
+            plot_brains_peak_func(dataForPPanalysis,subjid,sid,subjectNum,Grid,betaChan,stims,badsTotal,goodEPs,index,saveFig)
             
         end
     end

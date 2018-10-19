@@ -15,7 +15,7 @@ for i = 1:numChans
     
     if sum(~isnan(signal(:,i)))
         signalNoNaN = signalInt(~isnan(signalInt));
-        peakPhase(i) = circ_median(signalNoNaN);
+        peakPhase(i) = circ_mean(signalNoNaN);
         
         if peakPhase(i) < 0
             peakPhase(i) = 2*pi + peakPhase(i);

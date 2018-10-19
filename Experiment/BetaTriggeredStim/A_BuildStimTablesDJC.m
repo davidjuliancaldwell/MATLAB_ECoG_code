@@ -1,5 +1,5 @@
 %% Constants
-close all; clear all;clc
+%close all; clear all;clc
 
 Z_Constants;
 addpath ./scripts/ %DJC edit 7/17/2015
@@ -9,7 +9,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 %DJC 7/20/2015 - changed tp to fit David paths
 
 % select the subject from list
-sid = SIDS{1};
+sid = SIDS{7};
 
 if (strcmp(sid, '8adc5c'))
     tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');

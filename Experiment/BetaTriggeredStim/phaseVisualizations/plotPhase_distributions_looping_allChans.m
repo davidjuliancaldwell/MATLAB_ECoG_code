@@ -14,24 +14,24 @@ TouchDir(OUTPUT_DIR);
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},{'m',[0 180],2,[55 56],[2 3 31 57],64},{'s',180,3,[11 12],[57],4},...
     {'s',270,4,[59 60],[1 9 10 35 43],51},{'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],5},...
-    {'m',[90,180],6,[56 64],[57:64],55},{'m',[90,270],7,[22 30],[17 18 19 24 25 28 29],31},{'m',[90,270],8,[22 30],[17 18 19 24 25 28 29],31}};
+    {'m',[180,0],6,[56 64],[57:64],55},{'m',[90,270],7,[22 30],[17 18 19 24 25 28 29],31},{'m',[90,270],8,[22 30],[17 18 19 24 25 28 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 
 modifier = '_51samps_12_20_60ms_randomstart';
 modifier = '_51samps_12_20_40ms_randomstart';
 %modifierPhase = '_51samps_12_20_40m_0startPhase';
 
-%SIDS = {'0b5a2e','0b5a2ePlayback'};
+SIDS = {'0b5a2e','0b5a2ePlayback'};
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
-SIDS = {'0b5a2e'};
+%SIDS = {'0b5a2e'};
 %gcp;  %parallel pool
 %
 % settings
 hilbPlot = 0;
 acausalPlot = 0;
 rawPlot = 1;
-saveIt = 0;
-threshold = 0.6;
+saveIt = 1;
+threshold = 0.7;
 testStatistic = 'omnibus';
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -62,7 +62,7 @@ for sid = SIDS
     chans(ismember(chans, badsTotal)) = [];
    % chans = 28
     
-    %  chans = betaChan
+     chans = betaChan
     
     if strcmp(type,'m')
         if rawPlot

@@ -583,11 +583,11 @@ suffix{1} = 'Negative phase of Beta';
 suffix{2} = 'Positive phase of Beta';
 suffix{3} = 'Null Condition';
 
-
-for idx = 1:length(utype)-1 % modified to discount null condition for 0b5a2e, which is utype(3)
+for idx = [1,2,4]
+%for idx = 1:length(utype)-1 % modified to discount null condition for 0b5a2e, which is utype(3)
     mtype = utype(idx);
-    subplot(length(utype)-1,2,2*(idx-1)+1);
-    
+    %subplot(length(utype)-1,2,2*(idx-1)+1);
+    subplot(4,2,
     mdat = squeeze(dat(:, stimtypes==mtype));
     badmoment = diff(mdat,1,1)==0;
     badmoment = cat(1, false(1, size(badmoment, 2)), badmoment);

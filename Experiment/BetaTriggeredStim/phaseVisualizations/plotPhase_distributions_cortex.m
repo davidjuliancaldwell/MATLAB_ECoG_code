@@ -17,16 +17,16 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},...
     {'s',180,3,[11 12],[57],4},...
     {'s',270,4,[59 60],[1 9 10 35 43],51},...
     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],5},...
-    {'m',[90,180],6,[56 64],[57:64],55},...
+    {'t',[270,90],6,[56 64],[57:64],55},...
     {'m',[90,270],7,[22 30],[24 25 29],31},...
     {'m',[90,270],8,[22 30],[24 25 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 modifier = '_51samps_12_20_60ms_randomstart';
 modifier = '_51samps_12_20_40ms_randomstart';
-SIDS = {'c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
+SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
-%SIDS = {'c91479'}
+SIDS = {'ecb43e'};
 %gcp;  %parallel pool
 %
 % settings
@@ -67,9 +67,9 @@ for sid = SIDS
         locs = trodeLocsFromMontage(sid, Montage, false);
     end
     
-    markerMin = 5;
-    markerMax = 30;
-    minData = -1;
+    markerMin = 10;
+    markerMax = 40;
+    minData = 0;
     maxData = 1;
     typePlot = 'value';
     metricToUse = 'vecLength';
@@ -77,38 +77,38 @@ for sid = SIDS
     threshold = 0.7;
     
     %%
-    if strcmp(type,'m')
+    if strcmp(type,'m') || strcmp(type,'t')
         %%
         if rawPlot
             signalType = 'unfiltered';
             
             plot_phase_cortex(r_square_pos,threshold,phase_at_0_pos,signalType,desiredF(1),markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
+                markerMax,0,1,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
             plot_phase_cortex(r_square_neg,threshold,phase_at_0_neg,signalType,desiredF(2),markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
+                markerMax,0,1,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         if acausalPlot
             signalType = 'filtered';
             
             plot_phase_cortex(r_square_pos_acaus,threshold,phase_at_0_pos_acaus,signalType,desiredF(1),markerMin,...
-                markerMax,minData,maxData,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
+                markerMax,0,1,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
             rSquareThresh_neg = (r_square_neg) > threshold;
             plot_phase_cortex(r_square_neg_acaus,threshold,phase_at_0_neg_acaus,signalType,desiredF(2),markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
+                markerMax,0,1,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
-    elseif strcmp(type,'s')
+    end
+    if strcmp(type,'s') || strcmp(type,'t')
         %%
         if rawPlot
             signalType = 'unfiltered';
             
             plot_phase_cortex(r_square,threshold,phase_at_0,signalType,desiredF,markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
+                markerMax,0,1,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
             
             %   objhl = findobj(objh, 'type', 'patch'); % objects of legend of type patch
@@ -120,12 +120,11 @@ for sid = SIDS
             signalType = 'filtered';
             
             plot_phase_cortex(r_square_acaus,threshold,phase_at_0_acaus,signalType,desiredF,markerMin,...
-                markerMax,[],[],sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
+                markerMax,0,1,sid,subjectNum,locs,chans,badsTotal,betaChan,typePlot,metricToUse,testStatistic)
             
         end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     end
-    pause
 end
 
 

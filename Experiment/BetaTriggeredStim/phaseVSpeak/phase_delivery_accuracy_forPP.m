@@ -2,8 +2,6 @@ function [peakPhase,peakStd,peakLength,circularTest,markerSize] = phase_delivery
 %% extract accuracy of delivery and r_square
 % 8.30.2018 David.J.Caldwell
 
-
-
 % anonymous functions to define the size of the markers based on desired
 % values
 marker_size_func= @(minNew,maxNew,minData,maxData,val) (maxNew-minNew)*(val-minData)/(maxData-minData)+minNew;

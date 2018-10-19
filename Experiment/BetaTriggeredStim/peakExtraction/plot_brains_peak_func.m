@@ -1,5 +1,7 @@
-function [] = plot_brains_peak_func(dataForPPanalysis,subjid,sid,Grid,betaChan,stims,badsTotal,goodEPs,index)
+function [] = plot_brains_peak_func(dataForPPanalysis,subjid,sid,subjectNum,Grid,betaChan,stims,badsTotal,goodEPs,index,saveFig)
 %% plot differences
+
+OUTPUT_DIR = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PeaktoPeakEP\plots';
 
 cmap = cbrewer('seq','Purples',40);
 
@@ -17,6 +19,8 @@ end
 clims = [0 max(w)];
 
 figure
+set(gcf, 'Units', 'pixels', 'OuterPosition', [1.0003e+03 611 800.6667 727.3333]);
+
 % plot beta channel overlaid
 betaChanPlot = PlotBrainJustDots(subjid,{betaChan},[255, 153, 0]/255,true,800);
 PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, cmap, 1:size(Grid, 1), true);
@@ -25,13 +29,23 @@ PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20
 stimulationPlot = PlotBrainJustDots(subjid,{stims(1),stims(2)},[0 0 0; 0 0 0],true);
 leg = legend([stimulationPlot(1),stimulationPlot(2),betaChanPlot],...
     {['stimulation channel'],['stimulation channel'],...
-    ['beta recording channel = ' num2str(betaChan)]});
+    ['beta channel = ' num2str(betaChan)]},'location','southwest');
 
-colormap(cm);
+colormap(cmap);
 h = colorbar;
 ylabel(h,'Volts (\muV)')
-title({sid 'Peak to peak evoked potential magnitude '})
+if subjectNum == 8
+    title({['Subject 7 Playback'], ['Peak to peak evoked potential magnitude ']})
+    
+else
+    title({['Subject ' num2str(subjectNum)], 'Peak to peak evoked potential magnitude '})
+end
 set(gca,'fontsize', 14)
+
+% if saveFig
+%     %     SaveFig(OUTPUT_DIR, sprintf(['EP-phase-%d-sid-%s-chan-%d'],typei,sid, chan,type,signalType), 'svg');
+%     SaveFig(OUTPUT_DIR, sprintf(['cortex-EP-phase-1-sid-%s'],sid), 'png');
+% end
 
 %% plot differences
 cmap = flipud(cbrewer('div','PiYG',40));
@@ -52,6 +66,8 @@ end
 clims = [-max(abs(min(w)),abs(max(w))) max(abs(min(w)),abs(max(w)))];
 
 figure
+set(gcf, 'Units', 'pixels', 'OuterPosition', [1.0003e+03 611 800.6667 727.3333]);
+
 betaChanPlot = PlotBrainJustDots(subjid,{betaChan},[255, 153, 0]/255,true,800);
 
 PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, cmap, 1:size(Grid, 1), true);
@@ -62,10 +78,19 @@ stimulationPlot = PlotBrainJustDots(subjid,{stims(1),stims(2)},[0 0 0; 0 0 0],tr
 
 leg = legend([stimulationPlot(1),stimulationPlot(2),betaChanPlot],...
     {['stimulation channel'],['stimulation channel'],...
-    ['beta recording channel = ' num2str(betaChan)]});
+    ['beta channel = ' num2str(betaChan)]},'location','southwest');
 colormap(cmap);
 h = colorbar;
-title({sid 'Percent Baseline and Test Pulse (>5 stims) EP difference'})
+if subjectNum == 8
+    title({['Subject 7 Playback'], ['Percent Baseline and Test Pulse (>5 stims) EP difference']})
+    
+else
+    title({['Subject ' num2str(subjectNum)], 'Percent Baseline and Test Pulse (>5 stims) EP difference'})
+end
 ylabel(h,'Percent Difference')
 set(gca,'fontsize', 14)
+
+% if saveFig
+%     SaveFig(OUTPUT_DIR, sprintf(['cortex-percentChange-EP-phase-1-sid-%s'],sid), 'png');
+% end
 end

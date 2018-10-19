@@ -9,7 +9,7 @@ CONV_DIR = 'C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles';
 
 %% parameters
 
-for idx = 5:9
+for idx = 8:9
     sid = SIDS{idx};
     switch(sid)
         

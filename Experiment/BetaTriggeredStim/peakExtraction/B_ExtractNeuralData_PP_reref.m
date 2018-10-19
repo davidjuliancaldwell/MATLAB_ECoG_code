@@ -1,5 +1,6 @@
 %% constants
-close all; clear all;clc
+%close all; clear all;clc
+clear all
 %% parameters
 
 Z_Constants
@@ -12,7 +13,7 @@ saveIt = 0;
 plotIt = 1;
 plotItTrials = 0;
 %%
-for idx = 3:3
+for idx = 8:9
     sid = SIDS{idx};
     
     switch(sid)
@@ -80,7 +81,7 @@ for idx = 3:3
             block = 'BetaPhase-4';
             rerefChans = [1:4 6:12 15:22 24 25:27 33:40 41:43 45:51 53:58 62:64];
             tp = strcat(SUB_DIR,'\702d24\data\d7\702d24_BetaStim');
-            
+            betaChan = 5;
             stims = [13 14];
             chans = [4 5 21];
             goods = [ 5 ];
@@ -149,6 +150,7 @@ for idx = 3:3
     chans = [1:64];
     chans = goods;
     chans(ismember(chans, badsTotal)) = [];
+    chans = [14 23 31];
     %% load in the trigger data
     
     tank = TTank;
@@ -571,9 +573,19 @@ for idx = 3:3
                 
                 yl(1) = min(-10, max(yl(1),-340*4));
                 yl(2) = max(10, min(yl(2),300*4));
-                
+            
                 ylim(yl);
+                
+                    
+                xlim([-10 50])
+                ylim([-500 500])
+                
+                
                 highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
+%                            
+%                 xlim([-10 50])
+%                 ylim([-300 300])
+                
                 vline(0);
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
@@ -581,7 +593,9 @@ for idx = 3:3
                 if (types(typei) == nullType)
                     title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
                     leg = {'Pre','Post'};
-                elseif             (types(typei) ~= nullType)
+                elseif (types(typei) ~= nullType)
+                               title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                    title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
                     leg = {'Pre'};
                     for d = 1:length(labelGroupStarts)
                         if d == length(labelGroupStarts)
@@ -594,7 +608,7 @@ for idx = 3:3
                 
                 leg{end+1} = 'Stim Window';
                 legend(leg, 'location', 'Southeast')
-                
+                set(gca,'fontsize',18)
                 subplot(3,1,2)
                 
                 prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
@@ -605,6 +619,9 @@ for idx = 3:3
                 yl(1) = min(-10, max(yl(1),-140*4));
                 yl(2) = max(10, min(yl(2),100*4));
                 ylim(yl);
+                    
+                xlim([-10 50])
+                ylim([-500 500])
                 
                 highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5])
                 vline(0);
@@ -614,11 +631,11 @@ for idx = 3:3
                 title('Median Subtracted')
                 
                 if (types(typei) == nullType)
-                    title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
+%                     title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
                     leg = {'Pre','Post'};
-                else (types(typei) ~= nullType)
-                    title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-                    title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
+                elseif (types(typei) ~= nullType)
+%                     title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+%                     title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
                     leg = {'Pre'};
                     for d = 1:length(labelGroupStarts)
                         if d == length(labelGroupStarts)
@@ -627,18 +644,20 @@ for idx = 3:3
                             leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
                         end
                     end
-                    leg{end+1} = 'Stim Window';
-                    legend(leg, 'location', 'Southeast')
+%                     leg{end+1} = 'Stim Window';
+%                     legend(leg, 'location', 'Southeast')
                     
                 end
-                
+                                set(gca,'fontsize',18)
+
                 subplot(3,1,3)
-                prettybar(signalPP(keeps), label(keeps), colors, gcf);
+                prettybar(1e6*signalPP(keeps), label(keeps), colors, gcf);
                 set(gca, 'xtick', []);
                 ylabel('\DeltaEP_N (uV)');
                 
                 title(sprintf('Change in EP_N by N_{CT}: Kruskal-Wallis test F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-                
+                                set(gca,'fontsize',18)
+
                 if savePlot
                     %     SaveFig(OUTPUT_DIR, sprintf(['EP-phase-%d-sid-%s-chan-%d'],typei,sid, chan,type,signalType), 'svg');
                     SaveFig(OUTPUT_DIR, sprintf(['EP-phase-%d-sid-%s-chan-%d'],typei,sid, chan), 'png','-r600');

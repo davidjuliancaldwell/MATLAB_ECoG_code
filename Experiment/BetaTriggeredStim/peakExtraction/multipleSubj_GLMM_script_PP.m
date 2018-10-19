@@ -1,6 +1,6 @@
 %% Multisubject analysis with general linear mixed model
 % peak to peak values used
-% 
+%
 % David.J.Caldwell 9.19.2018
 
 %close all;clear all;clc
@@ -13,14 +13,14 @@ OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
 
 
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
-valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53},2.5,...
-    {'m',[0 180],2,[55 56],[1 2 3 31 57],[31 39 40 47 48 63 64],64},3,...
-    {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4},3.5,...
-    {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51},0.75,...
-    {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5},0.75,...
-    {'t',[90,180],6,[56 64],[57:64],[46 48 54 55 63],55},1.75...
-    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31},...
-    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31}};
+valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53,2.5},...
+    {'m',[0 180],2,[55 56],[1 2 3 31 57],[31 39 40 47 48 63 64],64,3},...
+    {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4,3.5},...
+    {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51,0.75},...
+    {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
+    {'t',[270,90],6,[56 64],[57:64],[46 48 54 55 63],55,1.75}...
+    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31,1.75},...
+    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31,1.75}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 %%
 
@@ -41,7 +41,7 @@ subdir = 'PeaktoPeakEP';
 
 for sid = SIDS
     
-        sid = sid{:};
+    sid = sid{:};
     subjid = sid;
     info = M(sid);
     type = info{1};
@@ -56,83 +56,6 @@ for sid = SIDS
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     
-    
-    switch sid
-        case 'd5cd55'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'d5cd55epSTATS-PP-sig'))
-            stims = [54 62];
-            goods = [35 36 37 44 45 46 52 53 55 60 61 63];
-            
-            betaChan = 53;
-            typeCell = {'180'};
-            typeCell = {'180'};
-            stimLevel = 2500;
-            
-        case 'c91479'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'c91479epSTATS-PP-sig'))
-            betaChan = 64;
-            stims = [55 56];
-            goods = [38 39 40 46 47 48 62 64];
-            
-            typeCell = {'180','0'};
-            stimLevel = 3000;
-            
-        case '7dbdec'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'7dbdecepSTATS-PP-sig'))
-            stims = [11 12];
-            goods = [4 5 10 13 21 22 23];
-            
-            betaChan = 4;
-            typeCell = {'180'};
-            stimLevel = 3500;
-            
-        case '9ab7ab'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'9ab7abepSTATS-PP-sig'))
-            betaChan = 51;
-            stims = [59 60];
-            goods = [42 43 50 51 52 53 57 58];
-            typeCell = {'270'};
-            stimLevel = 750;
-            
-        case '702d24'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'702d24epSTATS-PP-sig'))
-            betaChan = 5;
-            stims = [13 14];
-            %                     goods = 5;
-            goods = [4 5 6 12 20 21 22];
-            
-            typeCell = {'270','90'};
-            stimLevel = 750;
-            
-        case 'ecb43e'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'ecb43eepSTATS-PP-sig'))
-            dataForPPanalysis{64} = [];
-            
-            betaChan = 55;
-            goods = [55 63 54 46 47 48 46];
-            stims = [56 64];
-            typeCell = {'270','90','Null','Random'};
-            stimLevel = 1750;
-            
-        case '0b5a2e'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'0b5a2eepSTATS-PP-sig'))
-            betaChan = 23;
-            stims = [22 30];
-            goods = [12 13 14 15 16 21 23 31 32 39 40];
-            typeCell = {'270','90','Null'};
-            stimLevel = 1750;
-            
-            
-        case '0b5a2ePlayback'
-            load(fullfile(OUTPUT_DIR,'BetaTriggeredStim',subdir,'0b5a2ePlaybackepSTATS-PP-sig'))
-            betaChan = 14;
-            stims = [22 30];
-            goods = [12 13 14 15 16 21 23 31 32 39 40];
-            typeCell = {'270','90','Null'};
-            stimLevel = 1750;
-            
-            
-    end
     
     % here's where I pick those channels!
     chan = betaChan;
@@ -232,9 +155,9 @@ tableBetaStim = table(TotalMags',StimLevel',categorical(NumStims)',categorical(B
 % group stats
 
 statarray = grpstats(tableBetaStim,{'SID','NumStims'},{'mean','sem'},...
-                     'DataVars','Magnitude');
-                 %%
-                 numSubj = 7;
+    'DataVars','Magnitude');
+%%
+numSubj = 7;
 numDims = 4;
 j = 1;
 
@@ -253,10 +176,10 @@ subj_num_stim = repmat([1:4],1,numSubj);
 
 new_sid_order = 4*new_sid_order + subj_num_stim' - 4;
 statarray = statarray(new_sid_order,:);
-                 
+
 %hierarchicalBoxplot(anovaTotalMags,{categorical(anovaNumStims),categorical(anovaBetaSID)})
- %%                
-% fit glme         
+%%
+% fit glme
 glme = fitglme(tableBetaStim,'Magnitude~NumStims+stimLevel+(1|SID)+(-1 + NumStims | SID) + (-1 + stimLevel | SID)',...
     'Distribution','Normal','Link','Identity','FitMethod','Laplace','DummyVarCoding','effects','EBMethod','Default')
 disp(glme)
@@ -266,7 +189,7 @@ psi
 dispersion
 stats
 %%
-% test effect between different stim levels 
+% test effect between different stim levels
 
 % between 3<CT<4 and Base
 H = [0,0,0,1,-1];
@@ -305,14 +228,14 @@ fprintf(['p value between 3<ct<4 and > 5 ' num2str(pVal) '\n']);
 [pVal,F,DF1,DF2] = coefTest(glme)
 
 %% MULTIPLE SUBJECTS - plot
-% 
+%
 % D5cd55 - subject 1
 % C91479 - subject 2
 % 7dbdec - subject 3
 % 9ab7ab - subject 4
 % 702d24 - subject 5
 % Ecb43e - subject 6
-% 0b5a2e - subject 7 
+% 0b5a2e - subject 7
 
 figure
 
@@ -326,33 +249,33 @@ colors = flipud(cm(round(linspace(1, size(cm, 1), numDims)), :));
 k = 25;
 
 
-% generate error bars 
+% generate error bars
 
 for i = 1:height(statarray)
     
     if j == 5
         j = 1;
     end
- 
+    
     h = errorbar(i,means(i),sem(i),'o','linew',3,'color',colors(j,:),'capsize',10);
     ylim([0 800])
-
+    
     set(h, 'MarkerSize', 5, 'MarkerFaceColor', colors(j,:), ...
         'MarkerEdgeColor', colors(j,:));
     hold on
     
     ax = gca;
-
+    
     if j ==2
         text(i+0.15,min(means(:,1))-6,sprintf([num2str(floor(i/4)+1)]),'fontsize',14)
         
     end
     
     if mod(i,4) == 0 & i < 25
-       line = vline(i+0.5);
-       line.Color = [0.5 0.5 0.5];
+        line = vline(i+0.5);
+        line.Color = [0.5 0.5 0.5];
     end
-    ax.FontSize = 12;    
+    ax.FontSize = 12;
     j = j+1;
 end
 ylabel('CCEP Magnitude (\muV)','fontsize',14,'fontweight','bold')
@@ -375,9 +298,9 @@ title({'CCEP Magnitude across Subjects';},'fontsize',16,'fontweight','bold')
 % plotResiduals(glme,'fitted','ResidualType','Pearson')
 % figure
 % plotResiduals(glme,'lagged','ResidualType','Pearson')
-% 
+%
 % %%
-% 
+%
 % tableBetaStim = table(anovaTotalMags',anovaStimLevel',categorical(anovaType)',categorical(anovaNumStims)',categorical(anovaBetaSID)',...
 %     'VariableNames',{'Magnitude','stimLevel','Type','NumStims','SID'});
 % glme = fitglme(tableBetaStim,'Magnitude~NumStims+Type+stimLevel+(1|SID)+(Type|SID)',...
@@ -388,23 +311,23 @@ title({'CCEP Magnitude across Subjects';},'fontsize',16,'fontweight','bold')
 % psi
 % dispersion
 % stats
-% 
+%
 % %%
-% 
+%
 % H = [0,0,1,-1,0,0,0,0,0];
-% 
+%
 % [pVal,F,DF1,DF2] = coefTest(glme,H)
-% 
+%
 % H = [0,0,0,1,-1,0,0,0,0];
-% 
+%
 % [pVal,F,DF1,DF2] = coefTest(glme,H)
-% 
-% 
+%
+%
 % H = [0,0,0,1,0,-1,0,0,0];
-% 
+%
 % [pVal,F,DF1,DF2] = coefTest(glme,H)
-% 
-% 
+%
+%
 % H = [0,0,1,0,0,-1,0,0,0];
-% 
+%
 % [pVal,F,DF1,DF2] = coefTest(glme,H)

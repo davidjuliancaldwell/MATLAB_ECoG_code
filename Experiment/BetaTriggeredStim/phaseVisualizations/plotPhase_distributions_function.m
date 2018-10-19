@@ -44,7 +44,7 @@ if numel(phase(rSquare>threshold))
     figure
     histogram(rSquare(rSquare>0));
     title({['Subject ' num2str(subjectNum) ' R^2 distribution of fits '],[' on the ' signalType ' fit signal for Phase ' num2str(desiredF) char(176)],['Channel ' num2str(chan)]})
-    ylabel('Density Estimate')
+    ylabel('count')
     xlabel(['R^2 value'])
     set(gca,'fontsize',16)
     
