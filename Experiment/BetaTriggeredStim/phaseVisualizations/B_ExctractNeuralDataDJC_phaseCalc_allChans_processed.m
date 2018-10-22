@@ -53,13 +53,13 @@ for idx = idxVec
             
             block = 'BetaPhase-2';
             stims = [22 30];
-            bads = [24 25 29];
+            bads = [24 25 28 29];
             
         case '0b5a2ePlayback' % added DJC 7-23-2015
             
             block = 'BetaPhase-4';
             stims = [22 30];
-            bads = [24 25 29];
+            bads = [24 25 28 29];
             
         otherwise
             error('unknown SID entered');
@@ -258,8 +258,8 @@ for idx = idxVec
         plotIt = false;
         
         % set parameters for fit function
-        f_range = [12 20]; % was 10 30, then 12 25, changed back 8.28.2018
-        smooth_span = 51; % was 13, try 19, then 5, now try 17 8.28.2018
+        f_range = [8 30]; % was 10 30, then 12 25, changed back 8.28.2018
+        smooth_span = 13; % was 13, try 19, then 5, now try 17 8.28.2018
         % try 51 9.20.2018
         
         if (exist('ptsPos','var') & exist('ptsNeg','var'))
@@ -428,7 +428,7 @@ for idx = idxVec
         sid = '0b5a2ePlayBack';
     end
     %%
-    save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery_allChans_51samps_12_20_40m_0startPhase.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
+    save(fullfile(OUTPUT_DIR, [sid '_phaseDelivery_allChans_13samps_8_30_40ms_randomStart.mat']), 'sid','t','r_square','r_square_acaus','r_square_neg_acaus','r_square_pos','r_square_neg',...
         'r_square_pos_acaus','phase_at_0_pos','fitline_pos','phase_at_0_neg','fitline_neg',...
 	'phase_at_0_pos_acaus','fitline_pos_acaus','phase_at_0_neg_acaus','fitline_neg_acaus',...
 	'phase_at_0','r_square','fitline','phase_at_0_acaus','fitline_acaus',...
