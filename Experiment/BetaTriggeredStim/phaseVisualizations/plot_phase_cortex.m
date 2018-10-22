@@ -1,4 +1,4 @@
-function [] = plot_phase_cortex(rSquare,threshold,phaseAt0,signalType,desiredF,markerMin,markerMax,minData,maxData,sid,subjectNum,locs,chans,stims,betaChan,typePlot,metricToUse,testStatistic)
+function [] = plot_phase_cortex(rSquare,threshold,phaseAt0,signalType,desiredF,markerMin,markerMax,minData,maxData,sid,subjectNum,locs,chans,stims,betaChan,typePlot,metricToUse,testStatistic,f,fThresholdMin,fThresholdMax)
 %% plot the distribution of phases on each cortical surface
 % 8.30.2018 David.J.Caldwell
 
@@ -9,7 +9,7 @@ function [] = plot_phase_cortex(rSquare,threshold,phaseAt0,signalType,desiredF,m
 marker_size_func= @(minNew,maxNew,minData,maxData,val) (maxNew-minNew)*(val-minData)/(maxData-minData)+minNew;
 
 % threshold the data
-rSquareThresh = (rSquare) > threshold;
+rSquareThresh = (rSquare) > threshold & f>fThresholdMin & f<fThresholdMax;
 phaseAt0screened = phaseAt0;
 phaseAt0screened(~rSquareThresh) = nan;
 
@@ -144,7 +144,7 @@ switch typePlot
         stimulationPlot = PlotBrainJustDots(sid,{stims(1),stims(2)},[0 0 0; 0 0 0],true);
         
         % plot beta channel overlaid
-        betaChanPlot = PlotBrainJustDots(sid,{betaChan},[0.5 0.5 0.5],true,50);
+        betaChanPlot = PlotBrainJustDots(sid,{betaChan},[1 1 0],true,50);
         plotObj = gcf;
         objhl = findobj(plotObj, 'type', 'line'); % objects of legend of type patch
         %leg = legend([objhl(minChanIndex) objhl(maxChanIndex)],{['distribution width = ' num2str(minChanVal)],['distribution width = ' num2str(maxChanVal)]});
@@ -152,7 +152,7 @@ switch typePlot
             {['best fit' ],...
             ['worst fit '],...
             ['stimulation channel'],['stimulation channel'],...
-            ['beta recording channel = ' num2str(betaChan)]});
+            ['trigger channel = ' num2str(betaChan)]});
         
     case 'magDiff'
         PlotDotsDirect(sid, locs(chans(minChanIndex),:), weights(minChanIndex), 'b',...
@@ -163,7 +163,7 @@ switch typePlot
         stimulationPlot = PlotBrainJustDots(sid,{stims(1),stims(2)},[0 0 0; 0 0 0],true);
         
         % plot beta channel overlaid
-        betaChanPlot = PlotBrainJustDots(sid,{betaChan},[106,61,154]/255,true,50);
+        betaChanPlot = PlotBrainJustDots(sid,{betaChan},[1 1 0],true,50);
         plotObj = gcf;
         objhl = findobj(plotObj, 'type', 'line'); % objects of legend of type patch
         %leg = legend([objhl(minChanIndex) objhl(maxChanIndex)],{['distribution width = ' num2str(minChanVal)],['distribution width = ' num2str(maxChanVal)]});
@@ -171,7 +171,7 @@ switch typePlot
             {['best fit' ],...
             ['worst fit '],...
             ['stimulation channel'],['stimulation channel'],...
-            ['beta recording channel = ' num2str(betaChan)]});
+            ['trigger channel = ' num2str(betaChan)]});
         
         %             {['best fit = ' num2str(maxChanVal)],...
         %             ['worst fit = ' num2str(minChanVal)],...
@@ -186,7 +186,7 @@ switch typePlot
         stimulationPlot = PlotBrainJustDots(sid,{stims(1),stims(2)},[0 0 0; 0 0 0],true);
         
         % plot beta channel overlaid
-        betaChanPlot = PlotBrainJustDots(sid,{betaChan},[106,61,154]/255,true,50);
+        betaChanPlot = PlotBrainJustDots(sid,{betaChan},[1 1 1],true,50);
         plotObj = gcf;
         objhl = findobj(plotObj, 'type', 'line'); % objects of legend of type patch
         %leg = legend([objhl(minChanIndex) objhl(maxChanIndex)],{['distribution width = ' num2str(minChanVal)],['distribution width = ' num2str(maxChanVal)]});
@@ -194,7 +194,7 @@ switch typePlot
             {['best fit' ],...
             ['worst fit '],...
             ['stimulation channel'],['stimulation channel'],...
-            ['beta recording channel = ' num2str(betaChan)]});
+            ['trigger channel = ' num2str(betaChan)]});
 end
 
 set(gca,'fontsize',14)

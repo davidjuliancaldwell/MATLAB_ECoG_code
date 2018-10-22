@@ -1,4 +1,4 @@
-function [peakPhase,peakStd,peakLength,circularTest,markerSize] = phase_delivery_accuracy_forPP(rSquare,threshold,phaseAt0,chans,desiredF,markerMin,markerMax,minData,maxData,metricToUse,testStatistic)
+function [peakPhase,peakStd,peakLength,circularTest,markerSize] = phase_delivery_accuracy_forPP(rSquare,threshold,phaseAt0,chans,desiredF,markerMin,markerMax,minData,maxData,metricToUse,testStatistic,f,fThresholdMin,fThresholdMax)
 %% extract accuracy of delivery and r_square
 % 8.30.2018 David.J.Caldwell
 
@@ -6,7 +6,7 @@ function [peakPhase,peakStd,peakLength,circularTest,markerSize] = phase_delivery
 % values
 marker_size_func= @(minNew,maxNew,minData,maxData,val) (maxNew-minNew)*(val-minData)/(maxData-minData)+minNew;
 % threshold the data
-rSquareThresh = (rSquare) > threshold;
+rSquareThresh = (rSquare) > threshold & f<fThresholdMax & f>fThresholdMin;
 phaseAt0Screened = phaseAt0;
 phaseAt0Screened(~rSquareThresh) = nan;
 

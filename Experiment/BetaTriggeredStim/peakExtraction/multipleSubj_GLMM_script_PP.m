@@ -55,8 +55,7 @@ for sid = SIDS
     chans = [1:64];
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
-    
-    
+
     % here's where I pick those channels!
     chan = betaChan;
     chans = betaChan;
@@ -65,8 +64,7 @@ for sid = SIDS
     numTypes = length(dataForPPanalysis{betaChan});
     
     if strcmp(sid,'0b5a2e') || strcmp(sid,'0b5a2ePlayback') || strcmp(sid,'ecb43e')
-        nullType = 3;
-        
+        nullType = 3;        
     else
         nullType = NaN;
     end

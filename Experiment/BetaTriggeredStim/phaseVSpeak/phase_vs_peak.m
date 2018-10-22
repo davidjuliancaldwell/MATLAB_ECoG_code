@@ -2,7 +2,8 @@
 %
 % David.J.Caldwell 10.2.2018
 
-close all;clear all;clc
+%close all;clear all;clc
+clear all
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery';
 addpath(baseDir);
 baseDir2 = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PeaktoPeakEP';
@@ -17,7 +18,7 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4},...
     {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51},...
     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5},...
-    {'t',[90,180],6,[56 64],[57:64],[46 48 54 55 63],55},...
+    {'t',[90,270],6,[56 64],[57:64],[46 48 54 55 63],55},...
     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31},...
     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
@@ -47,8 +48,12 @@ plotColor = [
 
 
 plotColor = distinguishable_colors(9);
+%SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e'};
 
 modifierPhase = '_51samps_12_20_40ms_randomstart';
+%modifierPhase = '_51samps_8_30_40ms_randomstart';
+%modifier = '_51samps_8_30_40ms_randomstart';
+
 %modifierPhase = '_51samps_12_20_40m_0startPhase';
 modifierEP = '-reref';
 %SIDS = {'d5cd55'};
@@ -56,6 +61,14 @@ modifierEP = '-reref';
 % decide how to plot circles - std deviation or vector length
 markerToUse = 'vecLength';
 testStatistic = 'omnibus';
+
+threshold = 0.7;
+fThresholdMin = 12.01;
+fThresholdMax = 19.99;
+
+%fThresholdMin = 8.01;
+%fThresholdMax = 29.99;
+SIDS = {'d5cd55'};
 
 %% plot EP modulation vs phase for all subjects
 figTotal = figure;
@@ -85,9 +98,8 @@ for sid = SIDS
     minData = 0;
     maxData = 1;
     
-    threshold = 0.7;
     wInd = [];
-  %  h = [];
+    %  h = [];
     peakPhaseVec = [];
     chanVec = [];
     peakPhaseRep = [];
@@ -112,13 +124,13 @@ for sid = SIDS
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_pos,fThresholdMin,fThresholdMax);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
         end
         
         peakPhaseVec(index,:) = peakPhase;
@@ -131,7 +143,15 @@ for sid = SIDS
             keeps = dataForPPanalysis{i}{index}{5};
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             percentInd = 100*(mags(label ==3 & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            w(count,index) = difference;
+            if nanmean(mags(label ==0 & keeps)) > 150
+                w(count,index) = difference;
+                wTotal(subjectNum,count,index) = difference;
+                phaseTotal(subjectNum,count,index) = peakPhase(count);
+            else
+                w(count,index) = nan;
+                wTotal(subjectNum,count,index) = nan;
+                phaseTotal(subjectNum,count,index) = nan;
+            end
             %  wInd{count,index} = percentInd;
             count = count +1;
         end
@@ -204,6 +224,24 @@ xlabel('Phase of delivery (degrees)')
 ylabel([{'Percent change in EP size from baseline',' to >5 conditioning stimuli'}])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% do the difference between 0-180 and 180-360
+wTotal = wTotal(1:7,:,:);
+phaseTotal = phaseTotal(1:7,:,:);
+
+phaseTotalLess = phaseTotal(phaseTotal <= 180 & phaseTotal>=0);
+phaseTotalMore = phaseTotal(phaseTotal > 180 & phaseTotal<=365 );
+wTotalLess = wTotal(phaseTotal <= 180 & phaseTotal>=0);
+wTotalMore = wTotal(phaseTotal > 180 & phaseTotal<=365 );
+
+phaseTotalLess = phaseTotalLess(phaseTotalLess~=0);
+phaseTotalMore = phaseTotalMore(phaseTotalMore~=0);
+wTotalLess = wTotalLess(phaseTotalLess~=0);
+wTotalMore = wTotal(phaseTotalMore~=0);
+[h,p] = ttest2(wTotalLess,wTotalMore)
+
+[p,h,stats] = ranksum(wTotalLess,wTotalMore);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% plot EP modulation vs phase for subj. 7 with playback
 
 figure
@@ -229,10 +267,8 @@ for sid = SIDS(end-1:end)
     
     markerMin = 50;
     markerMax = 200;
-    minData = -1;
+    minData = 0;
     maxData = 1;
-    
-    threshold = 0.7;
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
@@ -252,13 +288,13 @@ for sid = SIDS(end-1:end)
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_pos,fThresholdMin,fThresholdMax);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
         end
         
         w = nan(length(chans), length(indices));
@@ -316,8 +352,6 @@ for sid = SIDS(end-1)
     minData = 0;
     maxData = 1;
     
-    threshold = 0.7;
-    
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     
@@ -332,10 +366,10 @@ for sid = SIDS(end-1)
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_pos,fThresholdMin,fThresholdMax);
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
         end
         w = nan(length(chans), indices);
         count = 1;
@@ -405,10 +439,8 @@ for sid = SIDS
     
     markerMin = 50;
     markerMax = 200;
-    minData = -1;
+    minData = 0;
     maxData = 1;
-    
-    threshold = 0;
     
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
@@ -430,16 +462,16 @@ for sid = SIDS
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_pos,fThresholdMin,fThresholdMax);
             fDeliver = f_pos;
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
             fDeliver = f_neg;
             
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
             fDeliver = f;
             
         end
@@ -500,11 +532,8 @@ for sid = SIDS(end-1:end)
     
     markerMin = 50;
     markerMax = 200;
-    minData = -1;
+    minData = 0;
     maxData = 1;
-    
-    threshold = 0;
-    
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
@@ -525,16 +554,16 @@ for sid = SIDS(end-1:end)
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
-                threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_pos_acaus,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_pos,fThresholdMin,fThresholdMax);
             fDeliver = f_pos;
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
-                threshold,phase_at_0_neg_acaus,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0_neg_acaus,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
             fDeliver = f_neg;
             
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
-                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic);
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
             fDeliver = f;
             
         end
