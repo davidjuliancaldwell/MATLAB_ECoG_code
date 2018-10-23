@@ -24,13 +24,9 @@ SIDS = {'0b5a2e','0b5a2ePlayback'};
 modifier = '-reref';
 
 %%
-anovaBetaMags5 = [];
-anovaBetaMags3 = [];
-anovaBetaMags1 = [];
-anovaBetaBase = [];
-anovaBetaSID = {};
-anovaNumStims = {};
-anovaTotalMags = [];
+betaSID = {};
+numStims = {};
+totalMags = [];
 anovaChan = {};
 anovaType = {};
 
@@ -57,7 +53,7 @@ for sid = SIDS
     load(strcat(subjid,['epSTATS-PP-sig' modifier '.mat']))
     % here's where I pick those channels!
     chans = [14];
-    chans = 31;
+    % chans = 31;
     % figure out number of test conditions
     numTypes = length(dataForPPanalysis{betaChan});
     
@@ -77,8 +73,8 @@ for sid = SIDS
         t2 = [];
         t3 = [];
         tN = [];
-                lengthItems = 0;
-
+        lengthItems = 0;
+        
         for i = 1:numTypes
             
             if i ~= nullType
@@ -91,19 +87,13 @@ for sid = SIDS
                 tempResp2 =tempMag(tempLabel==2 & tempKeeps);
                 tempResp3 = tempMag(tempLabel==3 & tempKeeps);
                 
-                if (strcmp(subdir,'NeuroModulation') | strcmp(subdir,'NeuroModulationV2')| strcmp(subdir,'NeuroModulationV4')  | strcmp(subdir,'NeuroModulationV3')) & strcmp(answer,'zscore')
-                    if i == 1
-                        tB = tempBase;
-                        tB = [tB tempBase'];
-                    end
-                    t1 = [t1 tempResp1'];
-                    t2 = [t2 tempResp2'];
-                    t3 = [t3 tempResp3'];
-                else
-                    t1 = [t1 tempResp1];
-                    t2 = [t2 tempResp2];
-                    t3 = [t3 tempResp3];
+                if i == 1
+                    tB = tempBase;
+                    tB = [tB tempBase];
                 end
+                t1 = [t1 tempResp1];
+                t2 = [t2 tempResp2];
+                t3 = [t3 tempResp3];
                 
                 if i == 1
                     lengthType = length(tempBase)+length(tempResp1)+length(tempResp2)+length(tempResp3);
@@ -116,14 +106,10 @@ for sid = SIDS
                 vecTypeC = string(vecType)';
                 anovaType = [anovaType{:} vecTypeC];
                 
-                % 6-17-2016 - have to transpose for 'subdir'
                 if i ==1
-                    if (strcmp(subdir,'NeuroModulation')| strcmp(subdir,'NeuroModulationV4') | strcmp(subdir,'NeuroModulationV2')  | strcmp(subdir,'NeuroModulationV3')) & strcmp(answer,'zscore')
-                        typeResp = [tempResp3' tempResp2' tempResp1' tempBase'];
-                    else
-                        typeResp = [tempResp3 tempResp2 tempResp1 tempBase];
-                    end
-                    anovaTotalMags = [anovaTotalMags typeResp];
+                    
+                    typeResp = [tempResp3 tempResp2 tempResp1 tempBase];
+                    totalMags = [totalMags typeResp];
                     num5S = repmat('Ct>=5',length(tempResp3),1);
                     num3S= repmat('3<=Ct<=4',length(tempResp2),1);
                     num1S = repmat('1<=Ct<=2',length(tempResp1),1);
@@ -133,15 +119,12 @@ for sid = SIDS
                     b3C = cellstr(num3S)';
                     b1C = cellstr(num1S)';
                     BC = cellstr(numBaseS)';
-                    anovaNumStims = [anovaNumStims{:} b5C b3C b1C BC];
+                    numStims = [numStims{:} b5C b3C b1C BC];
                     
                 else
-                    if (strcmp(subdir,'NeuroModulation')| strcmp(subdir,'NeuroModulationV4') | strcmp(subdir,'NeuroModulationV2')  | strcmp(subdir,'NeuroModulationV3')) & strcmp(answer,'zscore')
-                        typeResp = [tempResp3' tempResp2' tempResp1'];
-                    else
-                        typeResp = [tempResp3 tempResp2 tempResp1];
-                    end
-                    anovaTotalMags = [anovaTotalMags typeResp];
+                    
+                    typeResp = [tempResp3 tempResp2 tempResp1];
+                    totalMags = [totalMags typeResp];
                     num5S = repmat('Ct>=5',length(tempResp3),1);
                     num3S= repmat('3<=Ct<=4',length(tempResp2),1);
                     num1S = repmat('1<=Ct<=2',length(tempResp1),1);
@@ -149,7 +132,7 @@ for sid = SIDS
                     b5C = cellstr(num5S)';
                     b3C = cellstr(num3S)';
                     b1C = cellstr(num1S)';
-                    anovaNumStims = [anovaNumStims{:} b5C b3C b1C];
+                    numStims = [numStims{:} b5C b3C b1C];
                 end
                 
             end
@@ -159,14 +142,14 @@ for sid = SIDS
         lengthToRep = lengthItems;
         sidString = repmat(sid,lengthToRep,1);
         sidCell = cellstr(sidString)';
-        anovaBetaSID = [anovaBetaSID{:} sidCell];
+        betaSID = [betaSID{:} sidCell];
         
         
     end
 end
 %%
 % figure
-[p,tbl,stats] = anovan(anovaTotalMags,{anovaNumStims,anovaBetaSID},'varnames',{'anovaNumStims','anovaBetaSID'},'model','interaction')
+[p,tbl,stats] = anovan(totalMags,{numStims,betaSID},'varnames',{'anovaNumStims','anovaBetaSID'},'model','interaction')
 
 figure
 [cM,mM,hM,gnamesM] = multcompare(stats,'Dimension',[1 2])

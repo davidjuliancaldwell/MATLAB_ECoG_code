@@ -4,7 +4,7 @@
 
 % David.J.Caldwell 8.26.2018
 %%
-%close all;clear all;clc
+close all;clear all;clc
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery\';
 addpath(baseDir);
 
@@ -14,30 +14,31 @@ TouchDir(OUTPUT_DIR);
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},{'m',[0 180],2,[55 56],[2 3 31 57],64},{'s',180,3,[11 12],[57],4},...
     {'s',270,4,[59 60],[1 9 10 35 43],51},{'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],5},...
-    {'m',[180,0],6,[56 64],[57:64],55},{'m',[90,270],7,[22 30],[17 18 19 24 25 28 29],31},{'m',[90,270],8,[22 30],[17 18 19 24 25 28 29],31}};
+    {'t',[270,90,12345],6,[56 64],[57:64],55},{'m',[90,270],7,[22 30],[17 18 19 24 25 28 29],31},{'m',[90,270],8,[22 30],[17 18 19 24 25 28 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
- 
+
 modifier = '_51samps_12_20_40ms_randomstart';
 modifier = '_13samps_8_30_40ms_randomstart';
 %modifierPhase = '_51samps_12_20_40m_0startPhase';
 
 %SIDS = {'0b5a2e','0b5a2ePlayback'};
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
-SIDS = {'d5cd55'};
+%SIDS = {'d5cd55'};
 %gcp;  %parallel pool
 %
 % settings
 hilbPlot = 0;
 acausalPlot = 0;
 rawPlot = 1;
-saveIt = 1;
+saveIt = 0;
 threshold = 0.7; %r^2
 fThresholdMin = 8.01; % Hz
+
 fThresholdMax = 29.99; % Hz
 testStatistic = 'omnibus';
 % fThresholdMin = 12.01; % Hz
 %  fThresholdMax = 19.99; % Hz
-
+%SIDS = {'ecb43e'};
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -51,7 +52,7 @@ for sid = SIDS
     if (strcmpi(sid,'0b5a2ePlayback'))
         sid = '0b5a2ePlayback';
     end
-
+    
     info = M(sid);
     type = info{1};
     subjectNum = info{3};
@@ -67,9 +68,9 @@ for sid = SIDS
     chans(ismember(chans, badsTotal)) = [];
     % chans = 28
     
-   % chans = betaChan;
+    chans = betaChan;
     
-    if strcmp(type,'m')
+    if strcmp(type,'m') || strcmp(type,'t')
         if rawPlot
             for chan = chans
                 fprintf(['chan ' num2str(chan) '\n'])
@@ -98,8 +99,10 @@ for sid = SIDS
                 close all
             end
         end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    elseif strcmp(type,'s')
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if strcmp(type,'s')|| strcmp(type,'t')
         if rawPlot
             
             

@@ -2,8 +2,7 @@
 %
 % David.J.Caldwell 10.2.2018
 
-%close all;clear all;clc
-clear all
+close all;clear all;clc
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery';
 addpath(baseDir);
 baseDir2 = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PeaktoPeakEP';
@@ -48,11 +47,11 @@ plotColor = [
 
 
 plotColor = distinguishable_colors(9);
-%SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e'};
+SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e'};
 
 modifierPhase = '_51samps_12_20_40ms_randomstart';
 %modifierPhase = '_51samps_8_30_40ms_randomstart';
-%modifier = '_51samps_8_30_40ms_randomstart';
+modifier = '_13samps_8_30_40ms_randomstart';
 
 %modifierPhase = '_51samps_12_20_40m_0startPhase';
 modifierEP = '-reref';
@@ -63,12 +62,11 @@ markerToUse = 'vecLength';
 testStatistic = 'omnibus';
 
 threshold = 0.7;
-fThresholdMin = 12.01;
-fThresholdMax = 19.99;
+%fThresholdMin = 12.01;
+%fThresholdMax = 19.99;
 
-%fThresholdMin = 8.01;
-%fThresholdMax = 29.99;
-SIDS = {'d5cd55'};
+fThresholdMin = 8.01;
+fThresholdMax = 29.99;
 
 %% plot EP modulation vs phase for all subjects
 figTotal = figure;
@@ -119,7 +117,8 @@ for sid = SIDS
     elseif strcmp(type,'t')
         indices = [1,2,4];
     end
-    
+            w = nan(length(chans), length(indices));
+
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
@@ -135,7 +134,6 @@ for sid = SIDS
         
         peakPhaseVec(index,:) = peakPhase;
         
-        w = nan(length(chans), length(indices));
         count = 1;
         for i = chans
             mags = 1e6*dataForPPanalysis{i}{index}{1};
@@ -228,18 +226,17 @@ ylabel([{'Percent change in EP size from baseline',' to >5 conditioning stimuli'
 wTotal = wTotal(1:7,:,:);
 phaseTotal = phaseTotal(1:7,:,:);
 
-phaseTotalLess = phaseTotal(phaseTotal <= 180 & phaseTotal>=0);
-phaseTotalMore = phaseTotal(phaseTotal > 180 & phaseTotal<=365 );
-wTotalLess = wTotal(phaseTotal <= 180 & phaseTotal>=0);
-wTotalMore = wTotal(phaseTotal > 180 & phaseTotal<=365 );
+phaseTotalLess = phaseTotal((phaseTotal < 180) & (phaseTotal>0));
+phaseTotalMore = phaseTotal((phaseTotal > 180) & (phaseTotal<=365) );
+wTotalLess = wTotal((phaseTotal < 180) & (phaseTotal>0));
+wTotalMore = wTotal((phaseTotal > 180) & (phaseTotal<365) );
 
-phaseTotalLess = phaseTotalLess(phaseTotalLess~=0);
-phaseTotalMore = phaseTotalMore(phaseTotalMore~=0);
-wTotalLess = wTotalLess(phaseTotalLess~=0);
-wTotalMore = wTotal(phaseTotalMore~=0);
+
+wTotalLess = wTotalLess(~isnan(wTotalLess));
+wTotalMore = wTotalMore(~isnan(wTotalMore));
 [h,p] = ttest2(wTotalLess,wTotalMore)
 
-[p,h,stats] = ranksum(wTotalLess,wTotalMore);
+[p,h,stats] = ranksum(wTotalLess,wTotalMore)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% plot EP modulation vs phase for subj. 7 with playback
@@ -248,6 +245,7 @@ figure
 clearvars hPlayback1
 hold on
 countScatter = 1;
+SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 
 for sid = SIDS(end-1:end)
     sid = sid{:};
@@ -283,7 +281,8 @@ for sid = SIDS(end-1:end)
     elseif strcmp(type,'t')
         indices = [1,2,4];
     end
-    
+            wPlayback = nan(length(chans), length(indices));
+
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
@@ -297,18 +296,27 @@ for sid = SIDS(end-1:end)
                 threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
         end
         
-        w = nan(length(chans), length(indices));
         count = 1;
         for i = chans
             mags = 1e6*dataForPPanalysis{i}{index}{1};
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            w(count,index) = difference;
-            count = count +1;
+            percentInd = 100*(mags(label ==3 & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
+            if nanmean(mags(label ==0 & keeps)) > 150
+                wPlayback(count,index) = difference;
+                wTotalPlayback(subjectNum,count,index) = difference;
+                phaseTotal(subjectNum,count,index) = peakPhase(count);
+            else
+                wPlayBack(count,index) = nan;
+                wTotalPlayback(subjectNum,count,index) = nan;
+                phaseTotal(subjectNum,count,index) = nan;
+            end
+            count  = count + 1;
+            
         end
         
-        hPlayback(countScatter) =  scatter(peakPhase,w(:,index),markerSize,plotColor(subjectNum,:),'filled');
+        hPlayback(countScatter) =  scatter(peakPhase,wPlayback(:,index),markerSize,plotColor(subjectNum,:),'filled');
         
     end
     
@@ -371,35 +379,51 @@ for sid = SIDS(end-1)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
                 threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
         end
-        w = nan(length(chans), indices);
+        wNull = nan(length(chans), indices);
         count = 1;
         for i = chans
             mags = 1e6*dataForPPanalysis{i}{index}{1};
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            w(count,index) = difference;
+            if nanmean(mags(label ==0 & keeps)) > 150
+                wNull(count,index) = difference;
+                wTotalNull(subjectNum,count,index) = difference;
+                phaseTotal(subjectNum,count,index) = peakPhase(count);
+            else
+                wNull(count,index) = nan;
+                wTotalNull(subjectNum,count,index) = nan;
+                phaseTotal(subjectNum,count,index) = nan;
+            end
             count = count +1;
         end
         
-        hNull(countScatter) =  scatter(peakPhase,w(:,index),markerSize,plotColor(subjectNum,:),'filled');
+        hNull(countScatter) =  scatter(peakPhase,wNull(:,index),markerSize,plotColor(subjectNum,:),'filled');
         
     end
     countScatter = countScatter + 1;
     
     index = 3;
-    w = nan(length(chans), length(indices));
+    wNull = nan(length(chans), length(indices));
     count = 1;
     for i = chans
         mags = 1e6*dataForPPanalysis{i}{index}{1};
         label= dataForPPanalysis{i}{index}{4};
         keeps = dataForPPanalysis{i}{index}{5};
         difference = 100*(nanmean(mags(label ==1 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-        w(count,index) = difference;
+        if nanmean(mags(label ==0 & keeps)) > 150
+            wNull(count,index) = difference;
+            wTotalNull(subjectNum,count,index) = difference;
+            phaseTotal(subjectNum,count,index) = peakPhase(count);
+        else
+            wNull(count,index) = nan;
+            wTotalNull(subjectNum,count,index) = nan;
+            phaseTotal(subjectNum,count,index) = nan;
+        end
         count = count +1;
     end
     
-    hNull(countScatter) =  scatter(peakPhase,w(:,index),125,plotColor(subjectNum+2,:),'d','filled');
+    hNull(countScatter) =  scatter(peakPhase,wNull(:,index),125,plotColor(subjectNum+2,:),'d','filled');
     
 end
 xlim([0 360])

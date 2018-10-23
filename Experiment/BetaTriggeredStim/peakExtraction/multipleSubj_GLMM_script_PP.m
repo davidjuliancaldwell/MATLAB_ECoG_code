@@ -18,21 +18,24 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4,3.5},...
     {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51,0.75},...
     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
-    {'t',[270,90],6,[56 64],[57:64],[46 48 54 55 63],55,1.75}...
+    {'t',[270,90,12345,12345],6,[56 64],[57:64],[46 48 54 55 63],55,1.75}...
     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31,1.75},...
     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31,1.75}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
+modifier = '-reref';
+
 %%
 
-BetaMags5 = [];
-BetaMags3 = [];
-BetaMags1 = [];
-BetaBase = [];
-BetaSID = {};
-NumStims = {};
-TotalMags = [];
-Chan = {};
-Type = {};
+betaMags5 = [];
+betaMags3 = [];
+betaMags1 = [];
+betaBase = [];
+betaSID = {};
+numStims = {};
+totalMags = [];
+chanLabels = [];
+anovaType = {};
+stimLevelCombined =[];
 %answer = input('use zscore or raw values? Enter "zscore" or "raw"  \n','s');
 
 % exclude playback for now
@@ -55,16 +58,18 @@ for sid = SIDS
     chans = [1:64];
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
-
+    
+    load(strcat(subjid,['epSTATS-PP-sig' modifier '.mat']))
+    
     % here's where I pick those channels!
-    chan = betaChan;
-    chans = betaChan;
+  %  chan = betaChan;
+ %   chans = betaChan;
     
     % figure out number of test conditions
     numTypes = length(dataForPPanalysis{betaChan});
     
     if strcmp(sid,'0b5a2e') || strcmp(sid,'0b5a2ePlayback') || strcmp(sid,'ecb43e')
-        nullType = 3;        
+        nullType = 3;
     else
         nullType = NaN;
     end
@@ -78,82 +83,101 @@ for sid = SIDS
         t2 = [];
         t3 = [];
         tN = [];
+        lengthItems = 0;
         
-        for i = 1:numTypes
+        
+        %%%%%%%%%%%%%%%%%%%%% screen
+        tempMagScreen = 1e6*dataForPPanalysis{chan}{1}{1};
+        tempLabelScreen = dataForPPanalysis{chan}{1}{4};
+        tempKeepsScreen = dataForPPanalysis{chan}{1}{5};
+        if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > 150
             
-            if i ~= nullType
-                tempMag = 1e6*dataForPPanalysis{chan}{i}{1};
-                tempLabel = dataForPPanalysis{chan}{i}{4};
-                tempKeeps = dataForPPanalysis{chan}{i}{5};
+            
+            for i = 1:numTypes
                 
-                tempBase = tempMag(tempLabel==0 & tempKeeps);
-                tempResp1 = tempMag(tempLabel==1& tempKeeps);
-                tempResp2 = tempMag(tempLabel==2& tempKeeps);
-                tempResp3 = tempMag(tempLabel==3& tempKeeps);
-                
-                
-                if (strcmp(subdir,'NeuroModulation') | strcmp(subdir,'NeuroModulationV2')| strcmp(subdir,'NeuroModulationV4')  | strcmp(subdir,'NeuroModulationV3')) & strcmp(answer,'zscore')
-                    tB = [tB tempBase'];
-                    t1 = [t1 tempResp1'];
-                    t2 = [t2 tempResp2'];
-                    t3 = [t3 tempResp3'];
-                else
-                    tB = [tB tempBase];
+                if i ~= nullType
+                    tempMag = 1e6*dataForPPanalysis{chan}{i}{1};
+                    tempLabel = dataForPPanalysis{chan}{i}{4};
+                    tempKeeps = dataForPPanalysis{chan}{i}{5};
+                    
+                    
+                    
+                    tempBase = tempMag(tempLabel==0 & tempKeeps);
+                    tempResp1 = tempMag(tempLabel==1& tempKeeps);
+                    tempResp2 = tempMag(tempLabel==2& tempKeeps);
+                    tempResp3 = tempMag(tempLabel==3& tempKeeps);
+                    
+                    if i == 1
+                        tB = tempBase;
+                        tB = [tB tempBase];
+                    end
                     t1 = [t1 tempResp1];
                     t2 = [t2 tempResp2];
                     t3 = [t3 tempResp3];
+                    
+                    if i == 1
+                        lengthType = length(tempBase)+length(tempResp1)+length(tempResp2)+length(tempResp3);
+                    else
+                        lengthType = length(tempResp1)+length(tempResp2)+length(tempResp3);
+                        
+                    end
+                    lengthItems = lengthItems +lengthType;
+                    vecType = repmat(desiredF(i),lengthType,1);
+                    vecTypeC = string(vecType)';
+                    anovaType = [anovaType{:} vecTypeC];
+                    if i ==1
+                        
+                        typeResp = [tempResp3 tempResp2 tempResp1 tempBase];
+                        totalMags = [totalMags typeResp];
+                        num5S = repmat('Ct>=5',length(tempResp3),1);
+                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
+                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
+                        numBaseS = repmat('Base',length(tempBase),1);
+                        
+                        b5C = cellstr(num5S)';
+                        b3C = cellstr(num3S)';
+                        b1C = cellstr(num1S)';
+                        BC = cellstr(numBaseS)';
+                        numStims = [numStims{:} b5C b3C b1C BC];
+                    else
+                        typeResp = [tempResp3 tempResp2 tempResp1];
+                        totalMags = [totalMags typeResp];
+                        num5S = repmat('Ct>=5',length(tempResp3),1);
+                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
+                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
+                        
+                        b5C = cellstr(num5S)';
+                        b3C = cellstr(num3S)';
+                        b1C = cellstr(num1S)';
+                        numStims = [numStims{:} b5C b3C b1C];
+                    end
                 end
-                
-                lengthType = length(tempBase)+length(tempResp1)+length(tempResp2)+length(tempResp3);
-                vecType = repmat(typeCell{i},lengthType,1);
-                vecTypeC = cellstr(vecType)';
-                Type = [Type{:} vecTypeC];
-                
-                % 6-17-2016 - have to transpose for 'conf'
-                if (strcmp(subdir,'NeuroModulation')| strcmp(subdir,'NeuroModulationV4') | strcmp(subdir,'NeuroModulationV2')  | strcmp(subdir,'NeuroModulationV3')) & strcmp(answer,'zscore')
-                    typeResp = [tempBase' tempResp1' tempResp2' tempResp3'];
-                else
-                    typeResp = [tempBase tempResp1 tempResp2 tempResp3];
-                end
-                TotalMags = [TotalMags typeResp];
-                num5S = repmat('Ct>=5',length(tempResp3),1);
-                num3S= repmat('3<=Ct<=4',length(tempResp2),1);
-                num1S = repmat('1<=Ct<=2',length(tempResp1),1);
-                numBaseS = repmat('Base',length(tempBase),1);
-                
-                %             numNullS = repmat('Null',length(tN),1);
-                
-                b5C = cellstr(num5S)';
-                b3C = cellstr(num3S)';
-                b1C = cellstr(num1S)';
-                BC = cellstr(numBaseS)';
-                %             nC = cellstr(numNullS)';
-                NumStims = [NumStims{:} BC b1C b3C b5C];
             end
+            lengthToRep = lengthItems;
+            sidString = repmat(sid,lengthToRep,1);
+            sidCell = cellstr(sidString)';
+            chanLabels = [chanLabels repmat(chan,lengthToRep,1)'];
+            betaMags5 = [betaMags5 t3];
+            betaMags3 = [betaMags3 t2];
+            betaMags1 = [betaMags1 t1];
+            betaBase = [betaBase tB] ;
+            betaSID = [betaSID{:} sidCell];
+            stimLevelCombined = [stimLevelCombined repmat(stimLevel,lengthToRep,1)'];
         end
-        
-        lengthToRep = length(t3)+length(t2)+length(t1)+length(tB);
-        sidString = repmat(sid,lengthToRep,1);
-        
-        sidCell = cellstr(sidString)';
-        
-        BetaMags5 = [BetaMags5 t3];
-        BetaMags3 = [BetaMags3 t2];
-        BetaMags1 = [BetaMags1 t1];
-        BetaBase = [BetaBase tB] ;
-        BetaSID = [BetaSID{:} sidCell];
-        StimLevel = [StimLevel repmat(stimLevel,lengthToRep,1)'];
     end
 end
 
 
 %%
-tableBetaStim = table(TotalMags',StimLevel',categorical(NumStims)',categorical(BetaSID)',...
-    'VariableNames',{'Magnitude','stimLevel','NumStims','SID'});
+tableBetaStim = table(totalMags',stimLevelCombined',categorical(numStims)',categorical(betaSID)',categorical(chanLabels)',...
+    'VariableNames',{'Magnitude','stimLevel','NumStims','SID','channel'});
 % group stats
 
 statarray = grpstats(tableBetaStim,{'SID','NumStims'},{'mean','sem'},...
     'DataVars','Magnitude');
+
+grpstats(totalMags',numStims',0.05)
+
 %%
 numSubj = 7;
 numDims = 4;
