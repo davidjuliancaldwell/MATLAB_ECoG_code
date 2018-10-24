@@ -16,12 +16,29 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51,0.75},...
     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
     {'t',[270,90],6,[56 64],[57:64],[46 48 54 55 63],55,1.75}...
-    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31,1.75},...
-    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31,1.75}};
+    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75},...
+    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 SIDS = {'0b5a2e','0b5a2ePlayback'};
 
-modifier = '-reref';
+modifierEP = '-reref';
+modifierPhase = '_13samps_8_30_40ms_randomstart';
+
+% decide how to plot circles - std deviation or vector length
+markerToUse = 'vecLength';
+testStatistic = 'omnibus';
+
+threshold = 0.7;
+%fThresholdMin = 12.01;
+%fThresholdMax = 19.99;
+
+fThresholdMin = 8.01;
+fThresholdMax = 29.99;
+
+markerMin = 50;
+markerMax = 200;
+minData = 0;
+maxData = 1;
 
 %%
 betaSID = {};
@@ -29,7 +46,8 @@ numStims = {};
 totalMags = [];
 anovaChan = {};
 anovaType = {};
-
+phaseDelivery = [];
+phaseDeliveryBinned = [];
 
 subdir = 'PeaktoPeakEP';
 
@@ -49,15 +67,16 @@ for sid = SIDS
     chans = [1:64];
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
-    
-    load(strcat(subjid,['epSTATS-PP-sig' modifier '.mat']))
+        
+    load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
+    load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     % here's where I pick those channels!
     chans = [14];
     % chans = 31;
     % figure out number of test conditions
     numTypes = length(dataForPPanalysis{betaChan});
     
-    if strcmp(sid,'0b5a2e') || strcmp(sid,'0b5a2ePlayback') || strcmp(sid,'ecb43e')
+    if strcmp(sid,'0b5a2e') || strcmpi(sid,'0b5a2ePlayback') || strcmp(sid,'ecb43e')
         nullType = 3;
         
     else
@@ -65,6 +84,32 @@ for sid = SIDS
     end
     
     % cells, rather than stacked, of responses for given num stimuli
+    
+    %%
+    
+    if strcmp(type,'m')
+        indices = [1,2];
+    elseif strcmp(type,'s')
+        indices = 1;
+    elseif strcmp(type,'t')
+        indices = [1,2,4];
+    end
+    
+    for index = indices
+        
+        if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_pos,...
+                threshold,phase_at_0_pos,chans,desiredF(index),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_pos,fThresholdMin,fThresholdMax);
+        elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
+                threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
+        elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
+            [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
+                threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
+        end
+        peakPhaseVec(index,:) = peakPhase;
+    end
+    
     
     for chan = chans
         % for each channel, a single stacked vector of all of the responses for a given number of stimuli
@@ -75,81 +120,102 @@ for sid = SIDS
         tN = [];
         lengthItems = 0;
         
-        for i = 1:numTypes
+        %%%%%%%%%%%%%%%%%%%%% screen
+        tempMagScreen = 1e6*dataForPPanalysis{chan}{1}{1};
+        tempLabelScreen = dataForPPanalysis{chan}{1}{4};
+        tempKeepsScreen = dataForPPanalysis{chan}{1}{5};
+        
+        if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > 150
             
-            if i ~= nullType
-                tempMag = 1e6*dataForPPanalysis{chan}{i}{1};
-                tempLabel = dataForPPanalysis{chan}{i}{4};
-                tempKeeps = dataForPPanalysis{chan}{i}{5};
+            for i = 1:numTypes
                 
-                tempBase = tempMag(tempLabel==0 & tempKeeps);
-                tempResp1 = tempMag(tempLabel==1 & tempKeeps);
-                tempResp2 =tempMag(tempLabel==2 & tempKeeps);
-                tempResp3 = tempMag(tempLabel==3 & tempKeeps);
-                
-                if i == 1
-                    tB = tempBase;
-                    tB = [tB tempBase];
+                if i ~= nullType
+                    tempMag = 1e6*dataForPPanalysis{chan}{i}{1};
+                    tempLabel = dataForPPanalysis{chan}{i}{4};
+                    tempKeeps = dataForPPanalysis{chan}{i}{5};
+                    
+                    tempBase = tempMag(tempLabel==0 & tempKeeps);
+                    tempResp1 = tempMag(tempLabel==1 & tempKeeps);
+                    tempResp2 =tempMag(tempLabel==2 & tempKeeps);
+                    tempResp3 = tempMag(tempLabel==3 & tempKeeps);
+                    
+                    if i == 1
+                        tB = tempBase;
+                        tB = [tB tempBase];
+                    end
+                    t1 = [t1 tempResp1];
+                    t2 = [t2 tempResp2];
+                    t3 = [t3 tempResp3];
+                    
+                    if i == 1
+                        lengthType = length(tempBase)+length(tempResp1)+length(tempResp2)+length(tempResp3);
+                    else
+                        lengthType = length(tempResp1)+length(tempResp2)+length(tempResp3);
+                        
+                    end
+                    
+                    lengthItems = lengthItems +lengthType;
+                    vecType = repmat(desiredF(i),lengthType,1);
+                    vecTypeC = string(vecType)';
+                    anovaType = [anovaType{:} vecTypeC];
+                    
+                    phaseVecChosen = peakPhaseVec(i);
+                    phaseVec = repmat(phaseVecChosen,lengthType,1)';
+                    phaseDelivery = [phaseDelivery phaseVec];
+                    
+                    phaseBinned = phaseVec;
+%                     if any(phaseBinned > 180)
+%                         phaseBinned(:) = 270;
+%                     else
+%                         phaseBinned(:) = 90;
+%                     end
+                    phaseDeliveryBinned = [phaseDeliveryBinned phaseBinned];
+                    
+                    if i ==1
+                        
+                        typeResp = [tempResp3 tempResp2 tempResp1 tempBase];
+                        totalMags = [totalMags typeResp];
+                        num5S = repmat('Ct>=5',length(tempResp3),1);
+                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
+                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
+                        numBaseS = repmat('Base',length(tempBase),1);
+                        
+                        b5C = cellstr(num5S)';
+                        b3C = cellstr(num3S)';
+                        b1C = cellstr(num1S)';
+                        BC = cellstr(numBaseS)';
+                        numStims = [numStims{:} b5C b3C b1C BC];
+                        
+                    else
+                        
+                        typeResp = [tempResp3 tempResp2 tempResp1];
+                        totalMags = [totalMags typeResp];
+                        num5S = repmat('Ct>=5',length(tempResp3),1);
+                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
+                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
+                        
+                        b5C = cellstr(num5S)';
+                        b3C = cellstr(num3S)';
+                        b1C = cellstr(num1S)';
+                        numStims = [numStims{:} b5C b3C b1C];
+                    end
+                    
                 end
-                t1 = [t1 tempResp1];
-                t2 = [t2 tempResp2];
-                t3 = [t3 tempResp3];
-                
-                if i == 1
-                    lengthType = length(tempBase)+length(tempResp1)+length(tempResp2)+length(tempResp3);
-                else
-                    lengthType = length(tempResp1)+length(tempResp2)+length(tempResp3);
-                    
-                end
-                lengthItems = lengthItems +lengthType;
-                vecType = repmat(desiredF(i),lengthType,1);
-                vecTypeC = string(vecType)';
-                anovaType = [anovaType{:} vecTypeC];
-                
-                if i ==1
-                    
-                    typeResp = [tempResp3 tempResp2 tempResp1 tempBase];
-                    totalMags = [totalMags typeResp];
-                    num5S = repmat('Ct>=5',length(tempResp3),1);
-                    num3S= repmat('3<=Ct<=4',length(tempResp2),1);
-                    num1S = repmat('1<=Ct<=2',length(tempResp1),1);
-                    numBaseS = repmat('Base',length(tempBase),1);
-                    
-                    b5C = cellstr(num5S)';
-                    b3C = cellstr(num3S)';
-                    b1C = cellstr(num1S)';
-                    BC = cellstr(numBaseS)';
-                    numStims = [numStims{:} b5C b3C b1C BC];
-                    
-                else
-                    
-                    typeResp = [tempResp3 tempResp2 tempResp1];
-                    totalMags = [totalMags typeResp];
-                    num5S = repmat('Ct>=5',length(tempResp3),1);
-                    num3S= repmat('3<=Ct<=4',length(tempResp2),1);
-                    num1S = repmat('1<=Ct<=2',length(tempResp1),1);
-                    
-                    b5C = cellstr(num5S)';
-                    b3C = cellstr(num3S)';
-                    b1C = cellstr(num1S)';
-                    numStims = [numStims{:} b5C b3C b1C];
-                end
-                
             end
+            
+            
+            lengthToRep = lengthItems;
+            sidString = repmat(sid,lengthToRep,1);
+            sidCell = cellstr(sidString)';
+            betaSID = [betaSID{:} sidCell];
+            
+            
         end
-        
-        
-        lengthToRep = lengthItems;
-        sidString = repmat(sid,lengthToRep,1);
-        sidCell = cellstr(sidString)';
-        betaSID = [betaSID{:} sidCell];
-        
-        
     end
 end
 %%
 % figure
-[p,tbl,stats] = anovan(totalMags,{numStims,betaSID},'varnames',{'anovaNumStims','anovaBetaSID'},'model','interaction')
+[p,tbl,stats] = anovan(totalMags,{numStims,betaSID},'varnames',{'numStims','betaSID'},'model','interaction')
 
 figure
 [cM,mM,hM,gnamesM] = multcompare(stats,'Dimension',[1 2])

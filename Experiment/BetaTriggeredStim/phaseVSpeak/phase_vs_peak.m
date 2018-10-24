@@ -13,13 +13,13 @@ TouchDir(OUTPUT_DIR);
 
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53},...
-    {'m',[0 180],2,[55 56],[1 2 3 31 57],[31 39 40 47 48 63 64],64},...
+    {'m',[0 180],2,[55 56],[1 2 3 31 57],[39 40 47 48 63 64],64},...
     {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4},...
     {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51},...
     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5},...
     {'t',[90,270],6,[56 64],[57:64],[46 48 54 55 63],55},...
-    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31},...
-    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 24 29 31 32 39 40],31}};
+    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31},...
+    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 plotColor = [
     [.65, .65, .65];...   % light gray         (0)
@@ -49,11 +49,9 @@ plotColor = [
 plotColor = distinguishable_colors(9);
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e'};
 
-modifierPhase = '_51samps_12_20_40ms_randomstart';
-%modifierPhase = '_51samps_8_30_40ms_randomstart';
-modifier = '_13samps_8_30_40ms_randomstart';
+modifierPhase = '_13samps_8_30_40ms_randomstart';
 
-%modifierPhase = '_51samps_12_20_40m_0startPhase';
+modifierPhase = '_51samps_12_20_40ms_randomstart';
 modifierEP = '-reref';
 %SIDS = {'d5cd55'};
 
@@ -62,11 +60,11 @@ markerToUse = 'vecLength';
 testStatistic = 'omnibus';
 
 threshold = 0.7;
-%fThresholdMin = 12.01;
-%fThresholdMax = 19.99;
-
-fThresholdMin = 8.01;
-fThresholdMax = 29.99;
+fThresholdMin = 12.01;
+fThresholdMax = 19.99;
+% 
+% fThresholdMin = 10;
+% fThresholdMax = 29.99;
 
 %% plot EP modulation vs phase for all subjects
 figTotal = figure;
@@ -215,7 +213,7 @@ legend([h],{'Subject 1',...
 title('Phase of delivery and CEP modulation')
 xlabel('Phase of delivery (degrees)')
 ylabel('Percent change in EP size from baseline to >5 conditioning stimuli')
-set(gca,'fontsize',18)
+set(gca,'fontsize',24)
 
 figure(figInd)
 xlabel('Phase of delivery (degrees)')
@@ -227,7 +225,7 @@ wTotal = wTotal(1:7,:,:);
 phaseTotal = phaseTotal(1:7,:,:);
 
 phaseTotalLess = phaseTotal((phaseTotal < 180) & (phaseTotal>0));
-phaseTotalMore = phaseTotal((phaseTotal > 180) & (phaseTotal<=365) );
+phaseTotalMore = phaseTotal((phaseTotal > 180) & (phaseTotal<365) );
 wTotalLess = wTotal((phaseTotal < 180) & (phaseTotal>0));
 wTotalMore = wTotal((phaseTotal > 180) & (phaseTotal<365) );
 

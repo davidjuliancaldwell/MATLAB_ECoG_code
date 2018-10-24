@@ -23,7 +23,7 @@ modifier = '_13samps_8_30_40ms_randomstart';
 
 %SIDS = {'0b5a2e','0b5a2ePlayback'};
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
-%SIDS = {'d5cd55'};
+SIDS = {'c91479'};
 %gcp;  %parallel pool
 %
 % settings
@@ -32,8 +32,7 @@ acausalPlot = 0;
 rawPlot = 1;
 saveIt = 0;
 threshold = 0.7; %r^2
-fThresholdMin = 8.01; % Hz
-
+fThresholdMin = 8.01; % Hz2
 fThresholdMax = 29.99; % Hz
 testStatistic = 'omnibus';
 % fThresholdMin = 12.01; % Hz
@@ -68,7 +67,8 @@ for sid = SIDS
     chans(ismember(chans, badsTotal)) = [];
     % chans = 28
     
-    chans = betaChan;
+    %chans = betaChan;
+    chans = [39 40 47 48 63 64];
     
     if strcmp(type,'m') || strcmp(type,'t')
         if rawPlot

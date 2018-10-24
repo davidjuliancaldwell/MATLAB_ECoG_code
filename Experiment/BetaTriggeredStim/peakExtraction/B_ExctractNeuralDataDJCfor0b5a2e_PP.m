@@ -495,8 +495,8 @@ for idx = 2:9
                 %                 figure
                 prettybar(a1, label(keeps), colors, gcf);
                 set(gca, 'xtick', []);
-                ylabel('\DeltaEP_N (uV)');
-                title(sprintf('Change in EP_N by N_{CT}: One-Way Anova F=%4.2f p=%0.4f', tableNull{2,5}, tableNull{2,6}));
+                ylabel('EP_N Magnitude(uV)');
+                title(sprintf('EP_N Magnitude by N_{CT}: One-Way Kruskal-Wallis F=%4.2f p=%0.4f', tableNull{2,5}, tableNull{2,6}));
                 %                                     figure
                 figure
                 [pNull,tblNull,statsNull] = kruskalwallis(a1',label(keeps));
