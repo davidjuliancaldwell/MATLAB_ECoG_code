@@ -19,6 +19,8 @@ M = containers.Map(SIDS,valueSet,'UniformValues',false);
 
 modifier = '_51samps_12_20_40ms_randomstart';
 modifier = '_13samps_8_30_40ms_randomstart';
+modifier = '_13samps_10_30_40ms_randomstart';
+
 %modifierPhase = '_51samps_12_20_40m_0startPhase';
 
 %SIDS = {'0b5a2e','0b5a2ePlayback'};
@@ -32,7 +34,7 @@ acausalPlot = 0;
 rawPlot = 1;
 saveIt = 0;
 threshold = 0.7; %r^2
-fThresholdMin = 8.01; % Hz2
+fThresholdMin = 10.01; % Hz2
 fThresholdMax = 29.99; % Hz
 testStatistic = 'omnibus';
 % fThresholdMin = 12.01; % Hz

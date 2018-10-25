@@ -4,7 +4,7 @@
 % David.J.Caldwell 9.19.2018
 
 %close all;clear all;clc
-clear all
+%clear all
 Z_Constants;
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
@@ -24,9 +24,8 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 modifierEP = '-reref';
-SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e'};
 
-modifierPhase = '_13samps_8_30_40ms_randomstart';
+modifierPhase = '_13samps_10_30_40ms_randomstart';
 
 % decide how to plot circles - std deviation or vector length
 markerToUse = 'vecLength';
@@ -38,6 +37,7 @@ threshold = 0.7;
 
 fThresholdMin = 10;
 fThresholdMax = 29.99;
+epThresholdMag = 100;
 
 markerMin = 50;
 markerMax = 200;
@@ -64,7 +64,7 @@ phaseDeliveryBinned = [];
 % which
 subdir = 'PeaktoPeakEP';
 
-for sid = SIDS
+for sid = SIDS(1:end-1)
     
     sid = sid{:};
     subjid = sid;
@@ -150,7 +150,7 @@ for sid = SIDS
         tempLabelScreen = dataForPPanalysis{chan}{1}{4};
         tempKeepsScreen = dataForPPanalysis{chan}{1}{5};
         
-        if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > 150
+        if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > epThresholdMag
             
             for i = 1:numTypes
                 
@@ -288,18 +288,118 @@ end
 figure
 grpstats(meansChannelSID,{'NumStims','phaseClass'},{'mean','sem'},...
     'DataVars','percentDiff')%hierarchicalBoxplot(anovaTotalMags,{categorical(anovaNumStims),categorical(anovaBetaSID)})
-
-return
 %%
+clearvars plotSummary plotSummaryLabels
+phases = (meansChannelSID.phaseClass == '90');
+ct1= (meansChannelSID.NumStims == '1<=Ct<=2');
+ct2 = (meansChannelSID.NumStims == '3<=Ct<=4');
+ct3 = (meansChannelSID.NumStims == 'Ct>=5');
+phasesSelected = (ct1 | ct2 | ct3);
+ct1sel = ct1(phasesSelected);
+ct2sel = ct2(phasesSelected);
+ct3sel = ct3(phasesSelected);
+phasesAnova = phases(phasesSelected);
+
+%%
+dataInt = meansChannelSID.percentDiff(phasesSelected);
+
+plotSummary{1} = dataInt(phasesAnova);
+plotSummaryLabels{1} = zeros(size(plotSummary{1}));
+plotSummaryLabels{1}(ct2sel(phasesAnova)) = 1;
+plotSummaryLabels{1}(ct3sel(phasesAnova)) = 2;
+
+plotSummary{2} = dataInt(~phasesAnova);
+plotSummaryLabels{2} = zeros(size(plotSummary{2}));
+plotSummaryLabels{2}(ct2sel(~phasesAnova)) = 1;
+plotSummaryLabels{2}(ct3sel(~phasesAnova)) = 2;
+
+%%
+
+labelsCount = zeros(size(phasesAnova));
+labelsCount(ct1sel) = 1;
+labelsCount(ct2sel) = 2;
+labelsCount(ct3sel) = 3;
+[p,tbs,stats,terms] = anovan(dataInt,{phasesAnova,labelsCount},...
+    'varnames',{'phase','numStims'},'model','interaction');
 figure
-prettybar(a1, label(keeps), colors, gcf);
+multcompare(stats,'Dimension',[1 2])
+
+figure
+multcompare(stats,'Dimension',[2])
+%%
+phasesKruskal = phasesSelected;
+phasesKruskal(phasesKruskal & ct1sel) = 0;
+phasesKruskal(phasesKruskal & ct2sel) = 1;
+phasesKruskal(phasesKruskal & ct3sel) = 2;
+phasesKruskal(~phasesKruskal & ct1sel) = 3;
+phasesKruskal(~phasesKruskal & ct2sel) = 4;
+phasesKruskal(~phasesKruskal & ct3sel) = 5;
+
+[p,tbs,stats] = kruskalwallis(meansChannelSID.percentDiff,{phases,labelsCount});
+
+figure
+multcompare(stats,'Dimension',[1 2])
+
+figure
+multcompare(stats,'Dimension',[2])
+%%
+load('line_colormap.mat');
+colors = cm(round(linspace(1, size(cm, 1), 4)), :);
+colors = colors(2:end,:);
+figure
+subplot(1,2,1)
+prettybar(plotSummary{1}, plotSummaryLabels{1}, colors, gcf);
 set(gca, 'xtick', []);
-ylabel('EP_N Magnitude(uV)');
-title(sprintf('EP_N Magnitude by N_{CT}: One-Way Kruskal-Wallis F=%4.2f p=%0.4f', tableNull{2,5}, tableNull{2,6}));
+ylabel('Percent Difference from baseline ');
+ylim([-2 11])
+set(gca,'fontsize',20)
+title({'Hyperpolarizing conditioning','Percent change CEP from baseline'})
+
+subplot(1,2,2)
+prettybar(plotSummary{2}, plotSummaryLabels{2}, colors, gcf);
+set(gca, 'xtick', []);
+%ylabel('Percent difference from baseline');
+ylim([-2 11])
+title({'Depolarizing conditioning',' Percent change CEP from baseline'})
+
+legend({'1<=Ct<=2','3<=Ct<=4','Ct>=5'})
+
+set(gca,'fontsize',20)
+
+%%
+load('line_colormap.mat');
+colors = cm(round(linspace(1, size(cm, 1), 4)), :);
+colors = colors(2:end,:);
+figure
+subplot(1,2,1)
+prettybox(plotSummary{1}, plotSummaryLabels{1}, colors,2,1);
+set(gca, 'xtick', []);
+ylabel('Percent Difference from baseline ');
+ylim([-5 40])
+set(gca,'fontsize',20)
+title({'Hyperpolarizing conditioning','Percent change CEP from baseline'})
+
+subplot(1,2,2)
+prettybox(plotSummary{2}, plotSummaryLabels{2}, colors,2,1);
+set(gca, 'xtick', []);
+%ylabel('Percent difference from baseline');
+ylim([-5 40])
+title({'Depolarizing conditioning',' Percent change CEP from baseline'})
+
+       hLegend = legend(findall(gca,'Tag','Box'), {'1<=Ct<=2','3<=Ct<=4','Ct>=5'});
+
+
+set(gca,'fontsize',20)
+
+
 %                                     figure
 %%
 % fit glme
-glme = fitglme(tableBetaStim,'Magnitude~NumStims+stimLevel+phaseClass+(1|SID)+(-1 + NumStims | SID) + (-1 + stimLevel | SID) + (-1 + phaseClass | SID)',...
+% glme = fitglme(tableBetaStim,'Magnitude~NumStims+stimLevel+phaseClass+(1|SID)+(-1 + NumStims | SID) + (-1 + stimLevel | SID) + (-1 + phaseClass | SID)',...
+%     'Distribution','Normal','Link','Identity','FitMethod','Laplace','DummyVarCoding','effects','EBMethod','Default')
+
+% fit glme
+glme = fitglme(tableBetaStim,'Magnitude~NumStims+stimLevel+phaseClass+(-1+NumStims | SID) + (-1+stimLevel | SID) + (phaseClass | SID)',...
     'Distribution','Normal','Link','Identity','FitMethod','Laplace','DummyVarCoding','effects','EBMethod','Default')
 %%
 disp(glme)
@@ -308,6 +408,8 @@ anova(glme)
 psi
 dispersion
 stats
+
+
 %%
 % test effect between different stim levels
 
@@ -353,6 +455,15 @@ fprintf(['p value between phases ' num2str(pVal) '\n']);
 
 %%
 [pVal,F,DF1,DF2] = coefTest(glme)
+%%
+
+%%
+figure
+plotResiduals(glme,'histogram','ResidualType','Pearson')
+figure
+plotResiduals(glme,'fitted','ResidualType','Pearson')
+figure
+plotResiduals(glme,'lagged','ResidualType','Pearson')
 
 %% MULTIPLE SUBJECTS - plot
 %

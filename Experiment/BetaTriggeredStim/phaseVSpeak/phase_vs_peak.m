@@ -47,11 +47,13 @@ plotColor = [
 
 
 plotColor = distinguishable_colors(9);
-SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e'};
 
-modifierPhase = '_13samps_8_30_40ms_randomstart';
+%modifierPhase = '_13samps_8_30_40ms_randomstart';
 
-modifierPhase = '_51samps_12_20_40ms_randomstart';
+%modifierPhase = '_51samps_12_20_40ms_randomstart';
+
+modifierPhase = '_13samps_10_30_40ms_randomstart';
+
 modifierEP = '-reref';
 %SIDS = {'d5cd55'};
 
@@ -60,11 +62,16 @@ markerToUse = 'vecLength';
 testStatistic = 'omnibus';
 
 threshold = 0.7;
-fThresholdMin = 12.01;
-fThresholdMax = 19.99;
+fThresholdMin = 10.01;
+fThresholdMax = 29.99;
 % 
 % fThresholdMin = 10;
 % fThresholdMax = 29.99;
+  markerMin = 75;
+    markerMax = 300;
+ minData = 0;
+    maxData = 1;
+    epThresholdMag = 100;
 
 %% plot EP modulation vs phase for all subjects
 figTotal = figure;
@@ -72,7 +79,7 @@ hold on
 figInd = figure;
 countInd = 1;
 hold on
-for sid = SIDS
+for sid = SIDS(1:end-1)
     
     sid = sid{:};
     subjid = sid;
@@ -88,12 +95,7 @@ for sid = SIDS
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
-    
-    markerMin = 50;
-    markerMax = 200;
-    minData = 0;
-    maxData = 1;
-    
+   
     wInd = [];
     %  h = [];
     peakPhaseVec = [];
@@ -139,7 +141,7 @@ for sid = SIDS
             keeps = dataForPPanalysis{i}{index}{5};
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             percentInd = 100*(mags(label ==3 & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            if nanmean(mags(label ==0 & keeps)) > 150
+            if nanmean(mags(label ==0 & keeps)) > epThresholdMag
                 w(count,index) = difference;
                 wTotal(subjectNum,count,index) = difference;
                 phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -243,7 +245,6 @@ figure
 clearvars hPlayback1
 hold on
 countScatter = 1;
-SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 
 for sid = SIDS(end-1:end)
     sid = sid{:};
@@ -261,10 +262,7 @@ for sid = SIDS(end-1:end)
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
     
-    markerMin = 50;
-    markerMax = 200;
-    minData = 0;
-    maxData = 1;
+
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
@@ -301,7 +299,7 @@ for sid = SIDS(end-1:end)
             keeps = dataForPPanalysis{i}{index}{5};
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             percentInd = 100*(mags(label ==3 & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            if nanmean(mags(label ==0 & keeps)) > 150
+            if nanmean(mags(label ==0 & keeps)) > epThresholdMag
                 wPlayback(count,index) = difference;
                 wTotalPlayback(subjectNum,count,index) = difference;
                 phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -352,20 +350,13 @@ for sid = SIDS(end-1)
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
-    
-    markerMin = 50;
-    markerMax = 200;
-    minData = 0;
-    maxData = 1;
-    
+        
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
     
     %%
-    
-    
     indices = 3;
     
     for index = 1:2
@@ -384,7 +375,7 @@ for sid = SIDS(end-1)
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            if nanmean(mags(label ==0 & keeps)) > 150
+            if nanmean(mags(label ==0 & keeps)) > epThresholdMag
                 wNull(count,index) = difference;
                 wTotalNull(subjectNum,count,index) = difference;
                 phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -409,7 +400,7 @@ for sid = SIDS(end-1)
         label= dataForPPanalysis{i}{index}{4};
         keeps = dataForPPanalysis{i}{index}{5};
         difference = 100*(nanmean(mags(label ==1 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-        if nanmean(mags(label ==0 & keeps)) > 150
+        if nanmean(mags(label ==0 & keeps)) > epThresholdMag
             wNull(count,index) = difference;
             wTotalNull(subjectNum,count,index) = difference;
             phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -458,12 +449,6 @@ for sid = SIDS
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
-    
-    markerMin = 50;
-    markerMax = 200;
-    minData = 0;
-    maxData = 1;
-    
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
@@ -551,11 +536,6 @@ for sid = SIDS(end-1:end)
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
-    
-    markerMin = 50;
-    markerMax = 200;
-    minData = 0;
-    maxData = 1;
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
