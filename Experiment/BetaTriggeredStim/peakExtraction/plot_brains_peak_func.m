@@ -11,7 +11,8 @@ for i = 1:64
         mags = 1e6*dataForPPanalysis{i}{index}{1};
         label= dataForPPanalysis{i}{index}{4};
         keeps = dataForPPanalysis{i}{index}{5};
-        ppMax = nanmean(mags(label ==3 & keeps));
+            maxLabel = max(unique(label));
+        ppMax = nanmean(mags(label ==maxLabel & keeps));
         w(i) = ppMax;
     end
 end

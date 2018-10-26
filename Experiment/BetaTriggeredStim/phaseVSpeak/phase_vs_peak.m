@@ -139,8 +139,9 @@ for sid = SIDS(1:end-1)
             mags = 1e6*dataForPPanalysis{i}{index}{1};
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
-            difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            percentInd = 100*(mags(label ==3 & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
+            maxLabel = max(unique(label)); % plot vs. maximum number of stimuli tested 
+            difference = 100*(nanmean(mags(label ==maxLabel & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
+            percentInd = 100*(mags(label ==maxLabel & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             if nanmean(mags(label ==0 & keeps)) > epThresholdMag
                 w(count,index) = difference;
                 wTotal(subjectNum,count,index) = difference;
@@ -297,8 +298,10 @@ for sid = SIDS(end-1:end)
             mags = 1e6*dataForPPanalysis{i}{index}{1};
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
+                        maxLabel = max(unique(label));
+
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            percentInd = 100*(mags(label ==3 & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
+            percentInd = 100*(mags(label ==maxLabel & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             if nanmean(mags(label ==0 & keeps)) > epThresholdMag
                 wPlayback(count,index) = difference;
                 wTotalPlayback(subjectNum,count,index) = difference;
@@ -374,7 +377,9 @@ for sid = SIDS(end-1)
             mags = 1e6*dataForPPanalysis{i}{index}{1};
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
-            difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
+                        maxLabel = max(unique(label));
+
+            difference = 100*(nanmean(mags(label ==maxLabel & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             if nanmean(mags(label ==0 & keeps)) > epThresholdMag
                 wNull(count,index) = difference;
                 wTotalNull(subjectNum,count,index) = difference;

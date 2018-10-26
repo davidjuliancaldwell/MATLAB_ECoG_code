@@ -26,17 +26,17 @@ M = containers.Map(SIDS,valueSet,'UniformValues',false);
 modifierEP = '-reref';
 
 modifierPhase = '_13samps_10_30_40ms_randomstart';
-
+modifierPhase = '_51samps_12_20_40ms_randomstart';
 % decide how to plot circles - std deviation or vector length
 markerToUse = 'vecLength';
 testStatistic = 'omnibus';
 
 threshold = 0.7;
-%fThresholdMin = 12.01;
-%fThresholdMax = 19.99;
+fThresholdMin = 12.01;
+fThresholdMax = 19.99;
 
-fThresholdMin = 10;
-fThresholdMax = 29.99;
+%fThresholdMin = 10;
+%fThresholdMax = 29.99;
 epThresholdMag = 100;
 
 markerMin = 50;
@@ -132,17 +132,12 @@ for sid = SIDS(1:end-1)
         elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
                 threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
-        end       
-        peakPhaseVec(index,:) = peakPhase;   
+        end
+        peakPhaseVec(index,:) = peakPhase;
     end
     
     for chan = chans
         % for each channel, a single stacked vector of all of the responses for a given number of stimuli
-        tB = [];
-        t1 = [];
-        t2 = [];
-        t3 = [];
-        tN = [];
         lengthItems = 0;
         
         %%%%%%%%%%%%%%%%%%%%% screen
@@ -152,38 +147,30 @@ for sid = SIDS(1:end-1)
         
         if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > epThresholdMag
             
-            for i = 1:numTypes
+            for ii = 1:numTypes
                 
-                if i ~= nullType
-                    tempMag = 1e6*dataForPPanalysis{chan}{i}{1};
-                    tempLabel = dataForPPanalysis{chan}{i}{4};
-                    tempKeeps = dataForPPanalysis{chan}{i}{5};
+                if ii ~= nullType
+                    tempMag = 1e6*dataForPPanalysis{chan}{ii}{1};
+                    tempLabel = dataForPPanalysis{chan}{ii}{4};
+                    tempKeeps = dataForPPanalysis{chan}{ii}{5};
+                    
                     
                     tempBase = tempMag(tempLabel==0 & tempKeeps);
-                    tempResp1 = tempMag(tempLabel==1 & tempKeeps);
-                    tempResp2 = tempMag(tempLabel==2 & tempKeeps);
-                    tempResp3 = tempMag(tempLabel==3 & tempKeeps);
+                    tempTest = tempMag(tempLabel~=0 & tempKeeps);
+                    uniqueLabel = unique(tempLabel);
                     
-                    if i == 1
-                        tB = tempBase;
-                        tB = [tB tempBase];
-                    end
-                    t1 = [t1 tempResp1];
-                    t2 = [t2 tempResp2];
-                    t3 = [t3 tempResp3];
-                    
-                    if i == 1
-                        lengthType = length(tempBase)+length(tempResp1)+length(tempResp2)+length(tempResp3);
+                    if ii == 1
+                        lengthType = length(tempBase)+length(tempTest);
                     else
-                        lengthType = length(tempResp1)+length(tempResp2)+length(tempResp3);
+                        lengthType = length(tempTest);
                     end
                     
                     lengthItems = lengthItems +lengthType;
-                    vecType = repmat(desiredF(i),lengthType,1);
+                    vecType = repmat(desiredF(ii),lengthType,1);
                     vecTypeC = string(vecType)';
                     anovaType = [anovaType{:} vecTypeC];
                     
-                    phaseVecChosen = peakPhaseVec(i,goodEPs==chan);
+                    phaseVecChosen = peakPhaseVec(ii,goodEPs==chan);
                     phaseVec = repmat(phaseVecChosen,lengthType,1)';
                     phaseDelivery = [phaseDelivery phaseVec];
                     
@@ -191,34 +178,46 @@ for sid = SIDS(1:end-1)
                     if any(phaseBinned > 180)
                         phaseBinned(:) = 270;
                     else
-                    phaseBinned(:) = 90;
+                        phaseBinned(:) = 90;
                     end
                     phaseDeliveryBinned = [phaseDeliveryBinned phaseBinned];
                     
-                    if i ==1
-                        typeResp = [tempResp3 tempResp2 tempResp1 tempBase];
+                    if ii ==1
+                        
+                        numTest = [];
+                        tempTestOrdered = [];
+                        typeResp = [];
+                        
+                        for iii = 2:length(unique(tempLabel))
+                            numTestTemp = repmat(['Test ' num2str(iii - 1)],sum(tempLabel(tempKeeps) == uniqueLabel(iii)),1);
+                            numTest = [numTest; numTestTemp];
+                            tempTestOrdered = [tempTestOrdered tempMag(tempLabel == uniqueLabel(iii) & tempKeeps)];
+                        end
+                        typeResp = [  tempBase tempTestOrdered];
                         totalMags = [totalMags typeResp];
-                        num5S = repmat('Ct>=5',length(tempResp3),1);
-                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
-                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
+                        
                         numBaseS = repmat('Base',length(tempBase),1);
+                        bTest = cellstr(numTest)';
+                        bC = cellstr(numBaseS)';
+                        numStims = [numStims{:}  bC bTest  ];
                         
-                        b5C = cellstr(num5S)';
-                        b3C = cellstr(num3S)';
-                        b1C = cellstr(num1S)';
-                        BC = cellstr(numBaseS)';
-                        numStims = [numStims{:} b5C b3C b1C BC];
                     else
-                        typeResp = [tempResp3 tempResp2 tempResp1];
-                        totalMags = [totalMags typeResp];
-                        num5S = repmat('Ct>=5',length(tempResp3),1);
-                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
-                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
                         
-                        b5C = cellstr(num5S)';
-                        b3C = cellstr(num3S)';
-                        b1C = cellstr(num1S)';
-                        numStims = [numStims{:} b5C b3C b1C];
+                        numTest = [];
+                        tempTestOrdered = [];
+                        typeResp = [];
+                        for iii = 2:length(unique(tempLabel))
+                            numTestTemp = repmat(['Test ' num2str(iii - 1)],sum(tempLabel(tempKeeps) == uniqueLabel(iii)),1);
+                            numTest = [numTest; numTestTemp];
+                            tempTestOrdered = [tempTestOrdered tempMag(tempLabel == uniqueLabel(iii) & tempKeeps)];
+                            
+                        end
+                        
+                        typeResp = [tempTestOrdered];
+                        totalMags = [totalMags typeResp];
+                        
+                        bTest = cellstr(numTest)';
+                        numStims = [numStims{:} bTest];
                     end
                 end
             end
@@ -226,10 +225,6 @@ for sid = SIDS(1:end-1)
             sidString = repmat(sid,lengthToRep,1);
             sidCell = cellstr(sidString)';
             chanLabels = [chanLabels repmat(chan,lengthToRep,1)'];
-            betaMags5 = [betaMags5 t3];
-            betaMags3 = [betaMags3 t2];
-            betaMags1 = [betaMags1 t1];
-            betaBase = [betaBase tB] ;
             betaSID = [betaSID{:} sidCell];
             stimLevelCombined = [stimLevelCombined repmat(stimLevel,lengthToRep,1)'];
         end
@@ -247,25 +242,25 @@ statarray = grpstats(tableBetaStim,{'SID','NumStims','channel','phaseClass'},{'m
 
 grpstats(totalMags',numStims',0.05)
 
-%%
-numSubj = 7;
-numDims = 4;
-j = 1;
-
-newOrder = [3 1 2 4];
-newOrder = repmat(newOrder,1,numSubj);
-subjMult = repmat([0:4:24],numDims,1);
-subjMult = subjMult(:);
-newOrder = newOrder+subjMult';
-statarray = statarray(newOrder,:);
-%%
-newSidOrder = [6 5 3 4 2 7 1];
-newSidOrder = repmat(newSidOrder,numDims,1);
-newSidOrder = newSidOrder(:);
-subjNumStim = repmat([1:4],1,numSubj);
-
-newSidOrder = 4*newSidOrder + subjNumStim' - 4;
-statarray = statarray(newSidOrder,:);
+% %%
+% numSubj = 7;
+% numDims = 4;
+% j = 1;
+% 
+% newOrder = [3 1 2 4];
+% newOrder = repmat(newOrder,1,numSubj);
+% subjMult = repmat([0:4:24],numDims,1);
+% subjMult = subjMult(:);
+% newOrder = newOrder+subjMult';
+% statarray = statarray(newOrder,:);
+% %%
+% newSidOrder = [6 5 3 4 2 7 1];
+% newSidOrder = repmat(newSidOrder,numDims,1);
+% newSidOrder = newSidOrder(:);
+% subjNumStim = repmat([1:4],1,numSubj);
+% 
+% newSidOrder = 4*newSidOrder + subjNumStim' - 4;
+% statarray = statarray(newSidOrder,:);
 
 %%
 [groupings,meansChannelSID] = findgroups(tableBetaStim(:,{'NumStims','SID','channel','phaseClass'}));
@@ -277,9 +272,9 @@ for name = unique(meansChannelSID.SID)'
     for chan = unique(meansChannelSID.channel(meansChannelSID.SID == name))'
         for numStimTrial = unique(meansChannelSID.NumStims)'
             for typePhase = unique(meansChannelSID.phaseClass)'
-            base = meansChannelSID.mean(meansChannelSID.SID == name & meansChannelSID.channel == chan & meansChannelSID.NumStims == 'Base');
-            percentDiff = 100*((meansChannelSID.mean(meansChannelSID.SID == name & meansChannelSID.channel == chan & meansChannelSID.NumStims == numStimTrial & meansChannelSID.phaseClass == typePhase) - base)/base);
-            meansChannelSID.percentDiff(meansChannelSID.SID == name & meansChannelSID.channel == chan & meansChannelSID.NumStims == numStimTrial & meansChannelSID.phaseClass == typePhase) = percentDiff;
+                base = meansChannelSID.mean(meansChannelSID.SID == name & meansChannelSID.channel == chan & meansChannelSID.NumStims == 'Base');
+                percentDiff = 100*((meansChannelSID.mean(meansChannelSID.SID == name & meansChannelSID.channel == chan & meansChannelSID.NumStims == numStimTrial & meansChannelSID.phaseClass == typePhase) - base)/base);
+                meansChannelSID.percentDiff(meansChannelSID.SID == name & meansChannelSID.channel == chan & meansChannelSID.NumStims == numStimTrial & meansChannelSID.phaseClass == typePhase) = percentDiff;
             end
         end
     end
@@ -291,57 +286,71 @@ grpstats(meansChannelSID,{'NumStims','phaseClass'},{'mean','sem'},...
 %%
 clearvars plotSummary plotSummaryLabels
 phases = (meansChannelSID.phaseClass == '90');
-ct1= (meansChannelSID.NumStims == '1<=Ct<=2');
-ct2 = (meansChannelSID.NumStims == '3<=Ct<=4');
-ct3 = (meansChannelSID.NumStims == 'Ct>=5');
-phasesSelected = (ct1 | ct2 | ct3);
-ct1sel = ct1(phasesSelected);
-ct2sel = ct2(phasesSelected);
-ct3sel = ct3(phasesSelected);
+ctNonBaseBool = meansChannelSID.NumStims ~= 'Base';
+ctNonBase = meansChannelSID.NumStims(ctNonBaseBool);
+% ct1= (meansChannelSID.NumStims == '1<=Ct<=2');
+% ct2 = (meansChannelSID.NumStims == '3<=Ct<=4');
+% ct3 = (meansChannelSID.NumStims == 'Ct>=5');
+%phasesSelected = (ct1 | ct2 | ct3);
+phasesSelected = ctNonBaseBool;
+% ct1sel = ct1(phasesSelected);
+% ct2sel = ct2(phasesSelected);
+% ct3sel = ct3(phasesSelected);
 phasesAnova = phases(phasesSelected);
 
 %%
 dataInt = meansChannelSID.percentDiff(phasesSelected);
 
+
 plotSummary{1} = dataInt(phasesAnova);
 plotSummaryLabels{1} = zeros(size(plotSummary{1}));
-plotSummaryLabels{1}(ct2sel(phasesAnova)) = 1;
-plotSummaryLabels{1}(ct3sel(phasesAnova)) = 2;
+for ii = 2:length(unique(meansChannelSID.NumStims))
+    plotSummaryLabels{1}( ctNonBase(phasesAnova) == ['Test ' num2str(ii-1)]) = ii-1;
+
+end
+% plotSummaryLabels{1}(ct2sel(phasesAnova)) = 1;
+% plotSummaryLabels{1}(ct3sel(phasesAnova)) = 2;
 
 plotSummary{2} = dataInt(~phasesAnova);
 plotSummaryLabels{2} = zeros(size(plotSummary{2}));
-plotSummaryLabels{2}(ct2sel(~phasesAnova)) = 1;
-plotSummaryLabels{2}(ct3sel(~phasesAnova)) = 2;
+
+for ii = 2:length(unique(meansChannelSID.NumStims))
+    plotSummaryLabels{2}( ctNonBase(~phasesAnova) == ['Test ' num2str(ii-1)]) = ii-1;
+
+end
+% plotSummaryLabels{2}(ct2sel(~phasesAnova)) = 1;
+% plotSummaryLabels{2}(ct3sel(~phasesAnova)) = 2;
 
 %%
 
 labelsCount = zeros(size(phasesAnova));
-labelsCount(ct1sel) = 1;
-labelsCount(ct2sel) = 2;
-labelsCount(ct3sel) = 3;
+for ii = 2:length(unique(meansChannelSID.NumStims))
+labelsCount(ctNonBase ==['Test ' num2str(ii-1)]) = ii -1;
+end
+
 [p,tbs,stats,terms] = anovan(dataInt,{phasesAnova,labelsCount},...
     'varnames',{'phase','numStims'},'model','interaction');
 figure
-multcompare(stats,'Dimension',[1 2])
+multcompare(stats,'Dimension',[2 1])
 
 figure
 multcompare(stats,'Dimension',[2])
 %%
-phasesKruskal = phasesSelected;
-phasesKruskal(phasesKruskal & ct1sel) = 0;
-phasesKruskal(phasesKruskal & ct2sel) = 1;
-phasesKruskal(phasesKruskal & ct3sel) = 2;
-phasesKruskal(~phasesKruskal & ct1sel) = 3;
-phasesKruskal(~phasesKruskal & ct2sel) = 4;
-phasesKruskal(~phasesKruskal & ct3sel) = 5;
-
-[p,tbs,stats] = kruskalwallis(meansChannelSID.percentDiff,{phases,labelsCount});
-
-figure
-multcompare(stats,'Dimension',[1 2])
-
-figure
-multcompare(stats,'Dimension',[2])
+% phasesKruskal = phasesSelected;
+% phasesKruskal(phasesKruskal & ct1sel) = 0;
+% phasesKruskal(phasesKruskal & ct2sel) = 1;
+% phasesKruskal(phasesKruskal & ct3sel) = 2;
+% phasesKruskal(~phasesKruskal & ct1sel) = 3;
+% phasesKruskal(~phasesKruskal & ct2sel) = 4;
+% phasesKruskal(~phasesKruskal & ct3sel) = 5;
+%
+% [p,tbs,stats] = kruskalwallis(meansChannelSID.percentDiff,{phases,labelsCount});
+%
+% figure
+% multcompare(stats,'Dimension',[1 2])
+%
+% figure
+% multcompare(stats,'Dimension',[2])
 %%
 load('line_colormap.mat');
 colors = cm(round(linspace(1, size(cm, 1), 4)), :);
@@ -351,7 +360,7 @@ subplot(1,2,1)
 prettybar(plotSummary{1}, plotSummaryLabels{1}, colors, gcf);
 set(gca, 'xtick', []);
 ylabel('Percent Difference from baseline ');
-ylim([-2 11])
+ylim([-2 20])
 set(gca,'fontsize',20)
 title({'Hyperpolarizing conditioning','Percent change CEP from baseline'})
 
@@ -359,7 +368,7 @@ subplot(1,2,2)
 prettybar(plotSummary{2}, plotSummaryLabels{2}, colors, gcf);
 set(gca, 'xtick', []);
 %ylabel('Percent difference from baseline');
-ylim([-2 11])
+ylim([-2 20])
 title({'Depolarizing conditioning',' Percent change CEP from baseline'})
 
 legend({'1<=Ct<=2','3<=Ct<=4','Ct>=5'})
@@ -375,7 +384,7 @@ subplot(1,2,1)
 prettybox(plotSummary{1}, plotSummaryLabels{1}, colors,2,1);
 set(gca, 'xtick', []);
 ylabel('Percent Difference from baseline ');
-ylim([-5 40])
+ylim([-10 40])
 set(gca,'fontsize',20)
 title({'Hyperpolarizing conditioning','Percent change CEP from baseline'})
 
@@ -383,10 +392,10 @@ subplot(1,2,2)
 prettybox(plotSummary{2}, plotSummaryLabels{2}, colors,2,1);
 set(gca, 'xtick', []);
 %ylabel('Percent difference from baseline');
-ylim([-5 40])
+ylim([-10 40])
 title({'Depolarizing conditioning',' Percent change CEP from baseline'})
 
-       hLegend = legend(findall(gca,'Tag','Box'), {'1<=Ct<=2','3<=Ct<=4','Ct>=5'});
+hLegend = legend(findall(gca,'Tag','Box'), {'1<=Ct<=2','3<=Ct<=4','Ct>=5'});
 
 
 set(gca,'fontsize',20)
@@ -401,7 +410,7 @@ set(gca,'fontsize',20)
 % fit glme
 glme = fitglme(tableBetaStim,'Magnitude~NumStims+stimLevel+phaseClass+(-1+NumStims | SID) + (-1+stimLevel | SID) + (phaseClass | SID)',...
     'Distribution','Normal','Link','Identity','FitMethod','Laplace','DummyVarCoding','effects','EBMethod','Default')
-%%
+%
 disp(glme)
 anova(glme)
 [psi,dispersion,stats] = covarianceParameters(glme)
@@ -410,7 +419,7 @@ dispersion
 stats
 
 
-%%
+%
 % test effect between different stim levels
 
 % between 3<CT<4 and Base
@@ -453,11 +462,10 @@ H = [0,0,0,0,0,-1];
 [pVal,F,DF1,DF2] = coefTest(glme,H);
 fprintf(['p value between phases ' num2str(pVal) '\n']);
 
-%%
+%
 [pVal,F,DF1,DF2] = coefTest(glme)
-%%
 
-%%
+%
 figure
 plotResiduals(glme,'histogram','ResidualType','Pearson')
 figure
@@ -489,13 +497,13 @@ k = 25;
 
 % generate error bars
 
-for i = 1:height(statarray)
+for ii = 1:height(statarray)
     
     if j == 5
         j = 1;
     end
     
-    h = errorbar(i,means(i),sem(i),'o','linew',3,'color',colors(j,:),'capsize',10);
+    h = errorbar(ii,means(ii),sem(ii),'o','linew',3,'color',colors(j,:),'capsize',10);
     ylim([0 800])
     
     set(h, 'MarkerSize', 5, 'MarkerFaceColor', colors(j,:), ...
@@ -505,12 +513,12 @@ for i = 1:height(statarray)
     ax = gca;
     
     if j ==2
-        text(i+0.15,min(means(:,1))-6,sprintf([num2str(floor(i/4)+1)]),'fontsize',14)
+        text(ii+0.15,min(means(:,1))-6,sprintf([num2str(floor(ii/4)+1)]),'fontsize',14)
         
     end
     
-    if mod(i,4) == 0 & i < 25
-        line = vline(i+0.5);
+    if mod(ii,4) == 0 & ii < 25
+        line = vline(ii+0.5);
         line.Color = [0.5 0.5 0.5];
     end
     ax.FontSize = 12;

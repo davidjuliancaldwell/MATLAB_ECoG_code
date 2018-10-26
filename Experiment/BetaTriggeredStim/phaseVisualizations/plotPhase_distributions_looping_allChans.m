@@ -4,7 +4,7 @@
 
 % David.J.Caldwell 8.26.2018
 %%
-close all;clear all;clc
+%close all;clear all;clc
 baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery\';
 addpath(baseDir);
 
@@ -18,14 +18,14 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},{'m',[0 180],2,[55 56],[2 3 31 5
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 
 modifier = '_51samps_12_20_40ms_randomstart';
-modifier = '_13samps_8_30_40ms_randomstart';
-modifier = '_13samps_10_30_40ms_randomstart';
+%modifier = '_13samps_8_30_40ms_randomstart';
+%modifier = '_13samps_10_30_40ms_randomstart';
 
 %modifierPhase = '_51samps_12_20_40m_0startPhase';
 
 %SIDS = {'0b5a2e','0b5a2ePlayback'};
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
-SIDS = {'c91479'};
+%SIDS = {'c91479'};
 %gcp;  %parallel pool
 %
 % settings
@@ -34,12 +34,12 @@ acausalPlot = 0;
 rawPlot = 1;
 saveIt = 0;
 threshold = 0.7; %r^2
-fThresholdMin = 10.01; % Hz2
-fThresholdMax = 29.99; % Hz
+% fThresholdMin = 10.01; % Hz2
+% fThresholdMax = 29.99; % Hz
 testStatistic = 'omnibus';
-% fThresholdMin = 12.01; % Hz
-%  fThresholdMax = 19.99; % Hz
-%SIDS = {'ecb43e'};
+fThresholdMin = 12.01; % Hz
+ fThresholdMax = 19.99; % Hz
+%SIDS = {'d5cd55'};
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -70,7 +70,8 @@ for sid = SIDS
     % chans = 28
     
     %chans = betaChan;
-    chans = [39 40 47 48 63 64];
+    %chans = [39 40 47 48 63 64];
+    chans = betaChan;
     
     if strcmp(type,'m') || strcmp(type,'t')
         if rawPlot

@@ -39,6 +39,7 @@ markerMin = 50;
 markerMax = 200;
 minData = 0;
 maxData = 1;
+epThresholdMag = 100;
 
 %%
 betaSID = {};
@@ -67,7 +68,8 @@ for sid = SIDS
     chans = [1:64];
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
-        
+    epThresholdMag = 100;
+    
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     % here's where I pick those channels!
@@ -113,11 +115,6 @@ for sid = SIDS
     
     for chan = chans
         % for each channel, a single stacked vector of all of the responses for a given number of stimuli
-        tB = [];
-        t1 = [];
-        t2 = [];
-        t3 = [];
-        tN = [];
         lengthItems = 0;
         
         %%%%%%%%%%%%%%%%%%%%% screen
@@ -125,91 +122,87 @@ for sid = SIDS
         tempLabelScreen = dataForPPanalysis{chan}{1}{4};
         tempKeepsScreen = dataForPPanalysis{chan}{1}{5};
         
-        if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > 150
+        if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > epThresholdMag
             
-            for i = 1:numTypes
+            for ii = 1:numTypes
                 
-                if i ~= nullType
-                    tempMag = 1e6*dataForPPanalysis{chan}{i}{1};
-                    tempLabel = dataForPPanalysis{chan}{i}{4};
-                    tempKeeps = dataForPPanalysis{chan}{i}{5};
+                if ii ~= nullType
+                    tempMag = 1e6*dataForPPanalysis{chan}{ii}{1};
+                    tempLabel = dataForPPanalysis{chan}{ii}{4};
+                    tempKeeps = dataForPPanalysis{chan}{ii}{5};
                     
                     tempBase = tempMag(tempLabel==0 & tempKeeps);
-                    tempResp1 = tempMag(tempLabel==1 & tempKeeps);
-                    tempResp2 =tempMag(tempLabel==2 & tempKeeps);
-                    tempResp3 = tempMag(tempLabel==3 & tempKeeps);
-                    
-                    if i == 1
-                        tB = tempBase;
-                        tB = [tB tempBase];
-                    end
-                    t1 = [t1 tempResp1];
-                    t2 = [t2 tempResp2];
-                    t3 = [t3 tempResp3];
-                    
-                    if i == 1
-                        lengthType = length(tempBase)+length(tempResp1)+length(tempResp2)+length(tempResp3);
+                    tempTest = tempMag(tempLabel~=0 & tempKeeps);
+                    uniqueLabel = unique(tempLabel);
+                    if ii == 1
+                        lengthType = length(tempBase)+length(tempTest);
                     else
-                        lengthType = length(tempResp1)+length(tempResp2)+length(tempResp3);
-                        
+                        lengthType = length(tempTest);
                     end
                     
                     lengthItems = lengthItems +lengthType;
-                    vecType = repmat(desiredF(i),lengthType,1);
+                    vecType = repmat(desiredF(ii),lengthType,1);
                     vecTypeC = string(vecType)';
                     anovaType = [anovaType{:} vecTypeC];
                     
-                    phaseVecChosen = peakPhaseVec(i);
+                    phaseVecChosen = peakPhaseVec(ii);
                     phaseVec = repmat(phaseVecChosen,lengthType,1)';
                     phaseDelivery = [phaseDelivery phaseVec];
                     
                     phaseBinned = phaseVec;
-%                     if any(phaseBinned > 180)
-%                         phaseBinned(:) = 270;
-%                     else
-%                         phaseBinned(:) = 90;
-%                     end
+                    %                     if any(phaseBinned > 180)
+                    %                         phaseBinned(:) = 270;
+                    %                     else
+                    %                         phaseBinned(:) = 90;
+                    %                     end
                     phaseDeliveryBinned = [phaseDeliveryBinned phaseBinned];
                     
-                    if i ==1
+                    if ii ==1
                         
-                        typeResp = [tempResp3 tempResp2 tempResp1 tempBase];
+                        numTest = [];
+                        tempTestOrdered = [];
+                                                typeResp = [];
+
+                        for iii = 2:length(unique(tempLabel))
+                            numTestTemp = repmat(['Test ' num2str(iii - 1)],sum(tempLabel(tempKeeps) == uniqueLabel(iii)),1);
+                            numTest = [numTest; numTestTemp];
+                            tempTestOrdered = [tempTestOrdered tempMag(tempLabel == uniqueLabel(iii) & tempKeeps)];
+                        end
+                        typeResp = [  tempBase tempTestOrdered];
                         totalMags = [totalMags typeResp];
-                        num5S = repmat('Ct>=5',length(tempResp3),1);
-                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
-                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
-                        numBaseS = repmat('Base',length(tempBase),1);
                         
-                        b5C = cellstr(num5S)';
-                        b3C = cellstr(num3S)';
-                        b1C = cellstr(num1S)';
-                        BC = cellstr(numBaseS)';
-                        numStims = [numStims{:} b5C b3C b1C BC];
+                        numBaseS = repmat('Base',length(tempBase),1);
+                        bTest = cellstr(numTest)';
+                        bC = cellstr(numBaseS)';
+                        numStims = [numStims{:}  bC bTest  ];
                         
                     else
                         
-                        typeResp = [tempResp3 tempResp2 tempResp1];
-                        totalMags = [totalMags typeResp];
-                        num5S = repmat('Ct>=5',length(tempResp3),1);
-                        num3S= repmat('3<=Ct<=4',length(tempResp2),1);
-                        num1S = repmat('1<=Ct<=2',length(tempResp1),1);
+                        numTest = [];
+                        tempTestOrdered = [];
+                        typeResp = [];
+                        for iii = 2:length(unique(tempLabel))
+                            numTestTemp = repmat(['Test ' num2str(iii - 1)],sum(tempLabel(tempKeeps) == uniqueLabel(iii)),1);
+                            numTest = [numTest; numTestTemp];
+                            tempTestOrdered = [tempTestOrdered tempMag(tempLabel == uniqueLabel(iii) & tempKeeps)];
+                            
+                        end
                         
-                        b5C = cellstr(num5S)';
-                        b3C = cellstr(num3S)';
-                        b1C = cellstr(num1S)';
-                        numStims = [numStims{:} b5C b3C b1C];
+                        typeResp = [tempTestOrdered];
+                        totalMags = [totalMags typeResp];
+                        
+                        bTest = cellstr(numTest)';
+                        numStims = [numStims{:} bTest];
                     end
                     
                 end
             end
-            
-            
+  
             lengthToRep = lengthItems;
             sidString = repmat(sid,lengthToRep,1);
             sidCell = cellstr(sidString)';
             betaSID = [betaSID{:} sidCell];
-            
-            
+          
         end
     end
 end
@@ -220,22 +213,23 @@ end
 figure
 [cM,mM,hM,gnamesM] = multcompare(stats,'Dimension',[1 2])
 
+figure
 % flip order of playback
-mMnew = zeros(size(mM));
+%mMnew = zeros(size(mM));
 numSubj = 2;
 k = 5;
-% reshape mM to match order of subjects
-for i = 0:numSubj-1
-    mMnew((4*i+1:(4*i)+4),:) = mM(k:k+3,:);
-    k = k - 4;
-end
+% % reshape mM to match order of subjects
+% for ii = 0:numSubj-1
+%     mMnew((4*ii+1:(4*ii)+4),:) = mM(k:k+3,:);
+%     k = k - 4;
+% end
 
-mM = mMnew;
+%mM = mMnew;
 j = 1;
 load('line_blue.mat');
 colors = cm(round(linspace(1, size(cm, 1), length(mM)/2)), :);
 
-for i = 1:length(mM)
+for ii = 1:length(mM)
     
     if j == 5
         j = 1;
@@ -243,31 +237,32 @@ for i = 1:length(mM)
         colors = cm(round(linspace(1, size(cm, 1), length(mM)/2)), :);
     end
     
-    h = errorbar(i,flip(mM(length(mM)-i+1,1)),flip(mM(length(mM)-i+1,2)),'o','linestyle','none','linew',3,'color',colors(j,:));
-    
+    h = errorbar(ii,mM(ii,1),mM(ii,2),'o','linestyle','none','linew',3,'color',colors(j,:));
+   %   h = errorbar(ii,mM(:,1),flip(mM(length(mM)-ii+1,2)),'o','linestyle','none','linew',3,'color',colors(j,:));
+
     set(h, 'MarkerSize', 5, 'MarkerFaceColor', colors(j,:), ...
         'MarkerEdgeColor', colors(j,:));
     hold on
     ylims = [300 600];
     ylim(ylims)
     
-    if i == 1
-        text(i-0.5,ylims(1)+20,'Beta-triggered stimulation','fontsize',14)
+    if ii == 1
+        text(ii-0.5,ylims(1)+20,'Beta-triggered stimulation','fontsize',14)
     end
     
-    if i == 6
-        text(i-0.5,ylims(1)+20,'Playback condition','fontsize',14)
+    if ii == 6
+        text(ii-0.5,ylims(1)+20,'Playback condition','fontsize',14)
     end
     
-    if mod(i,4) == 0 & i < 7
-        line = vline(i+0.5);
+    if mod(ii,4) == 0 & ii < 7
+        line = vline(ii+0.5);
         line.Color = [0.5 0.5 0.5];
     end
     
     j = j+1;
     
     
-    if i == length(mM)-1
+    if ii == length(mM)-1
         
         [h,icons,plots,legend_text] = legend({'Baseline','1-2','3-4','>5'},'fontsize',12);
         

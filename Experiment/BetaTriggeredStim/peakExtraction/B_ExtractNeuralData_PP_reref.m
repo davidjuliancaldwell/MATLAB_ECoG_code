@@ -1,6 +1,6 @@
 %% constants
-%close all; clear all;clc
-clear all
+close all; clear all;clc
+%clear all
 %% parameters
 
 Z_Constants
@@ -13,7 +13,7 @@ saveIt = 0;
 plotIt = 1;
 plotItTrials = 0;
 %%
-for idx = 8:9
+for idx = 8:8
     sid = SIDS{idx};
     
     switch(sid)
@@ -419,7 +419,7 @@ for idx = 8:9
         
         for typei = 1:length(types)
             
-            probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))==types(typei);
+            probes = pstims(5,:) < .50*fs & bursts(5,pstims(4,:))==types(typei);
             
             if (sum(probes) < 100)
                 warning('N probes = %d.', sum(probes));
@@ -448,6 +448,8 @@ for idx = 8:9
             keeps = probes | baselines;
             
             load('line_colormap.mat');
+            awins = wins-repmat(mean(wins(t<-0.005,:),1), [size(wins, 1), 1]);
+            
             kwins = awins(:, keeps);
             klabel = label(keeps);
             ulabels = unique(klabel);
@@ -474,9 +476,49 @@ for idx = 8:9
             tBegin = t_min;
             tEnd = t_max;
             smooth = 1;
+            avgTrials = 0;
+            if avgTrials
+                awinsNew = [];
+                labelNew = [];
+                keepsNew = [];
+                for i = 1:length(ulabels)
+                    awinsInt = awins(:,label == ulabels(i) & keeps);
+                    numAvg = 5;
+                    [awinsAvg] = avg_every_p_elems(awinsInt,numAvg);
+                    awinsNew = [awinsNew awinsAvg];
+                    labelSpecific = repmat(ulabels(i),size(awinsAvg,2),1);
+                    keepsSpecific = repmat(1,size(awinsAvg,2),1);
+                    keepsNew = [keepsNew; keepsSpecific];
+                    labelNew = [labelNew; labelSpecific];
+                end
+                
+                label = labelNew;
+                keeps = logical(keepsNew);
+                awins = awinsNew;
+                klabel = label;
+            end
+            %%
             [signalPP,pkLocs,trLocs] =  extract_PP_betaStim(awins,t,tBegin,tEnd,smooth);
             
             dataForPPanalysis{chan}{typei} = {signalPP pkLocs trLocs label keeps};
+            
+            shuffleSigPP = 1;
+            if shuffleSigPP
+                % need to do for each type
+                CCEPbyNumStim = {};
+                for i = 1:length(ulabels)-1
+                    
+                    extractedSigsBase = signalPP(label==0 & keeps);
+                    extractedSigsTest = signalPP(label==i & keeps);
+                    extractedSigsPlot = [extractedSigsBase extractedSigsTest];
+                    extractedSigsLabel = [zeros(size(extractedSigsBase)) ones(size(extractedSigsTest))];
+                    figure
+                    prettybox(extractedSigsPlot,extractedSigsLabel,colors,2,1);
+                    [p, observeddifference, effectsize] =  permutationTest(extractedSigsTest,extractedSigsBase,1000,'plot',1);
+                    effectSize = mes(extractedSigsTest',extractedSigsBase','hedgesg','nBoot',1000);
+                    shuffleChansPP{chan}{typei} = {p, observeddifference, effectsize};
+                end
+            end
             %%
             
             [kruskalWallisResult,table,stats] = kruskalwallis(signalPP(keeps), label(keeps), 'off');
@@ -487,7 +529,7 @@ for idx = 8:9
             
             kruskalWallisStats{chan}{typei} = {kruskalWallisResult table stats};
             %% zscore
-            plotItTrials = 0;
+            plotItTrials = 1;
             %             for i = 1:length(ulabels)-1
             %                 total = 1e6*(awins(:,keeps));
             %                 base = 1e6*(awins(:,label==0 & keeps));
@@ -504,18 +546,16 @@ for idx = 8:9
             %             %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
             %             [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
             
-            shuffleSig = 0;
+            shuffleSig = 1;
             if shuffleSig
                 % need to do for each type
                 CCEPbyNumStim = {};
                 for i = 1:length(ulabels)-1
-                    t_minS = 0.005;
-                    t_maxS = 0.040;
-                    
-                    i = 1;
-                    Nperm = 1000;
+                    t_minS = tBegin;
+                    t_maxS = tEnd;
+                                        Nperm = 1000;
                     sp = 95;
-                    extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,keeps)));
+                    extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,:)));
                     extractedSigsBase = extractedSigs(:,label==0 & keeps);
                     extractedSigsTest = extractedSigs(:,label==i & keeps);
                     
@@ -573,29 +613,29 @@ for idx = 8:9
                 
                 yl(1) = min(-10, max(yl(1),-340*4));
                 yl(2) = max(10, min(yl(2),300*4));
-            
+                
                 ylim(yl);
                 
-                    
+                
                 xlim([-10 50])
                 ylim([-500 500])
                 
                 
-                highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-%                            
-%                 xlim([-10 50])
-%                 ylim([-300 300])
+                %                 highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
+                %
+                %                 xlim([-10 50])
+                %                 ylim([-300 300])
                 
-                vline(0);
+                vline(1e3*7/efs);
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
                 %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
                 if (types(typei) == nullType)
-                    title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
+                    title(sprintf('%s CEPs for Channel %d, Null Condition',sid,chan))
                     leg = {'Pre','Post'};
                 elseif (types(typei) ~= nullType)
-                               title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-                    title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
+                    title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                    title(sprintf('%s CEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
                     leg = {'Pre'};
                     for d = 1:length(labelGroupStarts)
                         if d == length(labelGroupStarts)
@@ -611,7 +651,7 @@ for idx = 8:9
                 set(gca,'fontsize',18)
                 subplot(3,1,2)
                 
-                prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,baselines),2)), label(keeps), colors);
+                prettyline(1e3*t, bsxfun(@minus,1e6*awins(:, keeps),1e6*median(awins(:,label == 0 & keeps),2)), label(keeps), colors);
                 
                 xlim(1e3*[min(t) max(t)]);
                 
@@ -619,23 +659,23 @@ for idx = 8:9
                 yl(1) = min(-10, max(yl(1),-140*4));
                 yl(2) = max(10, min(yl(2),100*4));
                 ylim(yl);
-                    
+                
                 xlim([-10 50])
                 ylim([-500 500])
                 
-                highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5])
+                %                 highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5])
                 vline(0);
                 
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
-                title('Median Subtracted')
+                title('CEP Median Subtracted')
                 
                 if (types(typei) == nullType)
-%                     title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
+                    %                     title(sprintf('%s CCEPs for Channel %d, Null Condition',sid,chan))
                     leg = {'Pre','Post'};
                 elseif (types(typei) ~= nullType)
-%                     title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
-%                     title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
+                    %                     title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
+                    %                     title(sprintf('%s CCEPs for Channel %d stimuli in {%s}',sid,chan,suffix{typei}))
                     leg = {'Pre'};
                     for d = 1:length(labelGroupStarts)
                         if d == length(labelGroupStarts)
@@ -644,20 +684,20 @@ for idx = 8:9
                             leg{end+1} = sprintf('%d<=CT<%d', labelGroupStarts(d), labelGroupEnds(d));
                         end
                     end
-%                     leg{end+1} = 'Stim Window';
-%                     legend(leg, 'location', 'Southeast')
+                    %                     leg{end+1} = 'Stim Window';
+                    %                     legend(leg, 'location', 'Southeast')
                     
                 end
-                                set(gca,'fontsize',18)
-
+                set(gca,'fontsize',18)
+                
                 subplot(3,1,3)
                 prettybar(1e6*signalPP(keeps), label(keeps), colors, gcf);
                 set(gca, 'xtick', []);
-                ylabel('\DeltaEP_N (uV)');
+                ylabel('Magntiude of CEP_N (uV)');
                 
-                title(sprintf('Change in EP_N by N_{CT}: Kruskal-Wallis test F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
-                                set(gca,'fontsize',18)
-
+                title(sprintf('Magnitude of CEP_N by N_{CT}: Kruskal-Wallis test F=%4.2f p=%0.4f', table{2,5}, table{2,6}));
+                set(gca,'fontsize',18)
+                
                 if savePlot
                     %     SaveFig(OUTPUT_DIR, sprintf(['EP-phase-%d-sid-%s-chan-%d'],typei,sid, chan,type,signalType), 'svg');
                     SaveFig(OUTPUT_DIR, sprintf(['EP-phase-%d-sid-%s-chan-%d'],typei,sid, chan), 'png','-r600');
