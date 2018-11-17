@@ -58,6 +58,7 @@ addToPath(genpath(fullfile(sharedCode,'phasemap')));
 
 addToPath(genpath(fullfile(sharedCode,'measures-of-effect-size-toolbox')));
 addToPath(genpath(fullfile(sharedCode,'permutationTest')));
+addToPath(genpath(fullfile(sharedCode,'artifactRejection')));
 
 % try adding the python executable to integrate matlabengine with python
 %addToPath('C:\Users\David\Anaconda2'); % DJC 1-18-2015 

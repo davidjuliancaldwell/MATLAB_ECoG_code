@@ -37,7 +37,7 @@ fThresholdMax = 19.99;
 
 %fThresholdMin = 10;
 %fThresholdMax = 29.99;
-epThresholdMag = 100;
+epThresholdMag = 150;
 
 markerMin = 50;
 markerMax = 200;
@@ -111,8 +111,7 @@ for sid = SIDS(1:end-1)
     
     fprintf(['running for subject ' sid '\n']);
     
-    %%
-    
+    %% 
     if strcmp(type,'m')
         indices = [1,2];
     elseif strcmp(type,'s')
@@ -146,14 +145,11 @@ for sid = SIDS(1:end-1)
         tempKeepsScreen = dataForPPanalysis{chan}{1}{5};
         
         if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > epThresholdMag
-            
-            for ii = 1:numTypes
-                
+            for ii = 1:numTypes          
                 if ii ~= nullType
                     tempMag = 1e6*dataForPPanalysis{chan}{ii}{1};
                     tempLabel = dataForPPanalysis{chan}{ii}{4};
                     tempKeeps = dataForPPanalysis{chan}{ii}{5};
-                    
                     
                     tempBase = tempMag(tempLabel==0 & tempKeeps);
                     tempTest = tempMag(tempLabel~=0 & tempKeeps);
@@ -182,8 +178,7 @@ for sid = SIDS(1:end-1)
                     end
                     phaseDeliveryBinned = [phaseDeliveryBinned phaseBinned];
                     
-                    if ii ==1
-                        
+                    if ii ==1                   
                         numTest = [];
                         tempTestOrdered = [];
                         typeResp = [];
@@ -201,11 +196,11 @@ for sid = SIDS(1:end-1)
                         bC = cellstr(numBaseS)';
                         numStims = [numStims{:}  bC bTest  ];
                         
-                    else
-                        
+                    else            
                         numTest = [];
                         tempTestOrdered = [];
                         typeResp = [];
+                        
                         for iii = 2:length(unique(tempLabel))
                             numTestTemp = repmat(['Test ' num2str(iii - 1)],sum(tempLabel(tempKeeps) == uniqueLabel(iii)),1);
                             numTest = [numTest; numTestTemp];
@@ -221,17 +216,17 @@ for sid = SIDS(1:end-1)
                     end
                 end
             end
+            
             lengthToRep = lengthItems;
             sidString = repmat(sid,lengthToRep,1);
             sidCell = cellstr(sidString)';
             chanLabels = [chanLabels repmat(chan,lengthToRep,1)'];
             betaSID = [betaSID{:} sidCell];
             stimLevelCombined = [stimLevelCombined repmat(stimLevel,lengthToRep,1)'];
+            
         end
     end
 end
-
-
 %%
 tableBetaStim = table(totalMags',stimLevelCombined',categorical(numStims)',categorical(betaSID)',categorical(chanLabels)',categorical(phaseDeliveryBinned'),...
     'VariableNames',{'Magnitude','stimLevel','NumStims','SID','channel','phaseClass'});
@@ -240,13 +235,18 @@ tableBetaStim = table(totalMags',stimLevelCombined',categorical(numStims)',categ
 statarray = grpstats(tableBetaStim,{'SID','NumStims','channel','phaseClass'},{'mean','sem'},...
     'DataVars','Magnitude');
 
-grpstats(totalMags',numStims',0.05)
+
+statarray2 = grpstats(tableBetaStim,{'NumStims','phaseClass'},{'mean','sem'},...
+    'DataVars','Magnitude');
+
+figure
+grpstats(totalMags',{categorical(numStims)'},0.05)
 
 % %%
 % numSubj = 7;
 % numDims = 4;
 % j = 1;
-% 
+%
 % newOrder = [3 1 2 4];
 % newOrder = repmat(newOrder,1,numSubj);
 % subjMult = repmat([0:4:24],numDims,1);
@@ -258,7 +258,7 @@ grpstats(totalMags',numStims',0.05)
 % newSidOrder = repmat(newSidOrder,numDims,1);
 % newSidOrder = newSidOrder(:);
 % subjNumStim = repmat([1:4],1,numSubj);
-% 
+%
 % newSidOrder = 4*newSidOrder + subjNumStim' - 4;
 % statarray = statarray(newSidOrder,:);
 
@@ -266,8 +266,12 @@ grpstats(totalMags',numStims',0.05)
 [groupings,meansChannelSID] = findgroups(tableBetaStim(:,{'NumStims','SID','channel','phaseClass'}));
 
 meansChannelSID.mean = splitapply(@nanmean,tableBetaStim.Magnitude,groupings);
+
+[groupings2,meansChannelSID2] = findgroups(tableBetaStim(:,{'NumStims','phaseClass'}));
+meansChannelSID2.mean = splitapply(@nanmean,tableBetaStim.Magnitude,groupings2);
 %%
 count = 1;
+
 for name = unique(meansChannelSID.SID)'
     for chan = unique(meansChannelSID.channel(meansChannelSID.SID == name))'
         for numStimTrial = unique(meansChannelSID.NumStims)'
@@ -282,6 +286,9 @@ end
 
 figure
 grpstats(meansChannelSID,{'NumStims','phaseClass'},{'mean','sem'},...
+    'DataVars','percentDiff')%hierarchicalBoxplot(anovaTotalMags,{categorical(anovaNumStims),categorical(anovaBetaSID)})
+
+grpstats(meansChannelSID,{'SID','NumStims','phaseClass'},{'mean','sem'},...
     'DataVars','percentDiff')%hierarchicalBoxplot(anovaTotalMags,{categorical(anovaNumStims),categorical(anovaBetaSID)})
 %%
 clearvars plotSummary plotSummaryLabels
@@ -301,12 +308,11 @@ phasesAnova = phases(phasesSelected);
 %%
 dataInt = meansChannelSID.percentDiff(phasesSelected);
 
-
 plotSummary{1} = dataInt(phasesAnova);
 plotSummaryLabels{1} = zeros(size(plotSummary{1}));
 for ii = 2:length(unique(meansChannelSID.NumStims))
     plotSummaryLabels{1}( ctNonBase(phasesAnova) == ['Test ' num2str(ii-1)]) = ii-1;
-
+    
 end
 % plotSummaryLabels{1}(ct2sel(phasesAnova)) = 1;
 % plotSummaryLabels{1}(ct3sel(phasesAnova)) = 2;
@@ -316,7 +322,7 @@ plotSummaryLabels{2} = zeros(size(plotSummary{2}));
 
 for ii = 2:length(unique(meansChannelSID.NumStims))
     plotSummaryLabels{2}( ctNonBase(~phasesAnova) == ['Test ' num2str(ii-1)]) = ii-1;
-
+    
 end
 % plotSummaryLabels{2}(ct2sel(~phasesAnova)) = 1;
 % plotSummaryLabels{2}(ct3sel(~phasesAnova)) = 2;
@@ -325,7 +331,7 @@ end
 
 labelsCount = zeros(size(phasesAnova));
 for ii = 2:length(unique(meansChannelSID.NumStims))
-labelsCount(ctNonBase ==['Test ' num2str(ii-1)]) = ii -1;
+    labelsCount(ctNonBase ==['Test ' num2str(ii-1)]) = ii -1;
 end
 
 [p,tbs,stats,terms] = anovan(dataInt,{phasesAnova,labelsCount},...
@@ -410,7 +416,7 @@ set(gca,'fontsize',20)
 % fit glme
 glme = fitglme(tableBetaStim,'Magnitude~NumStims+stimLevel+phaseClass+(-1+NumStims | SID) + (-1+stimLevel | SID) + (phaseClass | SID)',...
     'Distribution','Normal','Link','Identity','FitMethod','Laplace','DummyVarCoding','effects','EBMethod','Default')
-%
+%%
 disp(glme)
 anova(glme)
 [psi,dispersion,stats] = covarianceParameters(glme)
@@ -421,50 +427,50 @@ stats
 
 %
 % test effect between different stim levels
-
+%%
 % between 3<CT<4 and Base
 H = [0,0,0,1,-1,0];
 
 [pVal,F,DF1,DF2] = coefTest(glme,H);
 fprintf(['p value between 3<ct<4 and base = ' num2str(pVal) '\n']);
-
+%%
 % between 1<ct<2 and Base
 
 H = [0,0,1,0,1,0];
 
 [pVal,F,DF1,DF2] = coefTest(glme,H);
 fprintf(['p value between 1<ct<2 and base = ' num2str(pVal) '\n']);
-
+%%
 % between >5 and base
 H = [0,0,1,1,2,0];
 
 [pVal,F,DF1,DF2] = coefTest(glme,H);
 fprintf(['p value between >5 and base = ' num2str(pVal) '\n']);
-
+%%
 % between 1<ct<2 and >5
 
 H = [0,0,2,1,1,0];
 
 [pVal,F,DF1,DF2] = coefTest(glme,H);
 fprintf(['p value between 1<ct<2 and >5 = ' num2str(pVal) '\n']);
-
+%%
 % between 3<CT<4 and > 5
 
 H = [0,0,1,2,1,0];
 
 [pVal,F,DF1,DF2] = coefTest(glme,H);
 fprintf(['p value between 3<ct<4 and > 5 ' num2str(pVal) '\n']);
-
+%%
 % between PHASE
 
 H = [0,0,0,0,0,-1];
 
 [pVal,F,DF1,DF2] = coefTest(glme,H);
 fprintf(['p value between phases ' num2str(pVal) '\n']);
-
+%%
 %
 [pVal,F,DF1,DF2] = coefTest(glme)
-
+%%
 %
 figure
 plotResiduals(glme,'histogram','ResidualType','Pearson')
@@ -473,69 +479,69 @@ plotResiduals(glme,'fitted','ResidualType','Pearson')
 figure
 plotResiduals(glme,'lagged','ResidualType','Pearson')
 
-%% MULTIPLE SUBJECTS - plot
-%
-% D5cd55 - subject 1
-% C91479 - subject 2
-% 7dbdec - subject 3
-% 9ab7ab - subject 4
-% 702d24 - subject 5
-% Ecb43e - subject 6
-% 0b5a2e - subject 7
-
-figure
-
-sem = table2array(statarray(:,{'sem_Magnitude'}));
-means = table2array(statarray(:,{'mean_Magnitude'}));
-
-load('line_red.mat');
-colors = flipud(cm(round(linspace(1, size(cm, 1), numDims)), :));
-
-
-k = 25;
-
-
-% generate error bars
-
-for ii = 1:height(statarray)
-    
-    if j == 5
-        j = 1;
-    end
-    
-    h = errorbar(ii,means(ii),sem(ii),'o','linew',3,'color',colors(j,:),'capsize',10);
-    ylim([0 800])
-    
-    set(h, 'MarkerSize', 5, 'MarkerFaceColor', colors(j,:), ...
-        'MarkerEdgeColor', colors(j,:));
-    hold on
-    
-    ax = gca;
-    
-    if j ==2
-        text(ii+0.15,min(means(:,1))-6,sprintf([num2str(floor(ii/4)+1)]),'fontsize',14)
-        
-    end
-    
-    if mod(ii,4) == 0 & ii < 25
-        line = vline(ii+0.5);
-        line.Color = [0.5 0.5 0.5];
-    end
-    ax.FontSize = 12;
-    j = j+1;
-end
-ylabel('CCEP Magnitude (\muV)','fontsize',14,'fontweight','bold')
-xlabel('Subject subdivided by number of conditioning pulses','fontsize',14,'fontweight','bold')
-
-% set(gca,'XtickLabel',{'','>5','3->4', '1->2','Baseline'},'fontsize',14,'fontweight','bold')
-ax.XTickLabelMode = 'manual';
-ax.XTick = [];
-title({'CCEP Magnitude across Subjects';},'fontsize',16,'fontweight','bold')
-
-
-
-[h,icons,plots,legend_text] = legend({'Baseline','1-2','3-4','>5'},'fontsize',12);
-
+% %% MULTIPLE SUBJECTS - plot
+% %
+% % D5cd55 - subject 1
+% % C91479 - subject 2
+% % 7dbdec - subject 3
+% % 9ab7ab - subject 4
+% % 702d24 - subject 5
+% % Ecb43e - subject 6
+% % 0b5a2e - subject 7
+% 
+% figure
+% 
+% sem = table2array(statarray(:,{'sem_Magnitude'}));
+% means = table2array(statarray(:,{'mean_Magnitude'}));
+% 
+% load('line_red.mat');
+% colors = flipud(cm(round(linspace(1, size(cm, 1), numDims)), :));
+% 
+% 
+% k = 25;
+% 
+% 
+% % generate error bars
+% 
+% for ii = 1:height(statarray)
+%     
+%     if j == 5
+%         j = 1;
+%     end
+%     
+%     h = errorbar(ii,means(ii),sem(ii),'o','linew',3,'color',colors(j,:),'capsize',10);
+%     ylim([0 800])
+%     
+%     set(h, 'MarkerSize', 5, 'MarkerFaceColor', colors(j,:), ...
+%         'MarkerEdgeColor', colors(j,:));
+%     hold on
+%     
+%     ax = gca;
+%     
+%     if j ==2
+%         text(ii+0.15,min(means(:,1))-6,sprintf([num2str(floor(ii/4)+1)]),'fontsize',14)
+%         
+%     end
+%     
+%     if mod(ii,4) == 0 & ii < 25
+%         line = vline(ii+0.5);
+%         line.Color = [0.5 0.5 0.5];
+%     end
+%     ax.FontSize = 12;
+%     j = j+1;
+% end
+% ylabel('CCEP Magnitude (\muV)','fontsize',14,'fontweight','bold')
+% xlabel('Subject subdivided by number of conditioning pulses','fontsize',14,'fontweight','bold')
+% 
+% % set(gca,'XtickLabel',{'','>5','3->4', '1->2','Baseline'},'fontsize',14,'fontweight','bold')
+% ax.XTickLabelMode = 'manual';
+% ax.XTick = [];
+% title({'CCEP Magnitude across Subjects';},'fontsize',16,'fontweight','bold')
+% 
+% 
+% 
+% [h,icons,plots,legend_text] = legend({'Baseline','1-2','3-4','>5'},'fontsize',12);
+% 
 
 %%
 % figure
