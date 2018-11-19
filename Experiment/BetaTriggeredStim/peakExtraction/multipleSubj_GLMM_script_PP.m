@@ -19,7 +19,7 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4,3.5},...
     {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51,0.75},...
     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
-    {'t',[270,90,12345,12345],6,[56 64],[57:64],[46 48 54 55 63],55,1.75}...
+    {'t',[270,90,12345,12345],6,[56 64],[57:63],[46 48 54 55 63],55,1.75}...
     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75},...
     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
@@ -51,6 +51,7 @@ betaMags3 = [];
 betaMags1 = [];
 betaBase = [];
 betaSID = {};
+subjectNumVec = [];
 numStims = {};
 totalMags = [];
 chanLabels = [];
@@ -120,6 +121,7 @@ for sid = SIDS(1:end-1)
         indices = [1,2,4];
     end
     
+    peakPhaseVec = [];
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
@@ -128,7 +130,7 @@ for sid = SIDS(1:end-1)
         elseif (strcmp(type,'m') || strcmp(type,'t')) && (index == 2)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square_neg,...
                 threshold,phase_at_0_neg,chans,desiredF(2),markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f_neg,fThresholdMin,fThresholdMax);
-        elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 3)
+        elseif (strcmp(type,'s') && index ==1) || (strcmp(type,'t') && index == 4)
             [peakPhase,peakStd,peakLength,circularTest,markerSize] =  phase_delivery_accuracy_forPP(r_square,...
                 threshold,phase_at_0,chans,desiredF,markerMin,markerMax,minData,maxData,markerToUse,testStatistic,f,fThresholdMin,fThresholdMax);
         end
@@ -220,16 +222,17 @@ for sid = SIDS(1:end-1)
             lengthToRep = lengthItems;
             sidString = repmat(sid,lengthToRep,1);
             sidCell = cellstr(sidString)';
+            subjectNumInd = repmat(subjectNum,1,lengthToRep);
             chanLabels = [chanLabels repmat(chan,lengthToRep,1)'];
             betaSID = [betaSID{:} sidCell];
             stimLevelCombined = [stimLevelCombined repmat(stimLevel,lengthToRep,1)'];
-            
+            subjectNumVec = [subjectNumVec subjectNumInd];
         end
     end
 end
 %%
-tableBetaStim = table(totalMags',stimLevelCombined',categorical(numStims)',categorical(betaSID)',categorical(chanLabels)',categorical(phaseDeliveryBinned'),...
-    'VariableNames',{'Magnitude','stimLevel','NumStims','SID','channel','phaseClass'});
+tableBetaStim = table(totalMags',stimLevelCombined',categorical(numStims)',categorical(betaSID)',categorical(chanLabels)',categorical(subjectNumVec'),categorical(phaseDeliveryBinned'),categorical(anovaType'),...
+    'VariableNames',{'Magnitude','stimLevel','NumStims','SID','channel','subjectNum','phaseClass','setToDeliverPhase'});
 % group stats
 
 statarray = grpstats(tableBetaStim,{'SID','NumStims','channel','phaseClass'},{'mean','sem'},...
@@ -239,9 +242,12 @@ statarray = grpstats(tableBetaStim,{'SID','NumStims','channel','phaseClass'},{'m
 statarray2 = grpstats(tableBetaStim,{'NumStims','phaseClass'},{'mean','sem'},...
     'DataVars','Magnitude');
 
+statarrayCount = grpstats(tableBetaStim,{'subjectNum','NumStims','setToDeliverPhase'},{'numel'},'DataVars','Magnitude');
+
 figure
 grpstats(totalMags',{categorical(numStims)'},0.05)
 
+return
 % %%
 % numSubj = 7;
 % numDims = 4;

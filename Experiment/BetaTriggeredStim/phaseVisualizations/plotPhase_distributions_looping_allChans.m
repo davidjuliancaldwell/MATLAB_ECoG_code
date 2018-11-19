@@ -19,7 +19,7 @@ M = containers.Map(SIDS,valueSet,'UniformValues',false);
 
 modifier = '_51samps_12_20_40ms_randomstart';
 %modifier = '_13samps_8_30_40ms_randomstart';
-%modifier = '_13samps_10_30_40ms_randomstart';
+modifier = '_13samps_10_30_40ms_randomstart';
 
 %modifierPhase = '_51samps_12_20_40m_0startPhase';
 
@@ -39,7 +39,11 @@ threshold = 0.7; %r^2
 testStatistic = 'omnibus';
 fThresholdMin = 12.01; % Hz
  fThresholdMax = 19.99; % Hz
-%SIDS = {'d5cd55'};
+ %fThresholdMin = 10.01; % Hz
+ %fThresholdMax = 29.99; % Hz
+
+SIDS = {'d5cd55'};
+%SIDS = {'0b5a2ePlayback'};
 
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

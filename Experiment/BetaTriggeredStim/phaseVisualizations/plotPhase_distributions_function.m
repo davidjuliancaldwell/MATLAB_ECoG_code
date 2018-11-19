@@ -9,10 +9,10 @@ if numel(phase(rSquare>threshold))
     numGoodTrials = sum(rSquare>threshold & f<fThresholdMax & f>fThresholdMin);
     numTotalTrials = length(f);
     
-    
+    numBins = 8;
     % plot frequency stimulus delivery distribution
     figure
-    histogram((f(rSquare>threshold & f>fThresholdMin & f<fThresholdMax )))
+    histogram((f(rSquare>threshold & f>fThresholdMin & f<fThresholdMax )),'numbins',numBins)
     
     if subjectNum ==8
         title({['Subject 7 Playback distribution of frequencies '],[' on the ' signalType ' fit signal for Phase ' num2str(desiredF) char(176) ' R^2 > ' num2str(threshold)],['Channel ' num2str(chan)]})
