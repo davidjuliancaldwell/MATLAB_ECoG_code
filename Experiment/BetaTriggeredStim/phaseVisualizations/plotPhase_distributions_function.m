@@ -93,7 +93,11 @@ if numel(phase(rSquare>threshold))
         annot.FontSize = 16;
         
         set(circPlot,'fontsize',16)
-        
+               
+        if saveIt
+            SaveFig(OUTPUT_DIR, sprintf(['circ-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'svg');
+            SaveFig(OUTPUT_DIR, sprintf(['circ-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'png','-r600');
+        end
     end
     
     if bootdistPlotBool
