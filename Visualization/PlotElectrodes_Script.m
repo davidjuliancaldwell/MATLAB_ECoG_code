@@ -52,9 +52,9 @@ for chan = 1:gridSize
 end
 
 %%
-sid = '3f2113'
+sid = 'a7a181'
 figure
-PlotCortex(sid,'b')
+PlotCortex(sid,'l',[],0.5)
 hold on
 PlotElectrodes(sid)
 

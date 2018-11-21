@@ -33,12 +33,12 @@ SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePl
 hilbPlot = 0;
 acausalPlot = 0;
 rawPlot = 1;
-saveIt = 1;
+saveIt = 0;
 closeAll = 0;
 
 threshold = 0.7;
-fThresholdMin = 12.1;
-fThresholdMax = 19.9;
+fThresholdMin = 12.01;
+fThresholdMax = 19.99;
 
 
 % don't plot direction of magnitude of phase difference
@@ -58,9 +58,7 @@ for sid = SIDS
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
-    
-    %      load([sid '_phaseDelivery_allChans_51samps.mat']);
-    
+       
     load([sid '_phaseDelivery_allChans' modifier '.mat']);
     
     fprintf(['running for subject ' sid '\n']);
