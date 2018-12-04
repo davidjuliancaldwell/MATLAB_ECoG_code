@@ -44,8 +44,8 @@ addToPath(genpath(fullfile(codebase, 'BetaTriggeredStim')));
 addToPath(genpath(fullfile(codebase, 'Experiment','LarryStimulation'))); % 10-28-2015 - added Larry Stim
 addToPath(genpath(fullfile(codebase, 'FileExchange'))); %8-10-2015 DJC - adding file exchange toolboxes to this part
 addToPath(genpath(fullfile(sharedCode, 'stimulation_spacing'))); %1-30-2017 
-addToPath(genpath(fullfile(sharedCode, 'stimulationResponseTimingAnalysis'))); %1-30-2017 
-addToPath(genpath(fullfile(sharedCode, 'DBS_analysis'))); %1-30-2017 
+addToPath(genpath(fullfile(sharedCode, 'ResponseTimingAnalysis'))); %1-30-2017 
+addToPath(genpath(fullfile(sharedCode, 'DBSanalysisCode'))); %1-30-2017 
 addToPath(genpath(fullfile(sharedCode, 'ECoGAnalysisTools'))); %3-30-2017 
 addToPath(genpath(fullfile(sharedCode, 'TDT2Matlab_conversion'))); %4-17-2017 
 addToPath(genpath(fullfile(sharedCode, 'ElectrodeModeling'))); %11-17-2017
@@ -53,7 +53,7 @@ addToPath(genpath(fullfile(sharedCode, 'RHI'))); %11-17-2017
 addToPath(genpath(fullfile(sharedCode, 'ElectrodeModeling'))); %1-30-2017 
 
 rmpath(genpath(fullfile(codebase,'FileExchange','Toolboxes','distributionPlot'))); % DJC 1-8-2016, temporary to allow use of matlab 2015 hist function over the one in the distributionPlot toolbox
-addToPath(genpath(fullfile(sharedCode,'CircStat2012a')));
+addToPath(genpath(fullfile(sharedCode,'circstat-matlab')));
 addToPath(genpath(fullfile(sharedCode,'phasemap')));
 
 addToPath(genpath(fullfile(sharedCode,'measures-of-effect-size-toolbox')));
