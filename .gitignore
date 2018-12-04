@@ -2,6 +2,12 @@
 pathdef.m
 setupEnvironment.m
 setupPath.m
+startup.m
+*/startup.m
+*startup.m
+setupAll.m
+*/setupAll.m
+*setupAll.m
 *.wav
 *.png
 *.eps
