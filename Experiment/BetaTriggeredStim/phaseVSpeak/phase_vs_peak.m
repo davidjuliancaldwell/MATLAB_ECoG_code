@@ -3,12 +3,14 @@
 % David.J.Caldwell 10.2.2018
 
 close all;clear all;clc
-baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery';
+inputdir = getenv('OUTPUT_DIR');
+
+baseDir = fullfile(inputdir,'\BetaTriggeredStim\PhaseDelivery');
 addpath(baseDir);
-baseDir2 = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PeaktoPeakEP';
+baseDir2 = fullfile(inputdir,'\BetaTriggeredStim\PeaktoPeakEP');
 addpath(baseDir2);
 
-OUTPUT_DIR = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\phaseVSpeak\plots';
+OUTPUT_DIR = fullfile(inputdir,'\BetaTriggeredStim\phaseVSpeak\plots');
 TouchDir(OUTPUT_DIR);
 
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
