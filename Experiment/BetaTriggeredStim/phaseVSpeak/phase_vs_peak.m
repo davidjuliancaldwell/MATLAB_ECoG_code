@@ -52,9 +52,9 @@ plotColor = distinguishable_colors(9);
 
 %modifierPhase = '_13samps_8_30_40ms_randomstart';
 
-%modifierPhase = '_51samps_12_20_40ms_randomstart';
+modifierPhase = '_51samps_12_20_40ms_randomstart';
 
-modifierPhase = '_13samps_10_30_40ms_randomstart';
+%modifierPhase = '_13samps_10_30_40ms_randomstart';
 
 modifierEP = '-reref';
 %SIDS = {'d5cd55'};
@@ -64,8 +64,8 @@ markerToUse = 'vecLength';
 testStatistic = 'omnibus';
 
 threshold = 0.7;
-fThresholdMin = 10.01;
-fThresholdMax = 29.99;
+fThresholdMin = 12.01;
+fThresholdMax = 19.99;
 % 
 % fThresholdMin = 10;
 % fThresholdMax = 29.99;
