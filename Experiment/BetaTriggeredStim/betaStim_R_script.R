@@ -24,16 +24,16 @@ data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable.c
 data <- subset(data,!is.nan(data$magnitude))
 
 data$percentDiff = 0
-for (name in unique(data$SID)){
-  for (chan in unique(data[data$SID == name,]$channel)){
+for (name in unique(data$sid)){
+  for (chan in unique(data[data$sid == name,]$channel)){
     for (numStimTrial in unique(data$numStims)){
-      numBase = nrow(data[data$SID == name & data$channel == chan & data$numStims == 'Base',])
-      base = data[data$SID == name & data$channel == chan & data$numStims == 'Base',]$magnitude
+      numBase = nrow(data[data$sid == name & data$channel == chan & data$numStims == 'Base',])
+      base = data[data$sid == name & data$channel == chan & data$numStims == 'Base',]$magnitude
       baseMean = mean(base)
-      data[data$SID == name & data$channel == chan & data$numStims == 'Base',]$percentDiff = 100*(base - baseMean)/baseMean
+      data[data$sid == name & data$channel == chan & data$numStims == 'Base',]$percentDiff = 100*(base - baseMean)/baseMean
       for (typePhase in unique(data$phaseClass)){
-        percentDiff = 100*((data[data$SID == name & data$channel == chan & data$numStims == numStimTrial & data$phaseClass == typePhase,]$magnitude)-baseMean)/baseMean
-        data[data$SID == name & data$channel == chan & data$numStims == numStimTrial & data$phaseClass == typePhase,]$percentDiff = percentDiff
+        percentDiff = 100*((data[data$sid == name & data$channel == chan & data$numStims == numStimTrial & data$phaseClass == typePhase,]$magnitude)-baseMean)/baseMean
+        data[data$sid == name & data$channel == chan & data$numStims == numStimTrial & data$phaseClass == typePhase,]$percentDiff = percentDiff
       }
     }
   }
@@ -77,10 +77,10 @@ summary(glht(fit.glm,linfct=mcp(numStims="Tukey")))
 
 
 #fit.lmm = lmer(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass + (1|subjectNum) + (1|numStims) + (1|channel)+(1|stimLevel),data=data)
-fit.lmm = lmer(magnitude~numStims+stimLevel+phaseClass+(-1+numStims | sid) + (-1+stimLevel | sid) + (phaseClass | sid),data=data)
+fit.lmm = lmer(percentDiff~numStims+stimLevel+phaseClass+channel+(-1+numStims | sid) + (-1+stimLevel | sid) + (phaseClass | sid),data=dataNoBaseline)
 summary(fit.lmm)
 confint(fit.lmm,method="boot")
-summary(glht(fit.lmm,linfct=mcp(blockVec="Tukey")))
+summary(glht(fit.lmm,linfct=mcp(numStims="Tukey")))
 
 # xtra ss test
   anova(fit.glm, fit.lmm)

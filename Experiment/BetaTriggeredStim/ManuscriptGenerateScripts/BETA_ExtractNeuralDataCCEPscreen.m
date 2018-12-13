@@ -1,13 +1,13 @@
 %% Extract neural data for screening CCEPs.
 
 % Constants
-close all;clear all;clc
+%close all;clear all;clc
 Z_Constants
 saveIt = 0;
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 %%
-for idx = 2:9
+for idx = 3:9
     sid = SIDS{idx};
     
     switch(sid)
@@ -259,19 +259,40 @@ for idx = 2:9
         
         %% Process Triggers 9-3-2015
         
-        pts = stims(3,:)==0;
+        %% process triggers
         
-        % 0a80cf only had conditioning
-        
-        if strcmp(sid,'0a80cf');
-            pts = stims(3,:)==1;
+        if (strcmp(sid, '8adc5c'))
+            pts = stims(3,:)==0;
+        elseif (strcmp(sid, 'd5cd55'))
+            %         pts = stims(3,:)==0 & (stims(2,:) > 4.5e6);
+            pts = stims(3,:)==0 & (stims(2,:) > 4.5e6) & (stims(2, :) > 36536266);
+        elseif (strcmp(sid, 'c91479'))
+            pts = stims(3,:)==0;
+        elseif (strcmp(sid, '7dbdec'))
+            pts = stims(3,:)==0;
+        elseif (strcmp(sid, '9ab7ab'))
+            pts = stims(3,:)==0;
+        elseif (strcmp(sid, '702d24'))
+            pts = stims(3,:)==0;
+            %modified DJC 7-27-2015
+        elseif (strcmp(sid, 'ecb43e'))
+            pts = stims(3,:) == 0;
+        elseif (strcmp(sid, '0b5a2e'))
+            pts = stims(3,:) == 0;
+        elseif (strcmp(sid, '0b5a2ePlayback'))
+            pts = stims(3,:) == 0;
+        elseif (strcmp(sid,'3f2113'))
+            pts = stims(3,:) == 0;
+            
+        else
+            error 'unknown sid';
         end
         
         ptis = round(stims(2,pts)/fac);
         
         % change presamps and post samps to be what Kurt wanted to look at
         presamps = round(0.1 * efs); % pre time in sec
-        postsamps = round(0.15 * efs); % post time in sec
+        postsamps = round(0.12 * efs); % post time in sec
         
         t = (-presamps:postsamps)/efs;
         wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
@@ -318,5 +339,7 @@ for idx = 2:9
     %%
     
     smallMultiples(ECoGDataAverage,t,'type1',stimChans,'type2',betaChan,'average',1)
-    
+
+    clearvars winsReref ECoGData
+
 end
