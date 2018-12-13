@@ -1,5 +1,5 @@
+setwd('C:/Users/david/SharedCode/MATLAB_ECoG_code/Experiment/BetaTriggeredStim/')
 
-library('here')
 library('nlme')
 library('ggplot2')
 library('drc')
@@ -8,8 +8,8 @@ library('lmtest')
 library('glmm')
 library("lme4")
 library('multcomp')
-
-setwd('C:/Users/david/SharedCode/MATLAB_ECoG_code/Experiment/BetaTriggeredStim/')
+library('plyr')
+library('here')
 
 rootDir = here()
 
@@ -19,14 +19,79 @@ figHeight = 6
 
 
 data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
-                   colClasses=c("Magnitude"="numeric","SID"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
+                   colClasses=c("magnitude"="numeric","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
+#data <- subset(data, magnitude<800)
+data <- subset(data,!is.nan(data$magnitude))
 
+data$percentDiff = 0
+for (name in unique(data$SID)){
+  for (chan in unique(data[data$SID == name,]$channel)){
+    for (numStimTrial in unique(data$numStims)){
+      numBase = nrow(data[data$SID == name & data$channel == chan & data$numStims == 'Base',])
+      base = data[data$SID == name & data$channel == chan & data$numStims == 'Base',]$magnitude
+      baseMean = mean(base)
+      data[data$SID == name & data$channel == chan & data$numStims == 'Base',]$percentDiff = 100*(base - baseMean)/baseMean
+      for (typePhase in unique(data$phaseClass)){
+        percentDiff = 100*((data[data$SID == name & data$channel == chan & data$numStims == numStimTrial & data$phaseClass == typePhase,]$magnitude)-baseMean)/baseMean
+        data[data$SID == name & data$channel == chan & data$numStims == numStimTrial & data$phaseClass == typePhase,]$percentDiff = percentDiff
+      }
+    }
+  }
+}
+
+dataNoBaseline = data[data$numStims != "Base",]
 #data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable.csv"),header=TRUE,sep = ",",stringsAsFactors=F)
+ggplot(data, aes(x=magnitude)) + 
+  geom_histogram(binwidth=100)
 
-fit.glm    = glm(Magnitude ~ stimLevel + NumStims + subjectNum + channel + phaseClass,data=data)
+# Change box plot colors by groups
+ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
+  geom_boxplot()
+# Change the position
+p<-ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
+  geom_boxplot(position=position_dodge(1))
+p
+
+
+#summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), function(x) mean(x[,"percentDiff"]))
+summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), summarize, percentDiff = mean(percentDiff))
+
+# Change box plot colors by groups
+ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
+  geom_boxplot(notch=TRUE)
+# Change the position
+p<-ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
+  geom_boxplot(notch=TRUE,position=position_dodge(1))
+p
+
+
+
+#fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
+#fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
+fit.glm    = glm(percentDiff ~ numStims + channel + phaseClass,data=dataNoBaseline)
+
 summary(fit.glm)
 plot(fit.glm)
-summary(glht(fit.glm,linfct=mcp(blockVec="Tukey")))
+summary(glht(fit.glm,linfct=mcp(phaseClass="Tukey")))
+summary(glht(fit.glm,linfct=mcp(numStims="Tukey")))
+
+
+#fit.lmm = lmer(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass + (1|subjectNum) + (1|numStims) + (1|channel)+(1|stimLevel),data=data)
+fit.lmm = lmer(magnitude~numStims+stimLevel+phaseClass+(-1+numStims | sid) + (-1+stimLevel | sid) + (phaseClass | sid),data=data)
+summary(fit.lmm)
+confint(fit.lmm,method="boot")
+summary(glht(fit.lmm,linfct=mcp(blockVec="Tukey")))
+
+# xtra ss test
+  anova(fit.glm, fit.lmm)
+# Likelihood ratio test
+
+ lrtest(fit.glm,fit.lmm)
+
+# aic
+AIC(fit.glm,fit.lmm)
+
+BIC(fit.glm,fit.lmm)
 
 for (chanInt in chanIntVec){
   
