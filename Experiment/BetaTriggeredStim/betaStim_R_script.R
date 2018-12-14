@@ -18,10 +18,15 @@ figWidth = 8
 figHeight = 6 
 
 
-data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
-                   colClasses=c("magnitude"="numeric","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
-#data <- subset(data, magnitude<800)
+data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_100.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
+                   colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
+data <- subset(data, magnitude<1000)
 data <- subset(data,!is.nan(data$magnitude))
+
+# rename for ease
+data$numStims <- revalue(data$numStims, c("Test 1"="[1,2]","Test 2"="[3,4]","Test 3"="[5,inf)"))
+
+
 
 data$percentDiff = 0
 for (name in unique(data$sid)){
@@ -44,9 +49,9 @@ dataNoBaseline = data[data$numStims != "Base",]
 ggplot(data, aes(x=magnitude)) + 
   geom_histogram(binwidth=100)
 
-# Change box plot colors by groups
-ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
-  geom_boxplot()
+# # Change box plot colors by groups
+# ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
+#   geom_boxplot()
 # Change the position
 p<-ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
   geom_boxplot(position=position_dodge(1))
@@ -57,41 +62,86 @@ p
 summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), summarize, percentDiff = mean(percentDiff))
 
 # Change box plot colors by groups
-ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
-  geom_boxplot(notch=TRUE)
+# ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
+#   geom_boxplot(notch=TRUE)
 # Change the position
 p<-ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
-  geom_boxplot(notch=TRUE,position=position_dodge(1))
+  geom_boxplot(notch=TRUE,position=position_dodge(1)) +
+  geom_hline(yintercept=0)
 p
 
+p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) + theme_classic(base_size = 18) +
+  geom_dotplot(binaxis='y',binwidth=2,stackdir='center', 
+               position=position_dodge(0.8)) +
+  geom_pointrange(mapping = aes(x = numStims, y = percentDiff,color=phaseClass),
+                  stat = "summary",
+                  fun.ymin = function(z) {quantile(z,0.25)},
+                  fun.ymax = function(z) {quantile(z,0.75)},
+                  fun.y = median,
+                  position=position_dodge(0.8),size=1.2,color="black",show.legend = FALSE) +  
+  labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')+ 
+  geom_hline(yintercept=0) 
+p2
+
+p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) + 
+  geom_boxplot(mapping = aes(x = numStims, y = percentDiff,fill=phaseClass),
+               position=position_dodge(0.8),notch=TRUE)  + 
+  geom_dotplot(binaxis='y',binwidth=2,stackdir='center', 
+               position=position_dodge(0.8))+
+  labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')
+
+p2 
+p2 + geom_hline(yintercept=0) + theme_classic()
 
 
 #fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
 #fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
-fit.glm    = glm(percentDiff ~ numStims + channel + phaseClass,data=dataNoBaseline)
+fit.glm    = glm(percentDiff ~ numStims+phaseClass+betaLabels+channel,data=dataNoBaseline)
 
 summary(fit.glm)
 plot(fit.glm)
 summary(glht(fit.glm,linfct=mcp(phaseClass="Tukey")))
 summary(glht(fit.glm,linfct=mcp(numStims="Tukey")))
 
+#fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
+#fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
+fit.glm2    = glm(magnitude ~ numStims+phaseClass+betaLabels+channel,data=data)
+
+summary(fit.glm2)
+plot(fit.glm2)
+summary(glht(fit.glm2,linfct=mcp(phaseClass="Tukey")))
+summary(glht(fit.glm2,linfct=mcp(numStims="Tukey")))
+
 
 #fit.lmm = lmer(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass + (1|subjectNum) + (1|numStims) + (1|channel)+(1|stimLevel),data=data)
-fit.lmm = lmer(percentDiff~numStims+stimLevel+phaseClass+channel+(-1+numStims | sid) + (-1+stimLevel | sid) + (phaseClass | sid),data=dataNoBaseline)
+fit.lmm = lmer(percentDiff~numStims+phaseClass+betaLabels+channel+ (1| sid) ,data=dataNoBaseline)
+
 summary(fit.lmm)
+plot(fit.lmm)
 confint(fit.lmm,method="boot")
 summary(glht(fit.lmm,linfct=mcp(numStims="Tukey")))
+summary(glht(fit.lmm,linfct=mcp(betaLabels="Tukey")))
+summary(glht(fit.lmm,linfct=mcp(phaseClass="Tukey")))
+
+fit.lmm2 = lmer(percentDiff~numStims+phaseClass+betaLabels+channel + (-1 + numStims | sid) + (betaLabels | sid) + (1| sid) ,data=dataNoBaseline)
+plot(fit.lmm2)
+summary(fit.lmm2)
+confint(fit.lmm2,method="boot")
+summary(glht(fit.lmm2,linfct=mcp(numStims="Tukey")))
+summary(glht(fit.lmm2,linfct=mcp(betaLabels="Tukey")))
+summary(glht(fit.lmm2,linfct=mcp(phaseClass="Tukey")))
+
 
 # xtra ss test
-  anova(fit.glm, fit.lmm)
+anova(fit.glm, fit.lmm,fit.lmm2)
 # Likelihood ratio test
 
- lrtest(fit.glm,fit.lmm)
+lrtest(fit.glm,fit.lmm,fit.lmm2)
 
 # aic
-AIC(fit.glm,fit.lmm)
+AIC(fit.glm,fit.lmm,fit.lmm2)
 
-BIC(fit.glm,fit.lmm)
+BIC(fit.glm,fit.lmm,fit.lmm2)
 
 for (chanInt in chanIntVec){
   

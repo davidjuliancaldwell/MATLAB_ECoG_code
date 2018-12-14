@@ -4,7 +4,7 @@
 % David.J.Caldwell 9.19.2018
 
 %close all;clear all;clc
-%clear all
+clear all
 Z_Constants;
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
@@ -23,7 +23,7 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75},...
     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
-modifierEP = '-reref';
+modifierEP = '-reref-orig';
 
 modifierPhase = '_13samps_10_30_40ms_randomstart';
 modifierPhase = '_51samps_12_20_40ms_randomstart';
@@ -254,6 +254,7 @@ statarrayCount = grpstats(tableBetaStim,{'subjectNum','numStims','setToDeliverPh
 figure
 grpstats(totalMags',{categorical(numStims)'},0.05)
 
+%writetable(tableBetaStim,'betaStim_outputTable.csv');
 return
 % %%
 % numSubj = 7;
@@ -425,7 +426,7 @@ set(gca,'fontsize',20)
 % fit glme
 % glme = fitglme(tableBetaStim,'magnitude~numStims+stimLevel+phaseClass+(1|sid)+(-1 + numStims | sid) + (-1 + stimLevel | sid) + (-1 + phaseClass | sid)',...
 %     'Distribution','Normal','Link','Identity','FitMethod','Laplace','DummyVarCoding','effects','EBMethod','Default')
-
+Z
 % fit glme
 glme = fitglme(tableBetaStim,'magnitude~numStims+stimLevel+phaseClass+(-1+numStims | sid) + (-1+stimLevel | sid) + (phaseClass | sid)',...
     'Distribution','Normal','Link','Identity','FitMethod','Laplace','DummyVarCoding','effects','EBMethod','Default')

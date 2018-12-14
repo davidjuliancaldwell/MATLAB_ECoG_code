@@ -9,9 +9,19 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 %% additional options
 
 savePlot = 0;
-saveIt = 0;
-plotIt = 1;
+saveIt = 1;
+plotIt = 0;
 plotItTrials = 0;
+plotItStimArtifact = 0;
+chanInt = 31;
+labelChoice = 0;
+shuffleSig = 0;
+avgTrials = 0;
+numAvg = 3;
+smoothPP = 1;
+shuffleSigPP = 0;
+rerefMode = 'median';
+
 %%
 for idx = 2:9
     sid = SIDS{idx};
@@ -47,8 +57,8 @@ for idx = 2:9
             bads = [1 2 3 31 57];
             rerefChans = [4:29 32:37 41:45 49:52 57:61 ];
             
-            t_min = 0.003;
-            t_max = 0.033;
+            t_min = 0.005;
+            t_max = 0.036;
         case '7dbdec'
             block = 'BetaPhase-17';
             rerefChans = [1:3 7 15 1:16 17:19 22:24 33:56 58:64];
@@ -101,7 +111,7 @@ for idx = 2:9
             goods = sort([55 63 54 47 48]);
             bads = [57:64];
             
-            t_min = 0.008;
+            t_min = 0.006;
             t_max = 0.06;
         case '0b5a2e' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
@@ -123,7 +133,7 @@ for idx = 2:9
             goods = [ 14 21 23];
             bads = [24 25 29];
             t_min = 0.005;
-            t_max = 0.075;
+            t_max = 0.06;
         case '0b5a2ePlayback' % added DJC 7-23-2015
             tp = strcat(SUB_DIR,'\0b5a2e\data\d8\0b5a2e_BetaStim\0b5a2e_BetaStim');
             
@@ -140,7 +150,7 @@ for idx = 2:9
             goods = sort([12 13 14 15 16 21 23 31 32 39 40]);
             bads = [24 25 29];
             t_min = 0.005;
-            t_max = 0.075;
+            t_max = 0.06;
         otherwise
             error('unknown SID entered');
     end
@@ -148,9 +158,7 @@ for idx = 2:9
     badsTotal = [stims bads];
     
     chans = [1:64];
-    chans = goods;
     chans(ismember(chans, badsTotal)) = [];
-    chans = [14 23 31];
     %% load in the trigger data
     
     tank = TTank;
@@ -261,7 +269,6 @@ for idx = 2:9
         winsReref(:,:,chan) = wins;
     end
     
-    rerefMode = 'median';
     switch(rerefMode)
         case 'mean'
             rerefQuant = mean(winsReref,3);
@@ -293,64 +300,6 @@ for idx = 2:9
         
         fac = fs/efs;
         
-        %% preprocess eco
-        %             presamps = round(0.050 * efs); % pre time in sec
-        % pre time
-        presamps = round(0.025 * efs); % pre time in sec
-        
-        % if doing zscore, try 0.3, otherwise .120 is good. Looks like
-        % conditioning stimuli sometimes begin around 80 ms after? so if
-        % you zscore normalize bad news bears
-        postsamps = round(0.120 * efs); % post time in sec, % modified DJC to look at up to 300 ms after
-        
-        sts = round(stims(2,:) / fac);
-        edd = zeros(size(sts));
-        
-        temp = squeeze(getEpochSignal(eco', sts-presamps, sts+postsamps+1));
-        foo = mean(temp,2);
-        lastsample = round(0.040 * efs);
-        foo(lastsample:end) = foo(lastsample-1);
-        
-        last = find(abs(zscore(foo))>1,1,'last');
-        last2 = find(abs(diff(foo))>30e-6,1,'last')+1;
-        
-        zc = false;
-        
-        if (isempty(last2))
-            if (isempty(last))
-                error ('something seems wrong in the triggered average');
-            else
-                ct = last;
-            end
-        else
-            if (isempty(last))
-                ct = last2;
-            else
-                ct = max(last, last2);
-            end
-        end
-        % try getting rid of this part for 0b5a2e to conserve that initial
-        % spike DJC 1-7-2016
-        while (~zc && ct <= length(foo))
-            zc = sign(foo(ct-1)) ~= sign(foo(ct));
-            ct = ct + 1;
-        end
-        % consider 3 ms? DJC - 1-5-2016
-        if (ct > max(last, last2) + 0.10 * efs) % marched along more than 10 msec, probably gone to far
-            ct = max(last, last2);
-        end
-        
-        %         if strcmp(sid,'ecb43e')
-        %             for sti = 1:length(sts)
-        %                 win = (sts(sti)-presamps):(sts(sti)+postsamps+1);
-        %
-        %                 %           interpolation approach
-        %                 eco(win(presamps:(ct-1))) = interp1([presamps-1 ct], eco(win([presamps-1 ct])), presamps:(ct-1));
-        %             end
-        %
-        %             eco = toRow(notch(eco, [60 120 180 240], efs, 2, 'causal'));
-        %         end
-        %
         %% process triggers
         
         if (strcmp(sid, '8adc5c'))
@@ -373,8 +322,6 @@ for idx = 2:9
             pts = stims(3,:) == 0;
         elseif (strcmp(sid, '0b5a2ePlayback'))
             pts = stims(3,:) == 0;
-        elseif (strcmp(sid,'3f2113'))
-            pts = stims(3,:) == 0;
             
         else
             error 'unknown sid';
@@ -387,12 +334,9 @@ for idx = 2:9
         
         t = (-presamps:postsamps)/efs;
         
-        index = find(t==0);
-        ct = index + ct - round(0.025*efs);
-        
         wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
         wins = wins - rerefQuant;
-        awins = wins-repmat(mean(wins(t<-0.005,:),1), [size(wins, 1), 1]);
+        awins = wins-repmat(mean(wins(t<-0.005 & t>-0.03,:),1), [size(wins, 1), 1]);
         pstims = stims(:,pts);
         
         % considered a baseline if it's been at least N seconds since the last
@@ -419,7 +363,7 @@ for idx = 2:9
         
         for typei = 1:length(types)
             
-            probes = pstims(5,:) < .50*fs & bursts(5,pstims(4,:))==types(typei);
+            probes = pstims(5,:) < .5*fs & bursts(5,pstims(4,:))==types(typei);
             
             if (sum(probes) < 100)
                 warning('N probes = %d.', sum(probes));
@@ -446,44 +390,21 @@ for idx = 2:9
             end
             
             keeps = probes | baselines;
-            
             load('line_colormap.mat');
-            awins = wins-repmat(mean(wins(t<-0.005,:),1), [size(wins, 1), 1]);
             
             kwins = awins(:, keeps);
             klabel = label(keeps);
             ulabels = unique(klabel);
             colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
-            %
-            %             tMin = t_min;
-            %             tMax = t_max;
-            %
-            %             a1 = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
-            %             a1Median = median(a1);
-            %             a1 = a1 - median(a1(label(keeps)==0));
-            %
-            %             a = 1e6*max(abs((awins(t>tMin & t < tMax,keeps))));
-            %             dataForAnova{chan}{typei} = {a label keeps};
-            %
-            %             [anovaNull,tableNull,statsNull] = anova1(a1', label(keeps), 'on');
-            %             [c,m,h,gnames] = multcompare(statsNull,'display','on');
-            %             sigChans{chan}{typei} = {m c a1Median a1 label keeps};
-            %
-            %% peak to peak values
-            % tBegin = 0.01;
-            % tEnd = 0.06;
             
             tBegin = t_min;
             tEnd = t_max;
-            smooth = 1;
-            avgTrials = 0;
             if avgTrials
                 awinsNew = [];
                 labelNew = [];
                 keepsNew = [];
                 for i = 1:length(ulabels)
                     awinsInt = awins(:,label == ulabels(i) & keeps);
-                    numAvg = 5;
                     [awinsAvg] = avg_every_p_elems(awinsInt,numAvg);
                     awinsNew = [awinsNew awinsAvg];
                     labelSpecific = repmat(ulabels(i),size(awinsAvg,2),1);
@@ -498,11 +419,16 @@ for idx = 2:9
                 klabel = label;
             end
             %%
-            [signalPP,pkLocs,trLocs] =  extract_PP_betaStim(awins,t,tBegin,tEnd,smooth);
+            
+            if plotItStimArtifact && chan == chanInt
+                plot_stimArtifact_CEPs(t,kwins,klabel,labelChoice);
+            end
+            %%
+            
+            [signalPP,pkLocs,trLocs] =  extract_PP_betaStim(awins,t,tBegin,tEnd,smoothPP);
             
             dataForPPanalysis{chan}{typei} = {signalPP pkLocs trLocs label keeps};
             
-            shuffleSigPP = 1;
             if shuffleSigPP
                 % need to do for each type
                 CCEPbyNumStim = {};
@@ -528,32 +454,14 @@ for idx = 2:9
             end
             
             kruskalWallisStats{chan}{typei} = {kruskalWallisResult table stats};
-            %% zscore
-            plotItTrials = 1;
-            %             for i = 1:length(ulabels)-1
-            %                 total = 1e6*(awins(:,keeps));
-            %                 base = 1e6*(awins(:,label==0 & keeps));
-            %                 test = 1e6*(awins(:,label==i & keeps));
-            %                 %[zT,magT,latT] = zscoreCCEP(total,test,t,tMin,tMax);
-            %                 [zT,magT,latT] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
-            %                 %[zB,magB,latB] = zscoreCCEP(total,base,t,tMin,tMax);
-            %                 [zB,magB,latB] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
-            %                 CCEPbyNumStim{chan}{typei}{i} = {zT magT latT zB magB latB};
-            %             end
-            %
-            %             % zscore INDIVIDUAL FOR ANOVA 4-7-2016 DJC
-            %             total = 1e6*(awins(:,keeps));
-            %             %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
-            %             [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotItTrials);
             
-            shuffleSig = 1;
             if shuffleSig
                 % need to do for each type
                 CCEPbyNumStim = {};
                 for i = 1:length(ulabels)-1
                     t_minS = tBegin;
                     t_maxS = tEnd;
-                                        Nperm = 1000;
+                    Nperm = 1000;
                     sp = 95;
                     extractedSigs = 1e6*((awins(t>t_minS & t<t_maxS,:)));
                     extractedSigsBase = extractedSigs(:,label==0 & keeps);
@@ -593,7 +501,7 @@ for idx = 2:9
                 end
             end
             
-            if plotIt
+            if plotIt && any(chan==goods)
                 %
                 %  if kruskalWallisResult < 0.05/statThresh
                 %%
@@ -602,10 +510,7 @@ for idx = 2:9
                 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
                 subplot(3,1,1);
                 
-                % original
                 prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
-                % xlim(1e3*[-0.025 max(t)]);
-                
                 xlim(1e3*[min(t) max(t)]);
                 yl = ylim;
                 yl(1) = min(-10, max(yl(1),-140*4));
@@ -616,17 +521,11 @@ for idx = 2:9
                 
                 ylim(yl);
                 
-                
-                xlim([-10 50])
+                xlim([-10 60])
                 ylim([-500 500])
                 
-                
-                %                 highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5]) %this is the part that plots that stim window
-                %
-                %                 xlim([-10 50])
-                %                 ylim([-300 300])
-                
-                vline(1e3*7/efs);
+              %  vline(1e3*7/efs);
+              vline(0);
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
                 %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
@@ -660,7 +559,7 @@ for idx = 2:9
                 yl(2) = max(10, min(yl(2),100*4));
                 ylim(yl);
                 
-                xlim([-10 50])
+                xlim([-10 60])
                 ylim([-500 500])
                 
                 %                 highlight(gca, [0 t(ct)*1e3], [], [.5 .5 .5])
@@ -706,15 +605,13 @@ for idx = 2:9
             end
         end
         
-        
     end
     if saveIt
         save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig-reref.mat']), 'dataForPPanalysis','kruskalWallisStats');
         %close all;
         fprintf('saved %s:\n',sid);
         
-        clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR savePlot saveIt plotIt plotItTrials
-        
+        clearvars -except idx SIDS OUTPUT_DIR META_DIR SUB_DIR savePlot saveIt plotIt plotItTrials rerefMode plotItStimArtifact chanInt labelChoice shuffleSig avgTrials numAvg smoothPP shuffleSigPP
     end
 end
 
