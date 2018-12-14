@@ -23,7 +23,7 @@ shuffleSigPP = 0;
 rerefMode = 'median';
 
 %%
-for idx = 2:9
+for idx = 7:9
     sid = SIDS{idx};
     
     switch(sid)

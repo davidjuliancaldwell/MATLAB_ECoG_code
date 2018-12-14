@@ -3,8 +3,8 @@
 %
 % David.J.Caldwell 9.19.2018
 
-%close all;clear all;clc
-clear all
+close all;clear all;clc
+%clear all
 Z_Constants;
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
@@ -23,7 +23,7 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75},...
     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
-modifierEP = '-reref-orig';
+modifierEP = '-reref-30';
 
 modifierPhase = '_13samps_10_30_40ms_randomstart';
 modifierPhase = '_51samps_12_20_40ms_randomstart';
@@ -147,6 +147,9 @@ for sid = SIDS(1:end-1)
         tempLabelScreen = dataForPPanalysis{chan}{1}{4};
         tempKeepsScreen = dataForPPanalysis{chan}{1}{5};
         
+        %%%%%%%%%%%%%%%%%%%%%%
+        % want to code channel as unique to each subject 
+        
         if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > epThresholdMag
             if chan == betaChan
                 beta = 1;
@@ -229,6 +232,7 @@ for sid = SIDS(1:end-1)
             sidString = repmat(sid,lengthToRep,1);
             sidCell = cellstr(sidString)';
             subjectNumInd = repmat(subjectNum,1,lengthToRep);
+                    chan = (subjectNum*100)+chan; % code channel differently to keep straight later 
             chanLabels = [chanLabels repmat(chan,lengthToRep,1)'];
             betaLabels = [betaLabels repmat(beta,lengthToRep,1)'];
             betaSID = [betaSID{:} sidCell];
@@ -254,7 +258,7 @@ statarrayCount = grpstats(tableBetaStim,{'subjectNum','numStims','setToDeliverPh
 figure
 grpstats(totalMags',{categorical(numStims)'},0.05)
 
-%writetable(tableBetaStim,'betaStim_outputTable.csv');
+writetable(tableBetaStim,'betaStim_outputTable_30.csv');
 return
 % %%
 % numSubj = 7;

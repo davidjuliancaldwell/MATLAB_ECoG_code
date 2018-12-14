@@ -18,7 +18,7 @@ figWidth = 8
 figHeight = 6 
 
 
-data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_100.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
+data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
 data <- subset(data, magnitude<1000)
 data <- subset(data,!is.nan(data$magnitude))
@@ -123,9 +123,10 @@ summary(glht(fit.lmm,linfct=mcp(numStims="Tukey")))
 summary(glht(fit.lmm,linfct=mcp(betaLabels="Tukey")))
 summary(glht(fit.lmm,linfct=mcp(phaseClass="Tukey")))
 
-fit.lmm2 = lmer(percentDiff~numStims+phaseClass+betaLabels+channel + (-1 + numStims | sid) + (betaLabels | sid) + (1| sid) ,data=dataNoBaseline)
+fit.lmm2 = lmer(percentDiff~numStims+phaseClass+betaLabels + (1 + numStims|sid/channel) + (phaseClass|sid/channel) ,data=dataNoBaseline)
 plot(fit.lmm2)
-summary(fit.lmm2)
+qqnorm(resid(fit.lmm2))
+qqline(resid(fit.lmm2))  #summary(fit.lmm2)
 confint(fit.lmm2,method="boot")
 summary(glht(fit.lmm2,linfct=mcp(numStims="Tukey")))
 summary(glht(fit.lmm2,linfct=mcp(betaLabels="Tukey")))
