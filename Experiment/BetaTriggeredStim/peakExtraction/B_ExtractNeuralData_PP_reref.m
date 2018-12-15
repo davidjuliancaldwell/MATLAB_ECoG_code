@@ -16,14 +16,14 @@ plotItStimArtifact = 0;
 chanInt = 31;
 labelChoice = 0;
 shuffleSig = 0;
-avgTrials = 0;
+avgTrials = 1;
 numAvg = 3;
 smoothPP = 1;
 shuffleSigPP = 0;
 rerefMode = 'median';
 
 %%
-for idx = 7:9
+for idx = 2:9
     sid = SIDS{idx};
     
     switch(sid)
@@ -336,7 +336,6 @@ for idx = 7:9
         
         wins = squeeze(getEpochSignal(eco', ptis-presamps, ptis+postsamps+1));
         wins = wins - rerefQuant;
-        awins = wins-repmat(mean(wins(t<-0.005 & t>-0.03,:),1), [size(wins, 1), 1]);
         pstims = stims(:,pts);
         
         % considered a baseline if it's been at least N seconds since the last
@@ -362,6 +361,7 @@ for idx = 7:9
         nullType = 2;
         
         for typei = 1:length(types)
+            awins = wins-repmat(mean(wins(t<-0.005 & t>-0.05,:),1), [size(wins, 1), 1]);
             
             probes = pstims(5,:) < .5*fs & bursts(5,pstims(4,:))==types(typei);
             
@@ -448,7 +448,7 @@ for idx = 7:9
             %%
             
             [kruskalWallisResult,table,stats] = kruskalwallis(signalPP(keeps), label(keeps), 'off');
-            if kruskalWallisResult < 0.05/statThresh
+            if kruskalWallisResult < 0.05/statThresh && plotIt
                 figure
                 [c,m,h,gnames] = multcompare(stats,'display','on');
             end
@@ -524,8 +524,8 @@ for idx = 7:9
                 xlim([-10 60])
                 ylim([-500 500])
                 
-              %  vline(1e3*7/efs);
-              vline(0);
+                %  vline(1e3*7/efs);
+                vline(0);
                 xlabel('time (ms)');
                 ylabel('ECoG (uV)');
                 %                 title(sprintf('EP By N_{CT}: %s, %d, {%s}', sid, chan, suffix{typei}))
@@ -607,7 +607,7 @@ for idx = 7:9
         
     end
     if saveIt
-        save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig-reref.mat']), 'dataForPPanalysis','kruskalWallisStats');
+        save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig-reref-3avg-50ms.mat']), 'dataForPPanalysis','kruskalWallisStats');
         %close all;
         fprintf('saved %s:\n',sid);
         
