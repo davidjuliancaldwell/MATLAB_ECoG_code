@@ -1,3 +1,4 @@
+# ----
 setwd('C:/Users/david/SharedCode/MATLAB_ECoG_code/Experiment/BetaTriggeredStim/')
 
 library('nlme')
@@ -17,16 +18,15 @@ savePlot = 0
 figWidth = 8 
 figHeight = 6 
 
-
+# ----
 data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50_3avg.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
-data <- subset(data, magnitude<1000)
+#data <- subset(data, magnitude<1000)
 data <- subset(data,!is.nan(data$magnitude))
-
+data <- subset(data,data$sid!='702d24')
 # rename for ease
 data$numStims <- revalue(data$numStims, c("Test 1"="[1,2]","Test 2"="[3,4]","Test 3"="[5,inf)"))
-
-
+#data$phaseClass <- revalue(data$phaseClass, c("90"=0,"270"=1))
 
 data$percentDiff = 0
 for (name in unique(data$sid)){
@@ -44,7 +44,15 @@ for (name in unique(data$sid)){
   }
 }
 
+sapply(data,class)
+#summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), function(x) mean(x[,"percentDiff"]))
+summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel,betaLabels), summarize, percentDiff = mean(percentDiff))
+
 dataNoBaseline = data[data$numStims != "Base",]
+
+
+# ----
+
 #data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable.csv"),header=TRUE,sep = ",",stringsAsFactors=F)
 ggplot(data, aes(x=magnitude)) + 
   geom_histogram(binwidth=100)
@@ -56,10 +64,6 @@ ggplot(data, aes(x=magnitude)) +
 p<-ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
   geom_boxplot(position=position_dodge(1))
 p
-
-
-#summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), function(x) mean(x[,"percentDiff"]))
-summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), summarize, percentDiff = mean(percentDiff))
 
 # Change box plot colors by groups
 # ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
@@ -93,6 +97,7 @@ p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
 p2 
 p2 + geom_hline(yintercept=0) + theme_classic()
 
+# ----
 
 #fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
 #fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
@@ -103,9 +108,25 @@ plot(fit.glm)
 summary(glht(fit.glm,linfct=mcp(phaseClass="Tukey")))
 summary(glht(fit.glm,linfct=mcp(numStims="Tukey")))
 
+p <- ggplot(dataNoBaseline, aes(x=numStims, y=percentDiff, colour=phaseClass)) +
+  geom_point(size=3) +
+  geom_line(aes(y=predict(fm2), group=Subject, size="Subjects")) +
+  geom_line(data=newdat, aes(y=predict(fm2, level=0, newdata=newdat), size="Population")) +
+  scale_size_manual(name="Predictions", values=c("Subjects"=0.5, "Population"=3)) +
+  theme_bw(base_size=22) 
+print(p)
+
+p2 <- ggplot(dataNoBaseline, aes(x=numStims, y=percentDiff,fill=phaseClass)) + theme_classic(base_size = 18) +
+  geom_boxplot(binaxis='y',binwidth=2,stackdir='center', 
+               position=position_dodge(0.8)) +
+  geom_dotplot(data = dataNoBaseline, aes(y=predict(fit.lmm2,level=0,newdata = dataNoBaseline))) +
+  labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')+ 
+  geom_hline(yintercept=0) 
+p2
+
 #fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
 #fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
-fit.glm2    = glm(magnitude ~ numStims+phaseClass+betaLabels+channel,data=data)
+fit.glm2    = glm(magnitude ~ numStims+phaseClass+betaLabels,data=data)
 
 summary(fit.glm2)
 plot(fit.glm2)
@@ -124,7 +145,8 @@ summary(glht(fit.lmm,linfct=mcp(betaLabels="Tukey")))
 summary(glht(fit.lmm,linfct=mcp(phaseClass="Tukey")))
 
 fit.lmm2 = lmer(percentDiff~numStims+phaseClass+betaLabels + (1 | sid/channel) ,data=dataNoBaseline)
-
+RIaS = unlist(ranef(fit.lmm2))
+FixedEff = fixef(fit.lmm2)
 #fit.lmm2 = lmer(percentDiff~numStims+phaseClass+betaLabels + (1 + numStims|sid/channel) + (phaseClass|sid/channel) ,data=dataNoBaseline)
 plot(fit.lmm2)
 qqnorm(resid(fit.lmm2))
@@ -133,6 +155,22 @@ confint(fit.lmm2,method="boot")
 summary(glht(fit.lmm2,linfct=mcp(numStims="Tukey")))
 summary(glht(fit.lmm2,linfct=mcp(betaLabels="Tukey")))
 summary(glht(fit.lmm2,linfct=mcp(phaseClass="Tukey")))
+
+#
+
+#fit.lmm3 = lmer(percentDiff~numStims+phaseClass + betaLabels +  (1 | sid/channel) ,data=summaryData)
+fit.lmm3 = lmer(percentDiff~numStims+phaseClass + betaLabels  +  (1 | sid) ,data=summaryData)
+
+summary(fit.lmm3)
+qqnorm(resid(fit.lmm3))
+qqline(resid(fit.lmm3))  #summary(fit.lmm2)
+summary(glht(fit.lmm3,linfct=mcp(numStims="Tukey")))
+summary(glht(fit.lmm3,linfct=mcp(betaLabels="Tukey")))
+summary(glht(fit.lmm3,linfct=mcp(phaseClass="Tukey")))
+
+dataSubjOnly <- subset(data,data$sid=='0b5a2e')
+fit.lmm4 = lmer(percentDiff~numStims+phaseClass + betaLabels +  (1 | channel) ,data=dataSubjOnly)
+summary(fit.lmm4)
 
 
 # xtra ss test
