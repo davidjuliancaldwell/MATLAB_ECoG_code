@@ -5,7 +5,7 @@
 % David.J.Caldwell 8.26.2018
 %%
 close all;clear all;clc
-baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery';
+baseDir = 'C:\Users\david\Data\Output\BetaTriggeredStim\PhaseDelivery';
 addpath(baseDir);
 
 OUTPUT_DIR = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery\plots';
@@ -17,14 +17,14 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],53},...
     {'s',180,3,[11 12],[57],4},...
     {'s',270,4,[59 60],[1 9 10 35 43],51},...
     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],5},...
-    {'t',[270,90],6,[56 64],[57:64],55},...
+    {'t',[270,90,12345],6,[56 64],[57:64],55},...
     {'m',[90,270],7,[22 30],[24 25 29],31},...
     {'m',[90,270],8,[22 30],[24 25 29],31}};
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 modifier = '_51samps_12_20_60ms_randomstart';
 modifier = '_51samps_12_20_40ms_randomstart';
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
-
+SIDS = {'d5cd55'};
 %SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
 %SIDS = {'ecb43e'};
 %gcp;  %parallel pool
@@ -106,6 +106,10 @@ for sid = SIDS
     end
     if strcmp(type,'s') || strcmp(type,'t')
         %%
+        if strcmp(type,'t')
+            desiredF(1) = 12345;
+        end
+        
         if rawPlot
             signalType = 'unfiltered';
             

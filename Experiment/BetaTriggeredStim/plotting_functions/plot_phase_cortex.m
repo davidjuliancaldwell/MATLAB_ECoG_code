@@ -106,7 +106,7 @@ switch typePlot
         PlotDotsDirect(sid, locs(chans,:), weights, 'b',...
             [-pi pi], markerSize,cmap,[],false,false)
         title({['Subject ' num2str(subjectNum) ' '  signalType ' signal stimulation phase delivery '],...
-            ['for desired frequency of ' num2str(desiredF(1)) char(176) ]})
+            ['for desired phase of ' num2str(desiredF(1)) char(176) ]})
         phasemap()
         phasebar('location','nw','deg')
         
@@ -115,19 +115,19 @@ switch typePlot
             [0 180], markerSize,cmap,[],false,false)
         colormap(cmap);
         cbar = colorbar;
-        cbar.Label.String = 'difference in degrees from desired frequency';
+        cbar.Label.String = 'difference in degrees from desired phase';
         
         title({['Subject ' num2str(subjectNum) ' '  signalType ' signal stimulation delivery difference'],...
-            ['from desired frequency of ' num2str(desiredF(1)) char(176) ]})
+            ['from desired phase of ' num2str(desiredF(1)) char(176) ]})
     case 'direcDiff'
         PlotDotsDirect(sid, locs(chans,:), weights, 'b',...
             [-max(abs(weights)) max(abs(weights))], markerSize,cmap,[],false,false)
         colormap(cmap);
         cbar = colorbar;
-        cbar.Label.String = 'difference in degrees from desired frequency';
+        cbar.Label.String = 'difference in degrees from desired phase';
         
         title({['Subject ' num2str(subjectNum) ' '  signalType ' signal stimulation delivery difference'],...
-            ['from desired frequency of ' num2str(desiredF(1)) char(176) ]})
+            ['from desired phase of ' num2str(desiredF(1)) char(176) ]})
 end
 
 

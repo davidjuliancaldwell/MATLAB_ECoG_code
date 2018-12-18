@@ -7,7 +7,7 @@ saveIt = 0;
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 %%
-for idx = 3:9
+for idx = 2:9
     sid = SIDS{idx};
     
     switch(sid)

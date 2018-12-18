@@ -13,7 +13,6 @@ library('multcomp')
 library('plyr')
 library('here')
 library('lmerTest')
-library('sjPlot')
 
 rootDir = here()
 
@@ -22,12 +21,10 @@ figWidth = 8
 figHeight = 6 
 
 # ----
-data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50_3avg.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
+data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_100.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
-data <- subset(data, magnitude<1000)
+#data <- subset(data, magnitude<800)
 data <- subset(data,!is.nan(data$magnitude))
-data <- subset(data,data$sid!='702d24')
-data <- subset(data,data$sid!='0b5a2ePlayBack')
 data <- subset(data,data$numStims!='Null')
 # rename for ease
 data$numStims <- revalue(data$numStims, c("Test 1"="[1,2]","Test 2"="[3,4]","Test 3"="[5,inf)"))
@@ -54,7 +51,7 @@ sapply(data,class)
 summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel,betaLabels), summarize, percentDiff = mean(percentDiff))
 
 dataNoBaseline = data[data$numStims != "Base",]
-dataSubjOnly <- subset(data,data$sid=='0b5a2e')
+dataSubjOnly <- subset(data,data$sid=='0b5a2e' | data$sid=='0b5a2ePlayback')
 
 
 # ----
@@ -193,7 +190,7 @@ summary(glht(fit.lmm2,linfct=mcp(betaLabels="Tukey")))
 summary(glht(fit.lmm2,linfct=mcp(phaseClass="Tukey")))
 
 #
-############ BEST ONE RIGHT NOW
+
 #fit.lmm3 = lmer(percentDiff~numStims+phaseClass + betaLabels +  (1 | sid/channel) ,data=summaryData)
 fit.lmm3 = lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
 

@@ -70,8 +70,7 @@ if numel(phase(rSquare>threshold))
     
     if polarHistogramBool
         radVec = deg2rad([0:10:360]);
-        
-        figure
+       
         %polarhistogram(phase(rSquare>threshold),'binedges',radVec,'FaceColor','white')
         
         circPlot = circ_plot(phase(rSquare>threshold & f>fThresholdMin & f<fThresholdMax),'hist',[],20,true,true,'linewidth',2,'color','r');
@@ -93,7 +92,7 @@ if numel(phase(rSquare>threshold))
         annot.FontSize = 16;
         
         set(circPlot,'fontsize',16)
-               
+    
         if saveIt
             SaveFig(OUTPUT_DIR, sprintf(['circ-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'svg');
             SaveFig(OUTPUT_DIR, sprintf(['circ-phase-%d-sid-%s-chan-%d-type-%s-filt-%s'],desiredF,sid, chan,type,signalType), 'png','-r600');

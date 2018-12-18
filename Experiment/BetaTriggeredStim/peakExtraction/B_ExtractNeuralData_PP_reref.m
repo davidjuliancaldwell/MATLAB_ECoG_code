@@ -16,14 +16,14 @@ plotItStimArtifact = 0;
 chanInt = 31;
 labelChoice = 0;
 shuffleSig = 0;
-avgTrials = 1;
+avgTrials = 0;
 numAvg = 3;
 smoothPP = 1;
 shuffleSigPP = 0;
 rerefMode = 'median';
 
 %%
-for idx = 2:9
+for idx = 7:9
     sid = SIDS{idx};
     
     switch(sid)
@@ -361,7 +361,7 @@ for idx = 2:9
         nullType = 2;
         
         for typei = 1:length(types)
-            awins = wins-repmat(mean(wins(t<-0.005 & t>-0.05,:),1), [size(wins, 1), 1]);
+            awins = wins-repmat(mean(wins(t<-0.005 & t>-0.1,:),1), [size(wins, 1), 1]);
             
             probes = pstims(5,:) < .5*fs & bursts(5,pstims(4,:))==types(typei);
             
@@ -369,11 +369,10 @@ for idx = 2:9
                 warning('N probes = %d.', sum(probes));
             end
             
-            label = bursts(4,pstims(4,:));
-            label(baselines) = 0;
             
             if (types(typei) == nullType)
-                
+                label = nan(1,length(bursts(4,pstims(4,:))));
+                label(baselines) = 0;
                 label(probes) = 1 ;
                 
             elseif (types(typei) ~= nullType)
@@ -607,7 +606,7 @@ for idx = 2:9
         
     end
     if saveIt
-        save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig-reref-3avg-50ms.mat']), 'dataForPPanalysis','kruskalWallisStats');
+        save(fullfile(OUTPUT_DIR, [sid 'epSTATS-PP-sig-reref-100.mat']), 'dataForPPanalysis','kruskalWallisStats');
         %close all;
         fprintf('saved %s:\n',sid);
         

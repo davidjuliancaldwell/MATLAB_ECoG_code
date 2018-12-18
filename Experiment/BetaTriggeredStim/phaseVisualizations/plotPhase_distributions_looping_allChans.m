@@ -5,11 +5,11 @@
 % David.J.Caldwell 8.26.2018
 %%
 %close all;clear all;clc
-close all
-baseDir = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery\';
+%close all
+baseDir = 'C:\Users\david\Data\Output\BetaTriggeredStim\PhaseDelivery\';
 addpath(baseDir);
 
-OUTPUT_DIR = 'C:\Users\djcald.CSENETID\Data\Output\BetaTriggeredStim\PhaseDelivery\allChans';
+OUTPUT_DIR = 'C:\Users\david\Data\Output\BetaTriggeredStim\PhaseDelivery\allChans';
 TouchDir(OUTPUT_DIR);
 
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
@@ -33,7 +33,7 @@ modifier = '_51samps_12_20_40ms_randomstart';
 hilbPlot = 0;
 acausalPlot = 1;
 rawPlot = 1;
-saveIt = 1;
+saveIt = 0;
 threshold = 0.7; %r^2
 % fThresholdMin = 10.01; % Hz2
 % fThresholdMax = 29.99; % Hz
@@ -43,9 +43,8 @@ fThresholdMin = 12.01; % Hz
  %fThresholdMin = 10.01; % Hz
  %fThresholdMax = 29.99; % Hz
 
-%SIDS = {'d5cd55'};
-%SIDS = {'0b5a2ePlayback'};
-
+%SIDS = {'d5cd55','0b5a2e','0b5a2ePlayback'};
+SIDS = {'0b5a2ePlayback'};
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for sid = SIDS

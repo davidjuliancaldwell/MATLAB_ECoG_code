@@ -14,18 +14,29 @@ OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
 
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
 
-valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53,2.5},...
-    {'m',[0 180],2,[55 56],[1 2 3 31 57],[39 40 47 48 63 64],64,3},...
-    {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4,3.5},...
-    {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51,0.75},...
-    {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
-    {'t',[270,90,12345,12345],6,[56 64],[57:63],[46 48 54 55 63],55,1.75}...
-    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75},...
-    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75}};
-M = containers.Map(SIDS,valueSet,'UniformValues',false);
-modifierEP = '-reref-3avg-50ms';
+% valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53,2.5},...
+%     {'m',[0 180],2,[55 56],[1 2 3 31 57],[39 40 47 48 63 64],64,3},...
+%     {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4,3.5},...
+%     {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51,0.75},...
+%     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
+%     {'t',[270,90,12345,12345],6,[56 64],[57:63],[46 48 54 55 63],55,1.75}...
+%     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75},...
+%     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31,1.75}};
 
-modifierPhase = '_13samps_10_30_40ms_randomstart';
+
+valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 52 53 55 60 61 63],53,2.5},...
+    {'m',[0 180],2,[55 56],[1 2 3 31 57],[47 48 64],64,3},...
+    {'s',180,3,[11 12],[57],[4 5 10 13],4,3.5},...
+    {'s',270,4,[59 60],[1 9 10 35 43],[50 51 52 53 58],51,0.75},...
+    {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
+    {'t',[270,90,12345,12345],6,[56 64],[57:63],[47 48 54 55 63],55,1.75}...
+    {'m',[90,270],7,[22 30],[24 25 29],[14 15 16 20 21 23 31 32 40],31,1.75},...
+    {'m',[90,270],8,[22 30],[24 25 29],[14 15 16 20 21 23 31 32 40],31,1.75}};
+
+M = containers.Map(SIDS,valueSet,'UniformValues',false);
+modifierEP = '-reref-100';
+
+%modifierPhase = '_13samps_10_30_40ms_randomstart';
 modifierPhase = '_51samps_12_20_40ms_randomstart';
 % decide how to plot circles - std deviation or vector length
 markerToUse = 'vecLength';
@@ -65,8 +76,8 @@ phaseDeliveryBinned = [];
 % exclude playback for now
 % which
 subdir = 'PeaktoPeakEP';
-
-for sid = SIDS(1:end-1)
+%%
+for sid = SIDS(1:end)
     
     sid = sid{:};
     subjid = sid;
@@ -93,7 +104,7 @@ for sid = SIDS(1:end-1)
     % figure out number of test conditions
     numTypes = length(dataForPPanalysis{betaChan});
     
-    if strcmp(sid,'0b5a2e') || strcmp(sid,'0b5a2ePlayback') || strcmp(sid,'ecb43e')
+    if strcmp(sid,'0b5a2e') || strcmpi(sid,'0b5a2eplayback') || strcmp(sid,'ecb43e')
         nullType = 3;
     else
         nullType = NaN;
@@ -108,9 +119,9 @@ for sid = SIDS(1:end-1)
     peakPhaseRep = [];
     indexVec = [];
     
-    load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
-    load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
-    
+    %     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
+    %     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
+    %
     fprintf(['running for subject ' sid '\n']);
     
     %%
@@ -148,7 +159,7 @@ for sid = SIDS(1:end-1)
         tempKeepsScreen = dataForPPanalysis{chan}{1}{5};
         
         %%%%%%%%%%%%%%%%%%%%%%
-        % want to code channel as unique to each subject 
+        % want to code channel as unique to each subject
         
         if nanmean(tempMagScreen(tempLabelScreen ==0 & tempKeepsScreen)) > epThresholdMag
             if chan == betaChan
@@ -156,6 +167,7 @@ for sid = SIDS(1:end-1)
             else
                 beta = 0;
             end
+            
             for ii = 1:numTypes
                 if ii ~= nullType
                     tempMag = 1e6*dataForPPanalysis{chan}{ii}{1};
@@ -225,6 +237,47 @@ for sid = SIDS(1:end-1)
                         bTest = cellstr(numTest)';
                         numStims = [numStims{:} bTest];
                     end
+                    
+                elseif ii == nullType
+                    
+                    tempMag = 1e6*dataForPPanalysis{chan}{ii}{1};
+                    tempLabel = dataForPPanalysis{chan}{ii}{4};
+                    tempKeeps = dataForPPanalysis{chan}{ii}{5};
+                    
+                    tempTest = tempMag(tempLabel~=0 & tempKeeps);
+                    uniqueLabel = unique(tempLabel(~isnan(tempLabel)));
+                    
+                    lengthType = length(tempTest);
+                    
+                    % check for empty
+                    if ~isempty((tempTest))
+                        lengthItems = lengthItems +lengthType;
+                        vecType = repmat('null',lengthType,1);
+                        vecTypeC = string(vecType)';
+                        anovaType = [anovaType{:} vecTypeC];
+                        
+                        phaseVec = repmat(nan,lengthType,1)';
+                        phaseDelivery = [phaseDelivery phaseVec];
+                        
+                        phaseBinned = phaseVec;
+                        phaseDeliveryBinned = [phaseDeliveryBinned phaseBinned];
+                        
+                        
+                        numTest = [];
+                        tempTestOrdered = [];
+                        typeResp = [];
+                        
+                        numTestTemp = repmat(['Null'],sum(tempLabel(tempKeeps) == uniqueLabel(2)),1);
+                        numTest = [numTest; numTestTemp];
+                        tempTestOrdered = [tempTestOrdered tempMag(tempLabel == uniqueLabel(2) & tempKeeps)];
+                        
+                        
+                        typeResp = [tempTestOrdered];
+                        totalMags = [totalMags typeResp];
+                        
+                        bTest = cellstr(numTest)';
+                        numStims = [numStims{:} bTest];
+                    end
                 end
             end
             
@@ -232,7 +285,7 @@ for sid = SIDS(1:end-1)
             sidString = repmat(sid,lengthToRep,1);
             sidCell = cellstr(sidString)';
             subjectNumInd = repmat(subjectNum,1,lengthToRep);
-                    chan = (subjectNum*100)+chan; % code channel differently to keep straight later 
+            chan = (subjectNum*100)+chan; % code channel differently to keep straight later
             chanLabels = [chanLabels repmat(chan,lengthToRep,1)'];
             betaLabels = [betaLabels repmat(beta,lengthToRep,1)'];
             betaSID = [betaSID{:} sidCell];
@@ -258,7 +311,7 @@ statarrayCount = grpstats(tableBetaStim,{'subjectNum','numStims','setToDeliverPh
 figure
 grpstats(totalMags',{categorical(numStims)'},0.05)
 
-writetable(tableBetaStim,'betaStim_outputTable_50_3avg.csv');
+writetable(tableBetaStim,'betaStim_outputTable_100.csv');
 return
 % %%
 % numSubj = 7;
