@@ -2,14 +2,13 @@
 %close all; clear all;clc
 
 Z_Constants;
-addpath ./scripts/ %DJC edit 7/17/2015
 SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 %% Load in the trigger data
 %DJC 7/20/2015 - changed tp to fit David paths
 
 % select the subject from list
-sid = SIDS{7};
+sid = SIDS{4};
 
 if (strcmp(sid, '8adc5c'))
     tp = strcat(SUB_DIR,'\8adc5c\data\D6\8adc5c_BetaTriggeredStim');

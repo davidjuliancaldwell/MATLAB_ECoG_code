@@ -4,7 +4,7 @@
 
 % David.J.Caldwell 8.26.2018
 %%
-%close all;clear all;clc
+close all;clear all;clc
 %close all
 baseDir = 'C:\Users\david\Data\Output\BetaTriggeredStim\PhaseDelivery\';
 addpath(baseDir);
@@ -31,9 +31,9 @@ modifier = '_51samps_12_20_40ms_randomstart';
 %
 % settings
 hilbPlot = 0;
-acausalPlot = 1;
+acausalPlot = 0;
 rawPlot = 1;
-saveIt = 0;
+saveIt = 1;
 threshold = 0.7; %r^2
 % fThresholdMin = 10.01; % Hz2
 % fThresholdMax = 29.99; % Hz
@@ -43,8 +43,8 @@ fThresholdMin = 12.01; % Hz
  %fThresholdMin = 10.01; % Hz
  %fThresholdMax = 29.99; % Hz
 
-%SIDS = {'d5cd55','0b5a2e','0b5a2ePlayback'};
-SIDS = {'0b5a2ePlayback'};
+SIDS = {'d5cd55','ecb43e','0b5a2e','0b5a2ePlayback'};
+%SIDS = {'ecb43e'};
 %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for sid = SIDS

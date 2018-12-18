@@ -58,7 +58,7 @@ else
         case 'eps'
             print('-dpsc2', '-noui', '-painters',[destFile filetype]);
         case 'svg'
-            print('-dsvg','-noui', '-painters',[destFile filetype],opt);
+            print('-dsvg','-noui', '-painters',[destFile filetype]);
             
     end
 end

@@ -33,6 +33,8 @@ else
 end
 set(gca,'fontsize',14)
 xlim([-40 0])
+ylabel('\mu V')
+
 ylim([-max(abs(fitlineTemp(:)))-20 max(abs(fitlineTemp(:)))+20])
 
 fprintf('mean r_square value = %0.4f \n',mean(rSquare));
