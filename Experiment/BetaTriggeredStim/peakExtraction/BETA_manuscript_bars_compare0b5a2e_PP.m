@@ -21,8 +21,8 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],5
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 SIDS = {'0b5a2e','0b5a2ePlayback'};
 
-modifierEP = '-reref';
-modifierPhase = '_13samps_8_30_40ms_randomstart';
+modifierEP = '-reref-50';
+modifierPhase = '_51samps_12_20_40ms_randomstart';
 
 % decide how to plot circles - std deviation or vector length
 markerToUse = 'vecLength';
@@ -32,8 +32,8 @@ threshold = 0.7;
 %fThresholdMin = 12.01;
 %fThresholdMax = 19.99;
 
-fThresholdMin = 8.01;
-fThresholdMax = 29.99;
+fThresholdMin = 12.01;
+fThresholdMax = 19.99;
 
 markerMin = 50;
 markerMax = 200;

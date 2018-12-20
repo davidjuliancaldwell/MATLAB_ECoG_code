@@ -1,4 +1,4 @@
-# ----
+# ------------------------------------------------------------------------
 setwd('C:/Users/david/SharedCode/MATLAB_ECoG_code/Experiment/BetaTriggeredStim/')
 
 library('Hmisc')
@@ -20,10 +20,16 @@ savePlot = 0
 figWidth = 8 
 figHeight = 6 
 
-# ----
-data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_100.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
+chanInt = 14
+chanInt1 = paste0(7,chanInt)
+chanInt2 = paste0(8,chanInt)
+
+# ------------------------------------------------------------------------
+data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
 #data <- subset(data, magnitude<800)
+data <- subset(data, magnitude>25)
+
 data <- subset(data,!is.nan(data$magnitude))
 data <- subset(data,data$numStims!='Null')
 # rename for ease
@@ -48,94 +54,63 @@ for (name in unique(data$sid)){
 
 sapply(data,class)
 #summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), function(x) mean(x[,"percentDiff"]))
-summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel,betaLabels), summarize, percentDiff = mean(percentDiff))
 
 dataNoBaseline = data[data$numStims != "Base",]
-dataSubjOnly <- subset(data,data$sid=='0b5a2e' | data$sid=='0b5a2ePlayback')
+dataSubjOnly <- subset(data,data$sid=='0b5a2e' | data$sid=='0b5a2ePlayBack')
+dataSubjChanOnly <- subset(dataSubjOnly,dataSubjOnly$channel == chanInt1 | dataSubjOnly$channel == chanInt2)
+#summaryData = ddply(dataSubjOnly[dataSubjOnly$numStims != "Base",] , .(sid,phaseClass,numStims,channel,betaLabels), summarize, percentDiff = mean(percentDiff))
+#summaryData = ddply(dataSubjOnly, .(sid,phaseClass,numStims,channel,betaLabels), summarize, percentDiff = mean(percentDiff))
+summaryData = ddply(dataSubjOnly, .(sid,phaseClass,numStims,channel,betaLabels), summarize, meanMag = mean(magnitude), sdMag = sd(magnitude))
 
+summaryDataChan = subset(summaryData,summaryData$chan == chanInt1 | summaryData$chan == chanInt2)
+# ------------------------------------------------------------------------
 
-# ----
-
-#data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable.csv"),header=TRUE,sep = ",",stringsAsFactors=F)
-ggplot(data, aes(x=magnitude)) + 
-  geom_histogram(binwidth=100)
-
-# # Change box plot colors by groups
-# ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
-#   geom_boxplot()
-# Change the position
-p<-ggplot(data, aes(x=numStims, y=magnitude, fill=phaseClass)) +
-  geom_boxplot(position=position_dodge(1))
-p
 
 # Change box plot colors by groups
 # ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
 #   geom_boxplot(notch=TRUE)
 # Change the position
-p<-ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
+p<-ggplot(dataSubjChanOnly, aes(x=numStims, y=magnitude,fill=sid)) + theme_light(base_size = 18) +
   geom_boxplot(notch=TRUE,position=position_dodge(1)) +
-  geom_hline(yintercept=0)
-p
+  labs(x = 'Number of conditioning stimuli',colour = 'closed loop vs. control',title = 'Closed loop vs. control cortical evoked potentials', y = expression(paste("Voltage (",mu,"V)"))) +
+  scale_fill_hue(name="Experimental\nCondition",
+                      breaks=c("0b5a2e", "0b5a2ePlayBack"),
+                      labels=c("closed-loop", "control")) + 
+  ylim(0,max(dataSubjChanOnly$magnitude+20))
+  p
 
-p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) + theme_classic(base_size = 18) +
-  geom_dotplot(binaxis='y',binwidth=2,stackdir='center', 
-               position=position_dodge(0.8)) +
-  geom_pointrange(mapping = aes(x = numStims, y = percentDiff,color=phaseClass),
-                  stat = "summary",
-                  fun.ymin = function(z) {quantile(z,0.25)},
-                  fun.ymax = function(z) {quantile(z,0.75)},
-                  fun.y = median,
-                  position=position_dodge(0.8),size=1.2,color="black",show.legend = FALSE) +  
-  labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')+ 
-  geom_hline(yintercept=0) 
-p2
+  
+  p2<-ggplot(dataSubjChanOnly, aes(x=numStims, y=magnitude,fill=sid)) + theme_light(base_size = 18) +
+    geom_violin(position=position_dodge(1)) +
+    labs(x = 'Number of conditioning stimuli',colour = 'closed loop vs. control',title = 'Closed loop vs. control cortical evoked potentials', y = expression(paste("Voltage (",mu,"V)"))) +
+    scale_fill_hue(name="Experimental\nCondition",
+                   breaks=c("0b5a2e", "0b5a2ePlayBack"),
+                   labels=c("closed-loop", "control")) + 
+    ylim(0,max(dataSubjChanOnly$magnitude+20))
+  p2
+  
+  
 
-pd1 = position_dodge(0.2)
-pd2 = position_dodge(0.65)
-
-p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,color=phaseClass)) + theme_light(base_size = 18) +
-  geom_point(position=position_jitterdodge(dodge.width=0.65, jitter.height=0, jitter.width=0.25),
-             alpha=0.7) +
-  stat_summary(fun.data=mean_cl_boot, geom="errorbar", width=0.05, position=pd1) +
-  stat_summary(fun.y=mean, geom="point", size=2, position=pd1) +  
-  labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')+ 
-  geom_hline(yintercept=0) 
-p2
-
-pd1 = position_dodge(0.2)
-pd2 = position_dodge(0.65)
-
-p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,color=phaseClass)) + theme_light(base_size = 18) +
-  geom_point(position=position_jitterdodge(dodge.width=0.65, jitter.height=0, jitter.width=0.25),
-             alpha=0.7) +
-  stat_summary(fun.data=median_hilow,fun.args=(conf.int =0.5), geom="errorbar", width=0.05, position=pd1) +
-  stat_summary(fun.y=median, geom="point", size=2, position=pd1) +  
-  labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')+ 
-  geom_hline(yintercept=0) 
-p2
+# ------------------------------------------------------------------------
 
 
-
-p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) + 
-  geom_boxplot(mapping = aes(x = numStims, y = percentDiff,fill=phaseClass),
-               position=position_dodge(0.8),notch=TRUE)  + 
-  geom_dotplot(binaxis='y',binwidth=2,stackdir='center', 
-               position=position_dodge(0.8))+
-  labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')
-
-p2 
-p2 + geom_hline(yintercept=0) + theme_classic()
-
-# ----
-
-#fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
-#fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
-fit.glm    = glm(percentDiff ~ numStims+phaseClass+betaLabels+channel,data=dataNoBaseline)
-fit.glm    = glm(percentDiff ~ numStims+phaseClass,data=dataNoBaseline)
+fit.glm    = glm(magnitude ~ numStims+sid + numStims*sid,data=dataSubjChanOnly)
 
 summary(fit.glm)
 plot(fit.glm)
-summary(glht(fit.glm,linfct=mcp(phaseClass="Tukey")))
+
+tab_model(
+  m1, m2, 
+  pred.labels = c("Intercept", "Age (Carer)", "Hours per Week", "Gender (Carer)",
+                  "Education: middle (Carer)", "Education: high (Carer)", 
+                  "Age (Older Person)"),
+  dv.labels = c("First Model", "M2"),
+  string.pred = "Coeffcient",
+  string.ci = "Conf. Int (95%)",
+  string.p = "P-Value"
+)
+
+summary(glht(fit.glm,linfct=mcp(sid="Tukey")))
 summary(glht(fit.glm,linfct=mcp(numStims="Tukey")))
 
 p <- ggplot(dataNoBaseline, aes(x=numStims, y=percentDiff, colour=phaseClass)) +

@@ -1,12 +1,13 @@
-# ----
+# ------------------------------------------------------------------------
+
 setwd('C:/Users/david/SharedCode/MATLAB_ECoG_code/Experiment/BetaTriggeredStim/')
 
 library('Hmisc')
-library('nlme')
+#library('nlme')
 library('ggplot2')
-library('drc')
-library('minpack.lm')
-library('lmtest')
+#library('drc')
+#library('minpack.lm')
+#library('lmtest')
 library('glmm')
 library("lme4")
 library('multcomp')
@@ -21,10 +22,13 @@ savePlot = 0
 figWidth = 8 
 figHeight = 6 
 
-# ----
-data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50_3avg.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
+# ------------------------------------------------------------------------
+
+data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
-data <- subset(data, magnitude<1000)
+#data <- subset(data, magnitude<1000)
+data <- subset(data, magnitude>25)
+
 data <- subset(data,!is.nan(data$magnitude))
 data <- subset(data,data$sid!='702d24')
 data <- subset(data,data$sid!='0b5a2ePlayBack')
@@ -57,7 +61,8 @@ dataNoBaseline = data[data$numStims != "Base",]
 dataSubjOnly <- subset(data,data$sid=='0b5a2e')
 
 
-# ----
+# ------------------------------------------------------------------------
+
 
 #data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable.csv"),header=TRUE,sep = ",",stringsAsFactors=F)
 ggplot(data, aes(x=magnitude)) + 
@@ -114,7 +119,8 @@ p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,color=phaseClass)) + the
   stat_summary(fun.data=median_hilow,fun.args=(conf.int =0.5), geom="errorbar", width=0.05, position=pd1) +
   stat_summary(fun.y=median, geom="point", size=2, position=pd1) +  
   labs(x = 'Number of conditioning stimuli',colour = 'delivered phase',title = 'Dose dependence as a function of phase of stimulation',y = 'Percent difference from baseline')+ 
-  geom_hline(yintercept=0) 
+  geom_hline(yintercept=0) +
+  scale_color_hue(labels=c("depolarizing", "hyperpolarizing")) 
 p2
 
 
@@ -129,12 +135,13 @@ p2 <- ggplot(summaryData, aes(x=numStims, y=percentDiff,fill=phaseClass)) +
 p2 
 p2 + geom_hline(yintercept=0) + theme_classic()
 
-# ----
+# ------------------------------------------------------------------------
+
 
 #fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
 #fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
 fit.glm    = glm(percentDiff ~ numStims+phaseClass+betaLabels+channel,data=dataNoBaseline)
-fit.glm    = glm(percentDiff ~ numStims+phaseClass,data=dataNoBaseline)
+fit.glm    = glm(percentDiff ~ numStims+phaseClass+betaLabels,data=dataNoBaseline)
 
 summary(fit.glm)
 plot(fit.glm)
@@ -169,7 +176,6 @@ summary(glht(fit.glm2,linfct=mcp(numStims="Tukey")))
 
 #fit.lmm = lmer(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass + (1|subjectNum) + (1|numStims) + (1|channel)+(1|stimLevel),data=data)
 fit.lmm = lmer(percentDiff~numStims+phaseClass+betaLabels+channel+ (1| sid) ,data=dataNoBaseline)
-
 summary(fit.lmm)
 plot(fit.lmm)
 #confint(fit.lmm,method="boot")
@@ -194,9 +200,25 @@ summary(glht(fit.lmm2,linfct=mcp(phaseClass="Tukey")))
 
 #
 ############ BEST ONE RIGHT NOW
-#fit.lmm3 = lmer(percentDiff~numStims+phaseClass + betaLabels +  (1 | sid/channel) ,data=summaryData)
-fit.lmm3 = lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
+#fit.lmm3 = lme4::lmer(percentDiff~numStims+phaseClass + betaLabels + + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=summaryData)
+fit.lmm3 = lme4::lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
+RIaS = unlist(ranef(fit.lmm3))
+FixedEff = fixef(fit.lmm3)
 
+tab_model(
+  m1, m2, 
+  pred.labels = c("Intercept", "Age (Carer)", "Hours per Week", "Gender (Carer)",
+                  "Education: middle (Carer)", "Education: high (Carer)", 
+                  "Age (Older Person)"),
+  dv.labels = c("First Model", "M2"),
+  string.pred = "Coeffcient",
+  string.ci = "Conf. Int (95%)",
+  string.p = "P-Value"
+)
+
+tab_model(fit.lmm3)
+
+summary(fit.lmm3)
 qqnorm(resid(fit.lmm3))
 qqline(resid(fit.lmm3))  #summary(fit.lmm2)
 summary(glht(fit.lmm3,linfct=mcp(numStims="Tukey")))

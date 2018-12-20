@@ -34,7 +34,7 @@ valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 52 53 55 60 61 63],53,2.5}
     {'m',[90,270],8,[22 30],[24 25 29],[14 15 16 20 21 23 31 32 40],31,1.75}};
 
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
-modifierEP = '-reref-100';
+modifierEP = '-reref-50';
 
 %modifierPhase = '_13samps_10_30_40ms_randomstart';
 modifierPhase = '_51samps_12_20_40ms_randomstart';
@@ -311,7 +311,7 @@ statarrayCount = grpstats(tableBetaStim,{'subjectNum','numStims','setToDeliverPh
 figure
 grpstats(totalMags',{categorical(numStims)'},0.05)
 
-writetable(tableBetaStim,'betaStim_outputTable_100.csv');
+%writetable(tableBetaStim,'betaStim_outputTable_50.csv');
 return
 % %%
 % numSubj = 7;

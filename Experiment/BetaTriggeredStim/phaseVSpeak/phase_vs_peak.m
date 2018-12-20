@@ -14,14 +14,24 @@ OUTPUT_DIR = fullfile(inputdir,'\BetaTriggeredStim\phaseVSpeak\plots');
 TouchDir(OUTPUT_DIR);
 
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
-valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53},...
-    {'m',[0 180],2,[55 56],[1 2 3 31 57],[39 40 47 48 63 64],64},...
-    {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4},...
-    {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51},...
-    {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5},...
-    {'t',[90,270],6,[56 64],[57:64],[46 48 54 55 63],55},...
-    {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31},...
-    {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31}};
+% valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 47 48 52 53 55 60 61 63],53},...
+%     {'m',[0 180],2,[55 56],[1 2 3 31 57],[39 40 47 48 63 64],64},...
+%     {'s',180,3,[11 12],[57],[4 5 10 13 18 19 20],4},...
+%     {'s',270,4,[59 60],[1 9 10 35 43],[41 42 43 44 45 49 50 51 52 53 57 58 61 62],51},...
+%     {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5},...
+%     {'t',[90,270],6,[56 64],[57:64],[46 48 54 55 63],55},...
+%     {'m',[90,270],7,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31},...
+%     {'m',[90,270],8,[22 30],[24 25 29],[13 14 15 16 20 21 23 31 32 39 40],31}};
+
+valueSet = {{'s',180,1,[54 62],[1 49 58 59],[44 45 46 52 53 55 60 61 63],53,2.5},...
+    {'m',[0 180],2,[55 56],[1 2 3 31 57],[47 48 64],64,3},...
+    {'s',180,3,[11 12],[57],[4 5 10 13],4,3.5},...
+    {'s',270,4,[59 60],[1 9 10 35 43],[50 51 52 53 58],51,0.75},...
+    {'m',[90,270],5,[13 14],[23 27 28 29 30 32 44 52 60],[5],5,0.75},...
+    {'t',[270,90,12345,12345],6,[56 64],[57:63],[47 48 54 55 63],55,1.75}...
+    {'m',[90,270],7,[22 30],[24 25 29],[14 15 16 20 21 23 31 32 40],31,1.75},...
+    {'m',[90,270],8,[22 30],[24 25 29],[14 15 16 20 21 23 31 32 40],31,1.75}};
+
 M = containers.Map(SIDS,valueSet,'UniformValues',false);
 plotColor = [
     [.65, .65, .65];...   % light gray         (0)
@@ -47,6 +57,7 @@ plotColor = [
     [0.2, 0.2, 0.6];...    % dark blue         (20)
     ];
 
+SIDSint = {'d5cd55','c91479','7dbdec','9ab7ab','ecb43e','0b5a2e'};
 
 plotColor = distinguishable_colors(9);
 
@@ -56,7 +67,7 @@ modifierPhase = '_51samps_12_20_40ms_randomstart';
 
 %modifierPhase = '_13samps_10_30_40ms_randomstart';
 
-modifierEP = '-reref';
+modifierEP = '-reref-50';
 %SIDS = {'d5cd55'};
 
 % decide how to plot circles - std deviation or vector length
@@ -69,11 +80,12 @@ fThresholdMax = 19.99;
 % 
 % fThresholdMin = 10;
 % fThresholdMax = 29.99;
-  markerMin = 75;
-    markerMax = 300;
+  markerMin = 50;
+    markerMax = 500;
  minData = 0;
     maxData = 1;
-    epThresholdMag = 100;
+    epThresholdMax = 150;
+    epThresholdMin = 25;
 
 %% plot EP modulation vs phase for all subjects
 figTotal = figure;
@@ -81,7 +93,7 @@ hold on
 figInd = figure;
 countInd = 1;
 hold on
-for sid = SIDS(1:end-1)
+for sid = SIDSint
     
     sid = sid{:};
     subjid = sid;
@@ -139,12 +151,13 @@ for sid = SIDS(1:end-1)
         count = 1;
         for i = chans
             mags = 1e6*dataForPPanalysis{i}{index}{1};
+            mags(mags<25) = nan;
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
             maxLabel = max(unique(label)); % plot vs. maximum number of stimuli tested 
             difference = 100*(nanmean(mags(label ==maxLabel & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             percentInd = 100*(mags(label ==maxLabel & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            if nanmean(mags(label ==0 & keeps)) > epThresholdMag
+            if nanmean(mags(label ==0 & keeps)) > epThresholdMax
                 w(count,index) = difference;
                 wTotal(subjectNum,count,index) = difference;
                 phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -184,11 +197,12 @@ for sid = SIDS(1:end-1)
         
         figure(figTotal)
         hold on
-        h(subjectNum) =  scatter(peakPhase,w(:,index),markerSize,plotColor(subjectNum,:),'filled');
+        h(countInd) =  scatter(peakPhase,w(:,index),markerSize,plotColor(subjectNum,:),'filled');
         
         figure(figInd)
+        grid on
         hold on
-        subplot(4,2,subjectNum)
+        subplot(3,2,countInd)
         ylim([-30 60])
         scatter(peakPhase,w(:,index),markerSize,plotColor(subjectNum,:),'filled');
         xlim([0 360])
@@ -200,29 +214,30 @@ for sid = SIDS(1:end-1)
         set(gca,'fontsize',14)
     end
     
+    countInd = countInd + 1;
     
 end
+%%
 figure(figTotal)
+grid on
 xlim([0 360])
 xticks([0 45 90 135 180 225 270 315 360])
 ylim([-30 60])
 hline(0,'k')
-legend([h],{'Subject 1',...
+legend(h,{'Subject 1',...
     'Subject 2',...
     'Subject 3',...
     'Subject 4',...
-    'Subject 5',...
     'Subject 6',...
-    'Subject 7',...
-    'Subject 7 Playback'})
+    'Subject 7'})
 title('Phase of delivery and CEP modulation')
 xlabel('Phase of delivery (degrees)')
-ylabel('Percent change in EP size from baseline to >5 conditioning stimuli')
+ylabel({'EP percent change from baseline','to >5 conditioning stimuli'})
 set(gca,'fontsize',24)
 
 figure(figInd)
 xlabel('Phase of delivery (degrees)')
-ylabel([{'Percent change in EP size from baseline',' to >5 conditioning stimuli'}])
+ylabel([{'EP percent change from baseline',' to >5 conditioning stimuli'}])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% do the difference between 0-180 and 180-360
@@ -240,7 +255,7 @@ wTotalMore = wTotalMore(~isnan(wTotalMore));
 [h,p] = ttest2(wTotalLess,wTotalMore)
 
 [p,h,stats] = ranksum(wTotalLess,wTotalMore)
-
+return 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% plot EP modulation vs phase for subj. 7 with playback
 
@@ -304,7 +319,7 @@ for sid = SIDS(end-1:end)
 
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             percentInd = 100*(mags(label ==maxLabel & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            if nanmean(mags(label ==0 & keeps)) > epThresholdMag
+            if nanmean(mags(label ==0 & keeps)) > epThresholdMax
                 wPlayback(count,index) = difference;
                 wTotalPlayback(subjectNum,count,index) = difference;
                 phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -382,7 +397,7 @@ for sid = SIDS(end-1)
                         maxLabel = max(unique(label));
 
             difference = 100*(nanmean(mags(label ==maxLabel & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            if nanmean(mags(label ==0 & keeps)) > epThresholdMag
+            if nanmean(mags(label ==0 & keeps)) > epThresholdMax
                 wNull(count,index) = difference;
                 wTotalNull(subjectNum,count,index) = difference;
                 phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -407,7 +422,7 @@ for sid = SIDS(end-1)
         label= dataForPPanalysis{i}{index}{4};
         keeps = dataForPPanalysis{i}{index}{5};
         difference = 100*(nanmean(mags(label ==1 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-        if nanmean(mags(label ==0 & keeps)) > epThresholdMag
+        if nanmean(mags(label ==0 & keeps)) > epThresholdMax
             wNull(count,index) = difference;
             wTotalNull(subjectNum,count,index) = difference;
             phaseTotal(subjectNum,count,index) = peakPhase(count);
