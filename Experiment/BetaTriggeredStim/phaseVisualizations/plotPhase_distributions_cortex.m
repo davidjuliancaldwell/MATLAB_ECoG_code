@@ -4,7 +4,7 @@
 
 % David.J.Caldwell 8.26.2018
 %%
-close all;clear all;clc
+%close all;clear all;clc
 baseDir = 'C:\Users\david\Data\Output\BetaTriggeredStim\PhaseDelivery';
 addpath(baseDir);
 
@@ -24,11 +24,7 @@ M = containers.Map(SIDS,valueSet,'UniformValues',false);
 modifier = '_51samps_12_20_60ms_randomstart';
 modifier = '_51samps_12_20_40ms_randomstart';
 SIDS = {'d5cd55','c91479','7dbdec','9ab7ab','702d24','ecb43e','0b5a2e','0b5a2ePlayback'};
-SIDS = {'d5cd55'};
-%SIDS = {'d5cd55','c91479','7dbdec','9ab7ab'};
-%SIDS = {'ecb43e'};
-%gcp;  %parallel pool
-%
+
 % settings
 hilbPlot = 0;
 acausalPlot = 0;
