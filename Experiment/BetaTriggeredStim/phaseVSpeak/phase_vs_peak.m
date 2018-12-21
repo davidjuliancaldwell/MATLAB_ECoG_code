@@ -77,15 +77,17 @@ testStatistic = 'omnibus';
 threshold = 0.7;
 fThresholdMin = 12.01;
 fThresholdMax = 19.99;
-% 
+%
 % fThresholdMin = 10;
 % fThresholdMax = 29.99;
-  markerMin = 50;
-    markerMax = 500;
- minData = 0;
-    maxData = 1;
-    epThresholdMax = 150;
-    epThresholdMin = 25;
+markerMin = 50;
+markerMax = 500;
+minData = 0;
+maxData = 1;
+epThresholdMaxMean = 150;
+epThresholdMin = 25;
+epThresholdMax = 1500;
+
 
 %% plot EP modulation vs phase for all subjects
 figTotal = figure;
@@ -109,7 +111,7 @@ for sid = SIDSint
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
-   
+    
     wInd = [];
     %  h = [];
     peakPhaseVec = [];
@@ -131,8 +133,8 @@ for sid = SIDSint
     elseif strcmp(type,'t')
         indices = [1,2,4];
     end
-            w = nan(length(chans), length(indices));
-
+    w = nan(length(chans), length(indices));
+    
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
@@ -151,13 +153,15 @@ for sid = SIDSint
         count = 1;
         for i = chans
             mags = 1e6*dataForPPanalysis{i}{index}{1};
-            mags(mags<25) = nan;
+            mags(mags<epThresholdMin) = nan;
+            mags(mags>epThresholdMax) = nan;
+            
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
-            maxLabel = max(unique(label)); % plot vs. maximum number of stimuli tested 
+            maxLabel = max(unique(label)); % plot vs. maximum number of stimuli tested
             difference = 100*(nanmean(mags(label ==maxLabel & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             percentInd = 100*(mags(label ==maxLabel & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
-            if nanmean(mags(label ==0 & keeps)) > epThresholdMax
+            if nanmean(mags(label ==0 & keeps)) > epThresholdMaxMean
                 w(count,index) = difference;
                 wTotal(subjectNum,count,index) = difference;
                 phaseTotal(subjectNum,count,index) = peakPhase(count);
@@ -255,7 +259,7 @@ wTotalMore = wTotalMore(~isnan(wTotalMore));
 [h,p] = ttest2(wTotalLess,wTotalMore)
 
 [p,h,stats] = ranksum(wTotalLess,wTotalMore)
-return 
+return
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% plot EP modulation vs phase for subj. 7 with playback
 
@@ -280,7 +284,7 @@ for sid = SIDS(end-1:end)
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
     
-
+    
     
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
@@ -295,8 +299,8 @@ for sid = SIDS(end-1:end)
     elseif strcmp(type,'t')
         indices = [1,2,4];
     end
-            wPlayback = nan(length(chans), length(indices));
-
+    wPlayback = nan(length(chans), length(indices));
+    
     for index = indices
         
         if (strcmp(type,'m') || strcmp(type,'t')) && (index == 1)
@@ -315,8 +319,8 @@ for sid = SIDS(end-1:end)
             mags = 1e6*dataForPPanalysis{i}{index}{1};
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
-                        maxLabel = max(unique(label));
-
+            maxLabel = max(unique(label));
+            
             difference = 100*(nanmean(mags(label ==3 & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             percentInd = 100*(mags(label ==maxLabel & keeps) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             if nanmean(mags(label ==0 & keeps)) > epThresholdMax
@@ -370,7 +374,7 @@ for sid = SIDS(end-1)
     badsTotal = [stims bads];
     chans(ismember(chans, badsTotal) | ~ismember(chans,goodEPs)) = [];
     Montage.MontageTokenized = {'Grid(1:64)'};
-        
+    
     load(strcat(subjid,['epSTATS-PP-sig' modifierEP '.mat']))
     load([sid '_phaseDelivery_allChans' modifierPhase '.mat']);
     
@@ -394,8 +398,8 @@ for sid = SIDS(end-1)
             mags = 1e6*dataForPPanalysis{i}{index}{1};
             label= dataForPPanalysis{i}{index}{4};
             keeps = dataForPPanalysis{i}{index}{5};
-                        maxLabel = max(unique(label));
-
+            maxLabel = max(unique(label));
+            
             difference = 100*(nanmean(mags(label ==maxLabel & keeps)) - nanmean(mags(label ==0 & keeps)))/nanmean(mags(label ==0 & keeps));
             if nanmean(mags(label ==0 & keeps)) > epThresholdMax
                 wNull(count,index) = difference;

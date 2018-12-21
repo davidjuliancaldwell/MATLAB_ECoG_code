@@ -29,11 +29,11 @@ chanInt2 = paste0(8,chanInt)
 # ------------------------------------------------------------------------
 data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
-#data <- subset(data, magnitude<800)
+data <- subset(data, magnitude<1500)
 data <- subset(data, magnitude>25)
 
 data <- subset(data,!is.nan(data$magnitude))
-data <- subset(data,data$numStims!='Null')
+#data <- subset(data,data$numStims!='Null')
 # rename for ease
 data$numStims <- revalue(data$numStims, c("Test 1"="[1,2]","Test 2"="[3,4]","Test 3"="[5,inf)"))
 #data$phaseClass <- revalue(data$phaseClass, c("90"=0,"270"=1))
@@ -105,9 +105,10 @@ emmeans(fit.lm, list(pairwise ~ numStims), adjust = "tukey")
 emmeans(fit.lm, list(pairwise ~ sid), adjust = "tukey")
 
 emm_s.t <- emmeans(fit.lm, pairwise ~ sid | numStims)
+emm_s.t <- emmeans(fit.lm, pairwise ~ numStims | sid)
 
 
-
+tab_model(fit.lm)
 tab_model(
   m1, m2, 
   pred.labels = c("Intercept", "Age (Carer)", "Hours per Week", "Gender (Carer)",

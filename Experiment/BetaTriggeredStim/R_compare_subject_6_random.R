@@ -26,7 +26,7 @@ chanInt1 = paste0(6,chanInt)
 # ------------------------------------------------------------------------
 data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
-#data <- subset(data, magnitude<800)
+data <- subset(data, magnitude<1500)
 data <- subset(data, magnitude>25)
 
 data <- subset(data,!is.nan(data$magnitude))

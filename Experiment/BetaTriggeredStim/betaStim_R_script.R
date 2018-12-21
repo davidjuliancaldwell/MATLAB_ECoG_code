@@ -27,7 +27,7 @@ figHeight = 6
 
 data <- read.table(here("Experiment","BetaTriggeredStim","betaStim_outputTable_50.csv"),header=TRUE,sep = ",",stringsAsFactors=F,
                    colClasses=c("magnitude"="numeric","betaLabels"="factor","sid"="factor","numStims"="factor","stimLevel"="numeric","channel"="factor","subjectNum"="factor","phaseClass"="factor","setToDeliverPhase"="factor"))
-#data <- subset(data, magnitude<1000)
+data <- subset(data, magnitude<1500)
 data <- subset(data, magnitude>25)
 
 data <- subset(data,!is.nan(data$magnitude))
@@ -56,6 +56,10 @@ for (name in unique(data$sid)){
 
 sapply(data,class)
 #summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel), function(x) mean(x[,"percentDiff"]))
+
+# confirm nothing below 150 uV 
+summaryData = ddply(data, .(sid,phaseClass,numStims,channel,betaLabels), summarize, magnitude = mean(magnitude))
+
 summaryData = ddply(data[data$numStims != "Base",] , .(sid,phaseClass,numStims,channel,betaLabels), summarize, percentDiff = mean(percentDiff))
 
 dataNoBaseline = data[data$numStims != "Base",]
@@ -201,7 +205,7 @@ summary(glht(fit.lmm2,linfct=mcp(phaseClass="Tukey")))
 
 #
 ############ BEST ONE RIGHT NOW
-#fit.lmm3 = lme4::lmer(percentDiff~numStims+phaseClass + betaLabels + + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=summaryData)
+fit.lmm3 = lme4::lmer(percentDiff~numStims+phaseClass + betaLabels + + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=summaryData)
 #fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels + (1 | sid/channel) ,data=dataNoBaseline)
 
 fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
@@ -227,8 +231,8 @@ tab_model(
 tab_model(fit.lmm3)
 
 summary(fit.lmm3)
-qqnorm(resid(fit.lmm3))
 plot(fit.lmm3)
+qqnorm(resid(fit.lmm3))
 qqline(resid(fit.lmm3))  #summary(fit.lmm2)
 summary(glht(fit.lmm3,linfct=mcp(numStims="Tukey")))
 summary(glht(fit.lmm3,linfct=mcp(betaLabels="Tukey")))
