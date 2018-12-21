@@ -15,6 +15,7 @@ library('plyr')
 library('here')
 library('lmerTest')
 library('sjPlot')
+library('emmeans')
 
 rootDir = here()
 
@@ -201,9 +202,16 @@ summary(glht(fit.lmm2,linfct=mcp(phaseClass="Tukey")))
 #
 ############ BEST ONE RIGHT NOW
 #fit.lmm3 = lme4::lmer(percentDiff~numStims+phaseClass + betaLabels + + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=summaryData)
-fit.lmm3 = lme4::lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
+fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels + (1 | sid/channel) ,data=dataNoBaseline)
+
+#fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
 RIaS = unlist(ranef(fit.lmm3))
 FixedEff = fixef(fit.lmm3)
+emm_s.t <- emmeans(fit.lmm3, pairwise ~ numStims | phaseClass)
+emm_s.t <- emmeans(fit.lmm3, pairwise ~ numStims | betaLabels)
+anova(fit.lmm3)
+
+
 
 tab_model(
   m1, m2, 

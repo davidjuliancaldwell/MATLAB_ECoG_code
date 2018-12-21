@@ -13,6 +13,8 @@ library('multcomp')
 library('plyr')
 library('here')
 library('lmerTest')
+library('sjPlot')
+library('emmeans')
 
 rootDir = here()
 
@@ -94,10 +96,17 @@ p<-ggplot(dataSubjChanOnly, aes(x=numStims, y=magnitude,fill=sid)) + theme_light
 # ------------------------------------------------------------------------
 
 
-fit.glm    = glm(magnitude ~ numStims+sid + numStims*sid,data=dataSubjChanOnly)
+fit.lm    = lm(magnitude ~ numStims+sid + numStims*sid,data=dataSubjChanOnly)
 
-summary(fit.glm)
-plot(fit.glm)
+summary(fit.lm)
+plot(fit.lm)
+summary(glht(fit.lm,linfct=mcp(sid="Tukey")))
+emmeans(fit.lm, list(pairwise ~ numStims), adjust = "tukey")
+emmeans(fit.lm, list(pairwise ~ sid), adjust = "tukey")
+
+emm_s.t <- emmeans(fit.lm, pairwise ~ sid | numStims)
+
+
 
 tab_model(
   m1, m2, 
@@ -110,8 +119,8 @@ tab_model(
   string.p = "P-Value"
 )
 
-summary(glht(fit.glm,linfct=mcp(sid="Tukey")))
-summary(glht(fit.glm,linfct=mcp(numStims="Tukey")))
+summary(glht(fit.lm,linfct=mcp(sid="Tukey")))
+summary(glht(fit.lm,linfct=mcp(numStims="Tukey")))
 
 p <- ggplot(dataNoBaseline, aes(x=numStims, y=percentDiff, colour=phaseClass)) +
   geom_point(size=3) +
@@ -129,14 +138,14 @@ p2 <- ggplot(dataNoBaseline, aes(x=numStims, y=percentDiff,fill=phaseClass)) + t
   geom_hline(yintercept=0) 
 p2
 
-#fit.glm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
-#fit.glm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
-fit.glm2    = glm(magnitude ~ numStims+phaseClass+betaLabels,data=data)
+#fit.lm    = glm(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass,data=data)
+#fit.lm    = glm(magnitude ~ numStims + channel + phaseClass,data=data)
+fit.lm2    = glm(magnitude ~ numStims+phaseClass+betaLabels,data=data)
 
-summary(fit.glm2)
-plot(fit.glm2)
-summary(glht(fit.glm2,linfct=mcp(phaseClass="Tukey")))
-summary(glht(fit.glm2,linfct=mcp(numStims="Tukey")))
+summary(fit.lm2)
+plot(fit.lm2)
+summary(glht(fit.lm2,linfct=mcp(phaseClass="Tukey")))
+summary(glht(fit.lm2,linfct=mcp(numStims="Tukey")))
 
 
 #fit.lmm = lmer(magnitude ~ stimLevel + numStims + subjectNum + channel + phaseClass + (1|subjectNum) + (1|numStims) + (1|channel)+(1|stimLevel),data=data)
@@ -184,15 +193,15 @@ summary(glht(fit.lmm4,linfct=mcp(betaLabels="Tukey")))
 summary(glht(fit.lmm4,linfct=mcp(phaseClass="Tukey")))
 
 # xtra ss test
-anova(fit.glm, fit.lmm,fit.lmm2)
+anova(fit.lm, fit.lmm,fit.lmm2)
 # Likelihood ratio test
 
-lrtest(fit.glm,fit.lmm,fit.lmm2)
+lrtest(fit.lm,fit.lmm,fit.lmm2)
 
 # aic
-AIC(fit.glm,fit.lmm,fit.lmm2)
+AIC(fit.lm,fit.lmm,fit.lmm2)
 
-BIC(fit.glm,fit.lmm,fit.lmm2)
+BIC(fit.lm,fit.lmm,fit.lmm2)
 
 for (chanInt in chanIntVec){
   
@@ -212,10 +221,10 @@ for (chanInt in chanIntVec){
   }
   
   dataToFit <- na.exclude(dataPP[dataPP$blockVec %in% blockIntLM & dataPP$chanVec==chanInt,])
-  fit.glm    = glm(PPvec ~ blockVec + stimLevelVec,data=dataToFit)
-  summary(fit.glm)
-  summary(glht(fit.glm,linfct=mcp(blockVec="Tukey")))
-  # plot(fit.glm)
+  fit.lm    = glm(PPvec ~ blockVec + stimLevelVec,data=dataToFit)
+  summary(fit.lm)
+  summary(glht(fit.lm,linfct=mcp(blockVec="Tukey")))
+  # plot(fit.lm)
   
   # fit.lmm = lmer(PPvec ~ stimLevelVec + blockVec + (1|stimLevelVec) + (1|blockVec), data=dataToFit)
   # summary(fit.lmm)
@@ -297,12 +306,12 @@ for (chanInt in chanIntVec){
   #   anova(fit.nlme0, fit.nlme1)  
   # Likelihood ratio test
   
-  #  lrtest(fit.nlme0, fit.nlme1,fit.glm,fit.lmm)  
+  #  lrtest(fit.nlme0, fit.nlme1,fit.lm,fit.lmm)  
   
   # aic
-  # AIC(fit.nlme0, fit.nlme1,fit.glm,fit.lmm)  
+  # AIC(fit.nlme0, fit.nlme1,fit.lm,fit.lmm)  
   
-  #BIC(fit.nlme0, fit.nlme1,fit.glm,fit.lmm)
+  #BIC(fit.nlme0, fit.nlme1,fit.lm,fit.lmm)
   
 }
 

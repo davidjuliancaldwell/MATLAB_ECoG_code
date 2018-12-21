@@ -7,42 +7,42 @@ saveFig = 0;
 switch sid
     case 'd5cd55'
         betaChan = 53;
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\d5cd55\betaStim_forBetaPhase.mat')
+        load('C:\Users\david\Data\ConvertedTDTfiles\d5cd55\betaStim_forBetaPhase.mat')
         subject_num = '1';
         
     case '702d24'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\702d24\betaStim_forBetaPhase.mat')
+        load('C:\Users\david\Data\ConvertedTDTfiles\702d24\betaStim_forBetaPhase.mat')
         betaChan = 5;
         subject_num = '5';
         
     case 'c91479'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\c91479\betaStim_forBetaPhase.mat')
+        load('C:\Users\david\Data\ConvertedTDTfiles\c91479\betaStim_forBetaPhase.mat')
         betaChan = 64;
         subject_num = '2';
         
     case '0b5a2e'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\0b5a2e\BetaPhase-2')
+        load('C:\Users\david\Data\ConvertedTDTfiles\0b5a2e\BetaPhase-2')
         betaChan = 31;
         subject_num = '7';
         
     case '0b5a2ePlayback'
         betaChan = 31;
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\0b5a2e\BetaPhase-4')
+        load('C:\Users\david\Data\ConvertedTDTfiles\0b5a2e\BetaPhase-4')
         
         subject_num = '7 playback';
         
     case '7dbdec'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\7dbdec\betaStim_forBetaPhase.mat')
+        load('C:\Users\david\Data\ConvertedTDTfiles\7dbdec\betaStim_forBetaPhase.mat')
         subject_num = '3';
         
         betaChan = 4;
     case 'ecb43e'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\ecb43e\betaStim_forBetaPhase.mat')
+        load('C:\Users\david\Data\ConvertedTDTfiles\ecb43e\betaStim_forBetaPhase.mat')
         subject_num = '6';
         
         betaChan = 55;
     case '9ab7ab'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\9ab7ab\betaStim_forBetaPhase.mat')
+        load('C:\Users\david\Data\ConvertedTDTfiles\9ab7ab\betaStim_forBetaPhase.mat')
         betaChan = 51;
         subject_num = '4';
 end
@@ -90,7 +90,7 @@ set(gca,'fontsize', 14)
 title('Operation of Real Time Filtering with Stimulation Blanking')
 fig1.Position = [447.6667 786.3333 1408 420];
 
-clearvars -except raw_sig filt_sig_decimate stimTimes fac fs1 fs2 filt_sig t1 timeStamps sid betaChan subject_num
+clearvars -except saveFig raw_sig filt_sig_decimate stimTimes fac fs1 fs2 filt_sig t1 timeStamps sid betaChan subject_num
 
 % here come the burst tables
 Z_Constants;
@@ -201,7 +201,7 @@ end
 
 
 %%
-[indices] = find((bursts(4,:) >= 5) & bursts(5,:) == 1);
+[indices] = find((bursts(4,:) >= 5) & bursts(5,:) == 3);
 
 indices_rand = datasample(indices,4,'Replace',false);
 indices_rand
@@ -259,7 +259,7 @@ end
 %% visualize
 
 % interest
-interest = 2;
+interest = 3;
 figure
 subplot(2,1,1)
 hold on
