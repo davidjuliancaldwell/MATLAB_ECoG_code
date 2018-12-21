@@ -202,9 +202,9 @@ summary(glht(fit.lmm2,linfct=mcp(phaseClass="Tukey")))
 #
 ############ BEST ONE RIGHT NOW
 #fit.lmm3 = lme4::lmer(percentDiff~numStims+phaseClass + betaLabels + + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=summaryData)
-fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels + (1 | sid/channel) ,data=dataNoBaseline)
+#fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels + (1 | sid/channel) ,data=dataNoBaseline)
 
-#fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
+fit.lmm3 = lmerTest::lmer(percentDiff~numStims+phaseClass + betaLabels  + numStims*betaLabels + numStims*phaseClass + (1 | sid/channel) ,data=dataNoBaseline)
 RIaS = unlist(ranef(fit.lmm3))
 FixedEff = fixef(fit.lmm3)
 emm_s.t <- emmeans(fit.lmm3, pairwise ~ numStims | phaseClass)
@@ -228,6 +228,7 @@ tab_model(fit.lmm3)
 
 summary(fit.lmm3)
 qqnorm(resid(fit.lmm3))
+plot(fit.lmm3)
 qqline(resid(fit.lmm3))  #summary(fit.lmm2)
 summary(glht(fit.lmm3,linfct=mcp(numStims="Tukey")))
 summary(glht(fit.lmm3,linfct=mcp(betaLabels="Tukey")))
