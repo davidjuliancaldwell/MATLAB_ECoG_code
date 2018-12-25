@@ -5,7 +5,7 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 % OUTPUT_DIR = fullfile(myGetenv('OUTPUT_DIR'));
 
 %%
-for idx = 2:9
+for idx = 5:5
     sid = SIDS{idx};
     
     switch(sid)
@@ -304,18 +304,18 @@ for idx = 2:9
         elseif (strcmp(sid, '0b5a2ePlayback'))
             pts = stims(3,:) == 0;
         elseif (strcmp(sid,'3f2113'))
-            pts = stims(3,:) == 0;        
+            pts = stims(3,:) == 0;
         else
             error 'unknown sid';
         end
         
-            presamps = round(0.100*efs);
+        presamps = round(0.100*efs);
         postsamps = round(0.120*efs);
         
         ptis = round(stims(2,pts)/fac);
         
         t = (-presamps:postsamps)/efs;
-             
+        
         index = find(t==0);
         ct = index + ct - round(0.025*efs);
         
@@ -323,7 +323,7 @@ for idx = 2:9
         awins = wins-repmat(mean(wins(t<-0.005,:),1), [size(wins, 1), 1]);
         
         pstims = stims(:,pts);
-  
+        
         % considered a baseline if it's been at least N seconds since the last
         % burst ended
         
@@ -399,7 +399,7 @@ for idx = 2:9
                 %[~,~,~,zI,magI,latencyIms] = zscoreCCEP(total,total,t,tMin,tMax);
                 [~,~,~,~,~,zI,magI,latencyIms,~,~] = zscoreWithFindPeaks(total,test,t,tMin,tMax,plotIt);
                 
-                              
+                
                 t_minS = 0.005;
                 t_maxS = 0.040;
                 
@@ -448,7 +448,7 @@ for idx = 2:9
                 set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
                 subplot(3,1,1);
                 
-                 % original
+                % original
                 prettyline(1e3*t,1e6*awins(:, keeps), label(keeps), colors);
                 % xlim(1e3*[-0.025 max(t)]);
                 
@@ -691,9 +691,10 @@ for idx = 2:9
                 %                  end
                 
             end
-            
-            shuffleChans{chan}{typei} = {CI_lo CI_hi sgc CCEPbyNumStim};
-            
+            if shuffleSig
+                
+                shuffleChans{chan}{typei} = {CI_lo CI_hi sgc CCEPbyNumStim};
+            end
             
         end
         

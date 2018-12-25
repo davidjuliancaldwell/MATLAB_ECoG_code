@@ -43,7 +43,7 @@ if (exist('opt','var') && ~isempty(opt))
         case 'jpg'
             print('-djpeg', '-noui','-cmyk', '-painters',[destFile filetype],opt);
         case 'png'
-            print('-dpng', '-noui', '-painters',[destFile filetype],opt);
+            print('-dpng', '-noui', '-opengl',[destFile filetype],opt);
         case 'eps'
             print('-dpsc2', '-noui', '-painters',[destFile filetype],opt);
         case 'svg'
@@ -54,7 +54,7 @@ else
         case 'jpg'
             print('-djpeg', '-noui','-cmyk', '-painters',[destFile filetype]);
         case 'png'
-            print('-dpng', '-noui', '-painters',[destFile filetype]);
+            print('-dpng', '-noui', '-opengl',[destFile filetype]);
         case 'eps'
             print('-dpsc2', '-noui', '-painters',[destFile filetype]);
         case 'svg'
