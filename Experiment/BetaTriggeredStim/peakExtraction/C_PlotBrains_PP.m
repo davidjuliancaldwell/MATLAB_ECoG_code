@@ -1,6 +1,6 @@
 %% plot peak to peak differences on individual cortical surfaces
 
-close all; clear all;clc
+%close all; clear all;clc
 Z_Constants;
 baseDir = fullfile(prefixDirectory,'\Data\Output\BetaTriggeredStim\PeaktoPeakEP');
 addpath(baseDir);
@@ -34,7 +34,7 @@ M = containers.Map(SIDS,valueSet,'UniformValues',false);
 modifier = '-reref-50';
 %SIDS = {'d5cd55'}
 
-saveFig = 1;
+saveFig = 0;
 %%
 for sid = SIDS
     

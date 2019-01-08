@@ -18,7 +18,6 @@ c = linspace(1,10,size(locs,1));
 % take labeling from plot dots direct
 h = scatter3(locs(:,1),locs(:,2),locs(:,3),[100],c,'filled');
 
-
 %%
 % scatter plot of electrode locations - colored by number in order 
 figure
@@ -44,7 +43,7 @@ end
 figure
 PlotCortex(sid,'b')
 hold on
-h = scatter3(locs(:,1),locs(:,2),locs(:,3),100,c,'filled')
+h = scatter3(locs(:,1),locs(:,2),locs(:,3),100,c,'filled');
 for chan = 1:gridSize
     txt = num2str(trodeLabels(chan));
     t = text(locs(chan,1),locs(chan,2),locs(chan,3),txt,'FontSize',10,'HorizontalAlignment','center','VerticalAlignment','middle');

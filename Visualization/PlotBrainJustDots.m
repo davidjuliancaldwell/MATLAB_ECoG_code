@@ -79,7 +79,7 @@ end
 
 %legend([h(1),h(2)],{'Non Stimulation electrodes','Map EPs'})
 
-
+% gridSize = 64;
 % trodeLabels = [1:gridSize];
 % for chan = 1:gridSize
 %     txt = num2str(trodeLabels(chan));

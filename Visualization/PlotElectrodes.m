@@ -31,7 +31,9 @@ end
 % end
 plotGridLines = false;
 
+%load([basedir 'bis_trodes.mat']);
 load([basedir 'trodes.mat']);
+
 
 if ~exist('electrodeSubset','var')
     electrodeSubset = TrodeNames;
