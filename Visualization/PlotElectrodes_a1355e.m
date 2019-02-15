@@ -1,0 +1,61 @@
+function PlotElectrodes_a1355e(subject, electrodeSubset, colors, plotNames, plotGridLines)
+
+% subject = genPID(subject);
+
+basedir = getSubjDir(subject);
+
+% add another color - DJC 5-10-2018
+if(~exist('colors', 'var') || isempty(colors))
+    colors = [
+        [1 0 0];
+        [1 0 0];
+        [1 0 0];
+        %    [.5 .5 .5];
+        [1 0 0];
+        [1 0.5 0];
+        [0 0.5 1];
+        [1 0 0.5];
+        [1 0.5 0.5];
+        [0.5 1 0.5];
+        [0.5 0.5 1];
+        [0.5 0.5 0.75];
+        ];
+end
+
+if (~exist('plotNames', 'var'))
+    plotNames = true;
+end
+
+% if (~exist('plotGridLines', 'var'))
+%     plotGridLines = true;
+% end
+plotGridLines = false;
+
+%load([basedir 'bis_trodes.mat']);
+load([basedir 'trodes.mat']);
+
+
+if ~exist('electrodeSubset','var')
+    electrodeSubset = TrodeNames;
+end
+
+idx = 1;
+
+trodeNames = {'Grid'};
+electrodeSubset = {'Grid'};
+trodes = AllTrodes(1:64,:);
+Grid = trodes;
+
+for type = electrodeSubset
+    % the two cases for type are: (ex.) Grid, Grid(a:b)
+    % if Grid(a:b), need to change to Grid(a:b,:).
+    tok = regexp(type{:}, '[A-Za-z0-9]+\((.*?)\)', 'tokens', 'once');
+    if (~isempty(tok) && ~isempty(tok{:}))
+        type = {strrep(type{:}, tok{:}, [tok{:} ', :'])};
+    end
+    
+    eval(sprintf('trodes = %s;',type{:}));
+    label_add(trodes,colors(idx,:),40,plotNames, plotGridLines);
+    %         label_add(trodes,colors(idx,:),40,plotNames, plotGridLines);
+    idx = idx + 1;
+end

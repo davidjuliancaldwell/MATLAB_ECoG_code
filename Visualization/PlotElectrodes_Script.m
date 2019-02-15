@@ -51,9 +51,17 @@ for chan = 1:gridSize
 end
 
 %%
-sid = '7dbdec';
+sid = 'a1355e';
 figure
 PlotCortex(sid,'b',[],0.5)
 hold on
 PlotElectrodes(sid)
+
+%%
+sid = 'a1355e';
+figure
+PlotCortex(sid,'b',[],1)
+hold on
+PlotElectrodes_a1355e(sid)
+
 
