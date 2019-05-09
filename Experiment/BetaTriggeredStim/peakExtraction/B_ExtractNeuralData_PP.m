@@ -9,10 +9,10 @@ SUB_DIR = fullfile(myGetenv('subject_dir'));
 
 savePlot = 0;
 saveIt = 0;
-plotIt = 1;
+plotIt = 0;
 plotItTrials = 0;
 %%
-for idx = 6:6
+for idx = 2:8
     sid = SIDS{idx};
     
     switch(sid)
@@ -211,7 +211,7 @@ for idx = 6:6
     % set statistical threshold
     statThresh = length(chans);
     chans = [29 36 37 38 46];
-    chans = [5];
+    chans = [1];
     for chan = chans
         
         %% load in ecog data for that channel
@@ -317,7 +317,7 @@ for idx = 6:6
             error 'unknown sid';
         end
         
-        presamps = round(0.100*efs);
+        presamps = round(0.05*efs);
         postsamps = round(0.120*efs);
         
         ptis = round(stims(2,pts)/fac);
@@ -355,7 +355,7 @@ for idx = 6:6
         
         for typei = 1:length(types)
             
-            probes = pstims(5,:) < .250*fs & bursts(5,pstims(4,:))==types(typei);
+            probes = pstims(5,:) < .5*fs & bursts(5,pstims(4,:))==types(typei);
             
             if (sum(probes) < 100)
                 warning('N probes = %d.', sum(probes));
@@ -388,6 +388,7 @@ for idx = 6:6
             klabel = label(keeps);
             ulabels = unique(klabel);
             colors = cm(round(linspace(1, size(cm, 1), length(ulabels))), :);
+     
             %
             %             tMin = t_min;
             %             tMax = t_max;

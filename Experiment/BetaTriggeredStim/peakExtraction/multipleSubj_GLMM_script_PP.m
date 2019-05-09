@@ -306,7 +306,7 @@ statarray = grpstats(tableBetaStim,{'sid','numStims','channel','phaseClass'},{'m
 statarray2 = grpstats(tableBetaStim,{'numStims','phaseClass'},{'mean','sem'},...
     'DataVars','magnitude');
 
-statarrayCount = grpstats(tableBetaStim,{'subjectNum','numStims','setToDeliverPhase'},{'numel'},'DataVars','magnitude');
+statarrayCount = grpstats(tableBetaStim,{'subjectNum','numStims','setToDeliverPhase','channel'},{'numel'},'DataVars','magnitude');
 
 figure
 grpstats(totalMags',{categorical(numStims)'},0.05)

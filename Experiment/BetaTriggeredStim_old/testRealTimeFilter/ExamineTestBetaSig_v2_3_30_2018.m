@@ -145,48 +145,49 @@ plot(t2,stim)
 
 %% try 702d24, 0b5a2e
 close all;clear all;clc
+folderDir = 'C:\Users\david\Data\Subjects\ConvertedTDTfiles\';
 sid = input('what is the subject ID? ','s');
 
 % c19479,7dbdec doesnt have continuous raw channel
 switch sid
     case 'd5cd55'
         betaChan = 53;
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\d5cd55\betaStim_forBetaPhase.mat')
+        load(fullfile(folderDir,'d5cd55\betaStim_forBetaPhase.mat'));
         subject_num = '1';
         
     case '702d24'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\702d24\betaStim_forBetaPhase.mat')
+        load(fullfile(folderDir,'702d24\betaStim_forBetaPhase.mat')
         betaChan = 5;
         subject_num = '5';
         
     case 'c91479'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\c91479\betaStim_forBetaPhase.mat')
+        load(fullfile(folderDir,'c91479\betaStim_forBetaPhase.mat')
         betaChan = 64;
         subject_num = '2';
         
     case '0b5a2e'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\0b5a2e\BetaPhase-2')
+       load(fullfile(folderDir,'0b5a2e\BetaPhase-2')
         betaChan = 31;
         subject_num = '7';
         
     case '0b5a2ePlayback'
         betaChan = 31;
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\0b5a2e\BetaPhase-4')
+       load(fullfile(folderDir,'0b5a2e\BetaPhase-4')
         
         subject_num = '7 playback';
         
     case '7dbdec'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\7dbdec\betaStim_forBetaPhase.mat')
+        load(fullfile(folderDir,'betaStim_forBetaPhase.mat')
         subject_num = '3';
         
         betaChan = 4;
     case 'ecb43e'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\ecb43e\betaStim_forBetaPhase.mat')
+       load(fullfile(folderDir,'ecb43e\betaStim_forBetaPhase.mat')
         subject_num = '6';
         
         betaChan = 55;
     case '9ab7ab'
-        load('C:\Users\djcald.CSENETID\Data\ConvertedTDTfiles\9ab7ab\betaStim_forBetaPhase.mat')
+        load(fullfile(folderDir,'9ab7ab\betaStim_forBetaPhase.mat')
         betaChan = 51;
         subject_num = '4';
         
@@ -209,7 +210,7 @@ filt_sig = Wave.data(:,3);
 fs1 = ECO1.info.SamplingRateHz;
 fs2 = Wave.info.SamplingRateHz;
 stim_times = SMon.data(:,2);
-
+%%
 % convert sampling rates
 fac = fs2/fs1;
 

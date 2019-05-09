@@ -11,12 +11,12 @@ clims = [-1 1];
 figure
 
 map = [.2 1 0; 1 1 1; 1 0 1];
-    map = [0.5 0.5 1; 1 1 1; 1 0.5 0.5];
+%map = [0.5 0.5 1; 1 1 1; 1 0.5 0.5];
 
 w = zeros(size(Grid, 1), 1);
 w(stims(1)) = 1;
 w(stims(2)) = -1;
 clims = [-1 1];
-PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 15, map, trodeLabels, true);
+PlotDotsDirect(subjid, Grid, w, determineHemisphereOfCoverage(subjid), clims, 20, map, trodeLabels, true);
 
 end
