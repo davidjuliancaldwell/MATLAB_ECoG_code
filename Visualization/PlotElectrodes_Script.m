@@ -51,7 +51,7 @@ for chan = 1:gridSize
 end
 
 %%
-sid = '0569b1';
+sid = '822e26';
 figure
 PlotCortex(sid,'b',[],1)
 hold on
