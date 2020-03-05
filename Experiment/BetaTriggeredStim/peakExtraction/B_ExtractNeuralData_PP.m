@@ -12,7 +12,7 @@ saveIt = 0;
 plotIt = 0;
 plotItTrials = 0;
 %%
-for idx = 2:8
+for idx = 7:7
     sid = SIDS{idx};
     
     switch(sid)
